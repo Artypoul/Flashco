@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flashco/common/l10n_labels.dart';
-import 'package:flashco/l10n/l10n.dart';
+import 'package:fl_clash/common/l10n_labels.dart';
+import 'package:fl_clash/l10n/l10n.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _arbDir = 'arb';
@@ -46,8 +46,10 @@ void main() {
     final offenders = <String>[];
     for (final entity in Directory(_libDir).listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
-      final path = entity.path.replaceAll(r'\', '/');
-      if (path.contains('/generated/') || path.contains('/l10n/')) continue;
+      final path = entity.path.replaceAll('\\', '/');
+      if (path.contains('/generated/') || path.startsWith('lib/l10n/')) {
+        continue;
+      }
       if (entity.readAsStringSync().contains('Intl.message(')) {
         offenders.add(path);
       }

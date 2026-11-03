@@ -25,9 +25,8 @@ class ClashProvidersAction extends _$ClashProvidersAction {
     final latest = before == null ? null : await _stored(provider.id);
     if (before != null &&
         (latest == null || latest.fileName != before.fileName)) {
-      if (latest?.fileName != compiled.fileName) {
-        await _clearCache(compiled);
-      }
+      final stale = latest?.fileName == compiled.fileName ? before : compiled;
+      await _clearCache(stale);
       return latest ?? compiled;
     }
     final next = switch ((before, latest)) {
@@ -41,14 +40,19 @@ class ClashProvidersAction extends _$ClashProvidersAction {
     };
     ref.read(clashProvidersProvider.notifier).put(next);
     if (previous != null && previous.fileName != next.fileName) {
-      unawaited(_clearCache(previous));
+      await _clearCache(previous);
     }
-    unawaited(
-      applyIfReferenced(ProviderKind.rule, {
-        next.label,
-        ?previous?.label,
-      }, force: content != null || download),
-    );
+    final reread = content != null || download;
+    if (reread && next == before) {
+      unawaited(_reloadIfReferenced(next));
+    } else {
+      unawaited(
+        applyIfReferenced(ProviderKind.rule, {
+          next.label,
+          ?previous?.label,
+        }, force: reread),
+      );
+    }
     return next;
   }
 
@@ -228,14 +232,46 @@ class ClashProvidersAction extends _$ClashProvidersAction {
     Future<bool> Function(int profileId) isReferenced, {
     bool force = false,
   }) async {
-    final profile = ref.read(currentProfileProvider);
-    if (profile == null ||
-        profile.type != ProfileType.custom ||
-        !await isReferenced(profile.id)) {
+    if (!await _currentUses(isReferenced)) {
       return;
     }
     ref
         .read(setupActionProvider.notifier)
         .applyProfileDebounce(silence: true, force: force);
+  }
+
+  /// A reapply would close every connection and reset the route.
+  Future<void> _reloadIfReferenced(ClashProvider provider) async {
+    if (!await _currentUses(
+      (profileId) =>
+          _isReferenced(profileId, ProviderKind.rule, {provider.label}),
+    )) {
+      return;
+    }
+    try {
+      final message = await _core.updateExternalProvider(
+        providerName: provider.label,
+      );
+      if (message.isEmpty) {
+        return;
+      }
+    } catch (error) {
+      commonPrint.log(
+        'reload ${provider.label} failed: $error',
+        logLevel: coreFailureLogLevel(error),
+      );
+    }
+    ref
+        .read(setupActionProvider.notifier)
+        .applyProfileDebounce(silence: true, force: true);
+  }
+
+  Future<bool> _currentUses(
+    Future<bool> Function(int profileId) isReferenced,
+  ) async {
+    final profile = ref.read(currentProfileProvider);
+    return profile != null &&
+        profile.type == ProfileType.custom &&
+        await isReferenced(profile.id);
   }
 }

@@ -1,15 +1,15 @@
-import 'package:flashco/common/common.dart';
-import 'package:flashco/core/controller.dart';
-import 'package:flashco/core/interface.dart';
-import 'package:flashco/enum/enum.dart';
-import 'package:flashco/features/form/form.dart';
-import 'package:flashco/l10n/l10n.dart';
-import 'package:flashco/models/models.dart';
-import 'package:flashco/providers/providers.dart';
-import 'package:flashco/state.dart';
-import 'package:flashco/views/profiles/custom/groups.dart';
-import 'package:flashco/views/profiles/custom/members.dart';
-import 'package:flashco/widgets/widgets.dart';
+import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/core/interface.dart';
+import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/features/form/form.dart';
+import 'package:fl_clash/l10n/l10n.dart';
+import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/profiles/custom/groups.dart';
+import 'package:fl_clash/views/profiles/custom/members.dart';
+import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -103,6 +103,8 @@ final _optionSheet = find.byWidgetPredicate(
 Future<void> _addOption(WidgetTester tester, String label) async {
   await _openOptions(tester);
   final option = find.descendant(of: _optionSheet, matching: find.text(label));
+  await tester.ensureVisible(option);
+  await tester.pump();
   await tester.tap(option);
   await tester.pumpAndSettle();
   expect(option, findsNothing);
@@ -444,6 +446,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(offered('REJECT'), findsNothing);
+      await tester.tap(
+        find.descendant(
+          of: picker,
+          matching: find.textContaining('${l.filters} ('),
+        ),
+      );
+      await tester.pumpAndSettle();
       for (final header in [
         '${l.basicStrategy} (5)',
         '${l.localProxies} (1)',
@@ -452,13 +461,6 @@ void main() {
         await tester.tap(offered(header));
         await tester.pumpAndSettle();
       }
-      await tester.tap(
-        find.descendant(
-          of: picker,
-          matching: find.textContaining('${l.filters} ('),
-        ),
-      );
-      await tester.pumpAndSettle();
       expect(offered('DIRECT'), findsNothing);
       expect(offered('mine'), findsNothing);
       expect(offered(l.url), findsOneWidget);
@@ -472,6 +474,11 @@ void main() {
       expect(container.read(proxyGroupProvider).proxies, ['DIRECT']);
       await tester.tap(offered('REJECT'));
       await tester.tap(offered('Home'));
+      await Scrollable.ensureVisible(
+        tester.element(offered('p')),
+        alignment: 0.5,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(offered('p'));
       await tester.scrollUntilVisible(
         offered(_hongKong.label),
@@ -480,6 +487,12 @@ void main() {
             .descendant(of: picker, matching: find.byType(Scrollable))
             .first,
       );
+      // Clears the docked search, which floats over the end of the list.
+      await Scrollable.ensureVisible(
+        tester.element(offered(_hongKong.label)),
+        alignment: 0.5,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(offered(_hongKong.label));
       await tester.pump();
       expect(find.byTooltip(l.confirm), findsNothing);
@@ -491,6 +504,82 @@ void main() {
       expect(group.proxies, ['DIRECT', 'REJECT', 'Home']);
       expect(group.use, ['p']);
       expect(group.filter, 'mine`${_hongKong.regex}');
+    });
+
+    testWidgets('the picker adds taking in every proxy or provider as a member '
+        'beside the named ones', (tester) async {
+      final l = currentAppLocalizations;
+      container = buildContainer(
+        _group(proxies: ['DIRECT']),
+        customProxies: const [_home],
+      );
+      final picker = find.byWidgetPredicate(
+        (widget) =>
+            widget.runtimeType.toString() == '_MemberPicker<ProxyGroup>',
+      );
+      Finder offered(String name) =>
+          find.descendant(of: picker, matching: find.text(name));
+      Finder listed(String name) => find.descendant(
+        of: find.byType(SuperSliverReorderableList),
+        matching: find.text(name),
+      );
+
+      await pumpGroupSheet(tester);
+      await tester.ensureVisible(find.text(l.addNodes));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l.addNodes));
+      await tester.pumpAndSettle();
+      for (final header in [
+        '${l.autoInclude} (2)',
+        '${l.proxyProviders} (1)',
+      ]) {
+        await tester.tap(offered(header));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(offered('p'));
+      await tester.tap(offered(l.allReferencedProxyProviders));
+      await tester.tap(offered(l.allReferencedProxies));
+      await tester.pump();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      final group = container.read(proxyGroupProvider);
+      expect(group.proxies, ['DIRECT']);
+      expect(group.use, ['p']);
+      expect(group.includeAllProxies, isTrue);
+      expect(group.includeAllProviders, isTrue);
+      expect(listed(l.allReferencedProxies), findsOneWidget);
+      expect(listed(l.allReferencedProxyProviders), findsOneWidget);
+      expect(listed('p'), findsOneWidget);
+
+      await tester.ensureVisible(find.text(l.addNodes));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l.addNodes));
+      await tester.pumpAndSettle();
+      await tester.tap(offered('${l.localProxies} (1)'));
+      await tester.pumpAndSettle();
+      expect(offered('Home'), findsOneWidget);
+      for (final section in [l.autoInclude, l.proxyProviders]) {
+        expect(
+          find.descendant(
+            of: picker,
+            matching: find.textContaining('$section ('),
+          ),
+          findsNothing,
+        );
+      }
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.descendant(
+          of: rowOf(l.allReferencedProxyProviders),
+          matching: find.byTooltip(l.remove),
+        ),
+      );
+      await tester.pump();
+      expect(container.read(proxyGroupProvider).includeAllProviders, isNull);
+      expect(container.read(proxyGroupProvider).includeAllProxies, isTrue);
     });
 
     testWidgets('the picker adds exclude filters as members of their own', (
@@ -786,10 +875,10 @@ void main() {
       await pumpGroupSheet(tester);
       await _addOption(tester, currentAppLocalizations.testWhenUsed);
 
-      final lazy = tester.widget<Switch>(
+      final lazy = tester.widget<CommonSwitch>(
         find.descendant(
           of: _rowOf(currentAppLocalizations.testWhenUsed),
-          matching: find.byType(Switch),
+          matching: find.byType(CommonSwitch),
         ),
       );
       expect(lazy.value, isTrue);
@@ -848,6 +937,26 @@ void main() {
 
       expect(find.text(currentAppLocalizations.tolerance), findsOneWidget);
       expect(find.text(currentAppLocalizations.strategy), findsNothing);
+    });
+
+    testWidgets('offers fallback mode only to a fallback group', (
+      tester,
+    ) async {
+      container = buildContainer(_group());
+
+      await pumpGroupSheet(tester);
+      await _openOptions(tester);
+      expect(find.text(currentAppLocalizations.fallbackMode), findsNothing);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      container
+          .read(proxyGroupProvider.notifier)
+          .update((state) => state.copyWith(type: GroupType.Fallback));
+      await tester.pump();
+      await _openOptions(tester);
+
+      expect(find.text(currentAppLocalizations.fallbackMode), findsOneWidget);
     });
 
     testWidgets('offers strategy only to a load-balance group', (tester) async {
