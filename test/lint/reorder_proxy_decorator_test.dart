@@ -9,7 +9,7 @@ final _reorderableList = RegExp(
 );
 
 const _allowed = {
-  'lib/ui/super_reorderable_list.dart',
+  'lib/widgets/super_reorderable_list.dart',
   'lib/views/dashboard/edit.dart',
 };
 

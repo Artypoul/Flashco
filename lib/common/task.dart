@@ -373,6 +373,12 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
         .toList();
   }
   rawConfig['rules'] = rules;
+  applyRealityMlkemOverrides(
+    rawConfig,
+    overrides.realityMlkem,
+    enabledByDefault:
+        overrides.realityMlkemEnabled ?? realPatchConfig.realityMlkemEnabled,
+  );
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
 }

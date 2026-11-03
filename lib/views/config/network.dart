@@ -86,6 +86,24 @@ class TUNItem extends ConsumerWidget {
   }
 }
 
+class RealityMlkemItem extends ConsumerWidget {
+  const RealityMlkemItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ConfigToggleItem(
+      title: (l) => 'REALITY · ML-KEM',
+      subtitle: (l) => l.realityMlkemDescription,
+      selector: patchClashConfigProvider.select(
+        (state) => state.realityMlkemEnabled,
+      ),
+      onChanged: _tunWriter(
+        (state, value) => state.copyWith(realityMlkemEnabled: value),
+      ),
+    );
+  }
+}
+
 class AllowBypassItem extends ConsumerWidget {
   const AllowBypassItem({super.key});
 
@@ -430,6 +448,7 @@ class TunSection extends ConsumerWidget {
 // (component/keepalive), and only Linux honours a routing mark.
 List<Widget> outboundItems({required bool isDesktop, required bool isLinux}) {
   return [
+    const RealityMlkemItem(),
     if (isDesktop) ...[
       ConfigToggleItem(
         title: (l) => l.disableKeepAlive,

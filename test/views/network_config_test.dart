@@ -23,6 +23,12 @@ class _ToggleCase {
 
 final _toggleCases = <_ToggleCase>[
   _ToggleCase(
+    'REALITY ML-KEM',
+    const RealityMlkemItem(),
+    (c) => c.read(patchClashConfigProvider).realityMlkemEnabled,
+    initial: true,
+  ),
+  _ToggleCase(
     'VPN',
     const VPNItem(),
     (c) => c.read(vpnSettingProvider).enable,
@@ -236,9 +242,12 @@ void main() {
     });
 
     test('keep-alive rows stay off Android and the mark is Linux only', () {
-      expect(outboundItems(isDesktop: false, isLinux: false), isEmpty);
-      expect(outboundItems(isDesktop: true, isLinux: false), hasLength(3));
-      expect(outboundItems(isDesktop: true, isLinux: true), hasLength(4));
+      expect(
+        outboundItems(isDesktop: false, isLinux: false).single,
+        isA<RealityMlkemItem>(),
+      );
+      expect(outboundItems(isDesktop: true, isLinux: false), hasLength(4));
+      expect(outboundItems(isDesktop: true, isLinux: true), hasLength(5));
     });
   });
 }

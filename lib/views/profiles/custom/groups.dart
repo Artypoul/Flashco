@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/enum/enum.dart';
-import 'package:fl_clash/features/form/form.dart';
-import 'package:fl_clash/models/models.dart' hide FileInfo;
-import 'package:fl_clash/pages/editor.dart';
-import 'package:fl_clash/l10n/l10n.dart';
-import 'package:fl_clash/providers/providers.dart';
-import 'package:fl_clash/state.dart';
-import 'package:fl_clash/ui/icons/icons.dart';
-import 'package:fl_clash/widgets/widgets.dart';
+import 'package:flashco/common/common.dart';
+import 'package:flashco/enum/enum.dart';
+import 'package:flashco/features/form/form.dart';
+import 'package:flashco/models/models.dart' hide FileInfo;
+import 'package:flashco/pages/editor.dart';
+import 'package:flashco/icons/icons.dart';
+import 'package:flashco/l10n/l10n.dart';
+import 'package:flashco/providers/providers.dart';
+import 'package:flashco/state.dart';
+import 'package:flashco/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -223,8 +223,6 @@ class _CustomProxyGroupsSectionState
             ? message
             : appLocalizations.proxyGroupInUse(inUse.join(', ')),
       ),
-      destructive: true,
-      confirmText: appLocalizations.delete,
     );
     if (res != true || !mounted) {
       return;
@@ -272,34 +270,55 @@ class _CustomProxyGroupsSectionState
     ];
   }
 
-  List<IconButtonData> _buildActions(Set<int> ids, Set<int> selected) {
+  List<Widget> _buildActions(Set<int> ids, Set<int> selected) {
     final appLocalizations = context.appLocalizations;
     if (selected.isNotEmpty) {
       return [
-        IconButtonData(
-          glyph: AppGlyphs.delete,
-          tooltip: appLocalizations.delete,
-          onPressed: () => _handleDelete(
-            selected,
-            message: appLocalizations.deleteMultipTip(
-              appLocalizations.proxyGroup,
+        TonalButtonGroup(
+          size: TonalButtonSize.section,
+          children: [
+            IconButton(
+              tooltip: appLocalizations.delete,
+              onPressed: () => _handleDelete(
+                selected,
+                message: appLocalizations.deleteMultipTip(
+                  appLocalizations.proxyGroup,
+                ),
+              ),
+              icon: const GlyphIcon(AppGlyphs.delete),
             ),
-          ),
-        ),
-        IconButtonData(
-          glyph: AppGlyphs.selectAll,
-          tooltip: appLocalizations.selectAll,
-          onPressed: () => _handleSelectAll(ids),
+            IconButton(
+              tooltip: appLocalizations.selectAll,
+              onPressed: () => _handleSelectAll(ids),
+              icon: const GlyphIcon(AppGlyphs.selectAll),
+            ),
+          ],
         ),
       ];
     }
     return [
       if (_sorting || ids.length > 1)
-        sortModeAction(context, sorting: _sorting, onPressed: _toggleSorting),
-      IconButtonData(
-        glyph: AppGlyphs.addCircle,
-        tooltip: appLocalizations.add,
-        onPressed: _handleAddOrUpdate,
+        TonalButtonTheme(
+          size: TonalButtonSize.section,
+          child: ElasticPress(
+            child: AppBarActionButton(
+              data: sortModeAction(
+                context,
+                sorting: _sorting,
+                onPressed: _toggleSorting,
+              ),
+            ),
+          ),
+        ),
+      TonalButtonTheme(
+        size: TonalButtonSize.section,
+        child: ElasticPress(
+          child: IconButton(
+            tooltip: appLocalizations.add,
+            onPressed: _handleAddOrUpdate,
+            icon: const GlyphIcon(AppGlyphs.addCircle),
+          ),
+        ),
       ),
     ];
   }
@@ -347,11 +366,9 @@ class _CustomProxyGroupsSectionState
         child: SliverMainAxisGroup(
           slivers: [
             SliverToBoxAdapter(
-              child: TonalButtonTheme(
-                child: ListHeader(
-                  title: appLocalizations.proxyGroup,
-                  actions: _buildActions(ids, selected),
-                ),
+              child: ListHeader(
+                title: appLocalizations.proxyGroup,
+                actions: _buildActions(ids, selected),
               ),
             ),
             if (proxyGroups != null && proxyGroups.isEmpty)
@@ -657,26 +674,16 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
   }
 
   Future<void> _showEmptyFallbackOptions() async {
-    final profileId = ProfileIdProvider.of(context)!.profileId;
     final res = await Navigator.of(context).push(
       PagedSheetRoute(
         builder: (context) => Consumer(
           builder: (_, ref, _) {
-            final proxies = ref.watch(
-              customProfileDataProvider(
-                profileId,
-              ).select((data) => data?.namedProxies ?? const <String>{}),
-            );
             return SelectionSheet<String>(
               title: context.appLocalizations.emptyFallback,
               sections: [
                 SelectionSection(
                   label: context.appLocalizations.basicStrategy,
                   items: reservedProxyNames.toList(),
-                ),
-                SelectionSection(
-                  label: context.appLocalizations.proxies,
-                  items: proxies.toList(),
                 ),
               ],
               labelBuilder: (item) => item,
@@ -776,16 +783,20 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
     String? suffix,
   }) {
     final appLocalizations = context.appLocalizations;
-    final field = FormRowTextField(
+    final field = TextFormField(
       keyboardType: TextInputType.number,
       inputFormatters: TextInputLimits.digitsOnly(TextInputLimits.number),
+      textAlign: TextAlign.end,
       initialValue: value?.toString(),
       onChanged: (value) {
         ref
             .read(proxyGroupProvider.notifier)
             .update((state) => apply(state, int.tryParse(value)));
       },
-      hintText: appLocalizations.optional,
+      decoration: InputDecoration.collapsed(
+        border: const NoInputBorder(),
+        hintText: appLocalizations.optional,
+      ),
     );
     return _buildItem(
       title: title,
@@ -797,7 +808,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
               spacing: 4,
               children: [
                 Flexible(child: field),
-                Text(suffix, style: AppTextStyle.subheadline.of(context)),
+                Text(suffix, style: context.textTheme.bodyMedium),
               ],
             ),
     );
@@ -808,9 +819,10 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
     return _buildItem(
       title: appLocalizations.testUrl,
       leading: leading,
-      trailing: FormRowTextField(
+      trailing: TextFormField(
         keyboardType: TextInputType.url,
         inputFormatters: TextInputLimits.limit(TextInputLimits.url),
+        textAlign: TextAlign.end,
         initialValue: url,
         onChanged: (value) {
           ref
@@ -819,7 +831,10 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
                 (state) => state.copyWith(url: value.isEmpty ? null : value),
               );
         },
-        hintText: appLocalizations.optional,
+        decoration: InputDecoration.collapsed(
+          border: const NoInputBorder(),
+          hintText: appLocalizations.optional,
+        ),
       ),
     );
   }
@@ -865,7 +880,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
       title: context.appLocalizations.hashByInUser,
       leading: leading,
       onPressed: handleChangeHashKey,
-      trailing: CommonSwitch(
+      trailing: Switch(
         value: value,
         onChanged: (_) {
           handleChangeHashKey();
@@ -900,7 +915,8 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
     return _buildItem(
       title: appLocalizations.expectedStatus,
       leading: leading,
-      trailing: FormRowTextField(
+      trailing: TextFormField(
+        textAlign: TextAlign.end,
         initialValue: expectedStatus,
         inputFormatters: TextInputLimits.limit(TextInputLimits.status),
         onChanged: (value) {
@@ -912,7 +928,10 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
                 ),
               );
         },
-        hintText: appLocalizations.optional,
+        decoration: InputDecoration.collapsed(
+          border: const NoInputBorder(),
+          hintText: appLocalizations.optional,
+        ),
       ),
     );
   }
@@ -962,7 +981,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
           else
             Text(
               appLocalizations.optional,
-              style: context.listTitleStyle.copyWith(
+              style: context.listTitleStyle?.copyWith(
                 color: context.colorScheme.onSurfaceVariant,
               ),
             ),
@@ -977,7 +996,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
     return _buildItem(
       invalid: invalid,
       title: appLocalizations.name,
-      trailing: FormRowTextField(
+      trailing: TextFormField(
         initialValue: name,
         keyboardType: TextInputType.name,
         inputFormatters: TextInputLimits.policyName(TextInputLimits.groupName),
@@ -989,7 +1008,11 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
         onFieldSubmitted: (_) {
           _handleSave();
         },
-        hintText: appLocalizations.inputProxyGroupName,
+        textAlign: TextAlign.end,
+        decoration: InputDecoration.collapsed(
+          border: const NoInputBorder(),
+          hintText: appLocalizations.inputProxyGroupName,
+        ),
       ),
     );
   }
@@ -1006,7 +1029,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
       title: appLocalizations.hideFromList,
       leading: leading,
       onPressed: handleChangeHidden,
-      trailing: CommonSwitch(
+      trailing: Switch(
         value: hidden ?? false,
         onChanged: (_) {
           handleChangeHidden();
@@ -1029,7 +1052,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
       title: appLocalizations.testWhenUsed,
       leading: leading,
       onPressed: handleChangeLazy,
-      trailing: CommonSwitch(
+      trailing: Switch(
         value: value,
         onChanged: (_) {
           handleChangeLazy();
@@ -1052,7 +1075,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
       title: appLocalizations.disableUDP,
       leading: leading,
       onPressed: handleChangeDisableUDP,
-      trailing: CommonSwitch(
+      trailing: Switch(
         value: disableUDP ?? false,
         onChanged: (_) {
           handleChangeDisableUDP();
@@ -1093,25 +1116,11 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
   }
 
   Future<void> _handleDelete(int profileId) async {
-    final appLocalizations = context.appLocalizations;
-    final id = ref.read(proxyGroupProvider).id;
-    final inUse = await ref.read(profilesActionProvider.notifier).groupsInUse(
-      profileId,
-      {id},
-    );
-    if (!mounted) {
-      return;
-    }
     final res = await dialogs.showMessage(
-      message: TextSpan(
-        text: inUse.isEmpty
-            ? appLocalizations.confirmDeleteProxyGroup
-            : appLocalizations.proxyGroupInUse(inUse.join(', ')),
-      ),
-      destructive: true,
-      confirmText: appLocalizations.delete,
+      message: TextSpan(text: context.appLocalizations.confirmDeleteProxyGroup),
     );
     if (res == true && mounted) {
+      final id = ref.read(proxyGroupProvider).id;
       ref.read(proxyGroupsProvider(profileId).notifier).delAll([id]);
       context.safeNestedPop();
     }
@@ -1396,10 +1405,11 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
         .whereType<InvalidEmptyFallbackIssue>()
         .toList();
     return CommonScaffold(
-      iconActions: [
-        customQuickEditAction(context, onPressed: _handleQuickEdit),
-      ],
-      confirmationAction: customSaveAction(context, onPressed: _handleSave),
+      iconActions: customFormActions(
+        context,
+        onQuickEdit: _handleQuickEdit,
+        onSave: _handleSave,
+      ),
       body: CustomScrollView(
         key: ValueKey(_revision),
         slivers: [
@@ -1408,7 +1418,7 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverList.list(
               children: [
-                generateSection(
+                generateSectionV3(
                   title: appLocalizations.general,
                   items: [
                     _field(
@@ -1429,11 +1439,11 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
-            ).copyWith(bottom: 20 + context.bottomInset),
+            ).copyWith(bottom: 20),
             sliver: SliverList.list(
               children: [
                 _buildOptions(emptyFallbackIssues: emptyFallbackIssues),
-                generateSection(
+                generateSectionV3(
                   title: appLocalizations.action,
                   items: [
                     if (!_isNew)

@@ -45,6 +45,7 @@ export 'print.dart';
 export 'protocol.dart';
 export 'provider_reader.dart';
 export 'proxy.dart';
+export 'reality_mlkem.dart';
 export 'request.dart';
 export 'scroll.dart';
 export 'search.dart';

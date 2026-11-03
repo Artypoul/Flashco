@@ -9,11 +9,15 @@ import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/pages/editor.dart';
 import 'package:flashco/providers/action.dart';
+import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/core.dart';
+import 'package:flashco/providers/database.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'reality_mlkem.dart';
 
 class EditProfileView extends ConsumerStatefulWidget {
   final Profile profile;
@@ -35,6 +39,8 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   late final TextEditingController _ageSecretKeyController;
   late final TextEditingController _autoUpdateDurationController;
   late bool _autoUpdate;
+  late Map<String, bool> _realityMlkem;
+  bool? _realityMlkemEnabled;
   String? _rawText;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _fileInfoNotifier = ValueNotifier<FileInfo?>(null);
@@ -50,6 +56,8 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
       text: widget.profile.ageSecretKey,
     );
     _autoUpdate = widget.profile.autoUpdate;
+    _realityMlkem = widget.profile.overrides.realityMlkem;
+    _realityMlkemEnabled = widget.profile.overrides.realityMlkemEnabled;
     _autoUpdateDurationController = TextEditingController(
       text: widget.profile.autoUpdateDuration.inMinutes.toString(),
     );
@@ -71,6 +79,10 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   Future<void> _handleConfirm() async {
     if (!_formKey.currentState!.validate()) return;
     var profile = widget.profile.copyWith(
+      overrides: widget.profile.overrides.copyWith(
+        realityMlkem: _realityMlkem,
+        realityMlkemEnabled: _realityMlkemEnabled,
+      ),
       url: _urlController.text,
       ageSecretKey: _ageSecretKeyController.text.trim(),
       label: _labelController.text,
@@ -126,6 +138,37 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     if (_autoUpdate == value) return;
     setState(() {
       _autoUpdate = value;
+    });
+  }
+
+  Future<void> _editRealityMlkem() async {
+    final config = await globalState.safeRun(
+      () async => widget.profile.type == ProfileType.custom
+          ? {
+              'proxies': [
+                for (final proxy in await ref.read(
+                  customProxiesProvider.future,
+                ))
+                  proxy.definition,
+              ],
+            }
+          : await ref.read(coreHandlerProvider).getConfig(widget.profile.id),
+    );
+    if (config == null || !mounted) return;
+    final selection = await dialogs.showCommonDialog<RealityMlkemSelection>(
+      child: RealityMlkemDialog(
+        nodes: realityMlkemNodes(config),
+        overrides: _realityMlkem,
+        enabled: _realityMlkemEnabled,
+        inheritedEnabled: ref
+            .read(patchClashConfigProvider)
+            .realityMlkemEnabled,
+      ),
+    );
+    if (selection == null || !mounted) return;
+    setState(() {
+      _realityMlkem = selection.nodes;
+      _realityMlkemEnabled = selection.enabled;
     });
   }
 
@@ -247,6 +290,11 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
         if (_autoUpdate)
           _AutoUpdateIntervalField(controller: _autoUpdateDurationController),
       ],
+      ListItem(
+        title: const Text('REALITY · ML-KEM'),
+        subtitle: Text(appLocalizations.realityMlkemDescription),
+        onTap: _editRealityMlkem,
+      ),
       if (widget.profile.type != ProfileType.custom)
         _ProfileFileItem(
           fileInfoNotifier: _fileInfoNotifier,

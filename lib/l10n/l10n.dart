@@ -55,6 +55,438 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `Network detection`
+  String get networkDetection {
+    return Intl.message(
+      'Network detection',
+      name: 'networkDetection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Check`
+  String get serviceCheck {
+    return Intl.message('Check', name: 'serviceCheck', desc: '', args: []);
+  }
+
+  /// `Checked at {time}`
+  String serviceCheckedAt(Object time) {
+    return Intl.message(
+      'Checked at $time',
+      name: 'serviceCheckedAt',
+      desc: '',
+      args: [time],
+    );
+  }
+
+  /// `Set dark mode and adjust colors`
+  String get themeDesc {
+    return Intl.message(
+      'Set dark mode and adjust colors',
+      name: 'themeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Final config`
+  String get finalConfig {
+    return Intl.message(
+      'Final config',
+      name: 'finalConfig',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Obtain a profile from a subscription link or a proxy share link`
+  String get linkDesc {
+    return Intl.message(
+      'Obtain a profile from a subscription link or a proxy share link',
+      name: 'linkDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Upload a profile file directly`
+  String get fileDesc {
+    return Intl.message(
+      'Upload a profile file directly',
+      name: 'fileDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected`
+  String get selected {
+    return Intl.message('Selected', name: 'selected', desc: '', args: []);
+  }
+
+  /// `Standard`
+  String get expand {
+    return Intl.message('Standard', name: 'expand', desc: '', args: []);
+  }
+
+  /// `Compact`
+  String get shrink {
+    return Intl.message('Compact', name: 'shrink', desc: '', args: []);
+  }
+
+  /// `Minimal`
+  String get min {
+    return Intl.message('Minimal', name: 'min', desc: '', args: []);
+  }
+
+  /// `Sidebar blur`
+  String get sidebarBlur {
+    return Intl.message(
+      'Sidebar blur',
+      name: 'sidebarBlur',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Changes take effect after restarting the VPN`
+  String get vpnTip {
+    return Intl.message(
+      'Changes take effect after restarting the VPN',
+      name: 'vpnTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Leave out proxies whose last delay test timed out`
+  String get hideTimeoutProxiesDesc {
+    return Intl.message(
+      'Leave out proxies whose last delay test timed out',
+      name: 'hideTimeoutProxiesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} selected`
+  String selectedCountTitle(Object count) {
+    return Intl.message(
+      '$count selected',
+      name: 'selectedCountTitle',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Rule name`
+  String get ruleName {
+    return Intl.message('Rule name', name: 'ruleName', desc: '', args: []);
+  }
+
+  /// `Sub-rule`
+  String get subRule {
+    return Intl.message('Sub-rule', name: 'subRule', desc: '', args: []);
+  }
+
+  /// `Color schemes`
+  String get colorSchemes {
+    return Intl.message(
+      'Color schemes',
+      name: 'colorSchemes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Palette`
+  String get palette {
+    return Intl.message('Palette', name: 'palette', desc: '', args: []);
+  }
+
+  /// `Tonal spot`
+  String get tonalSpotScheme {
+    return Intl.message(
+      'Tonal spot',
+      name: 'tonalSpotScheme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fidelity`
+  String get fidelityScheme {
+    return Intl.message('Fidelity', name: 'fidelityScheme', desc: '', args: []);
+  }
+
+  /// `Neutral`
+  String get neutralScheme {
+    return Intl.message('Neutral', name: 'neutralScheme', desc: '', args: []);
+  }
+
+  /// `Vibrant`
+  String get vibrantScheme {
+    return Intl.message('Vibrant', name: 'vibrantScheme', desc: '', args: []);
+  }
+
+  /// `Expressive`
+  String get expressiveScheme {
+    return Intl.message(
+      'Expressive',
+      name: 'expressiveScheme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Content`
+  String get contentScheme {
+    return Intl.message('Content', name: 'contentScheme', desc: '', args: []);
+  }
+
+  /// `Rainbow`
+  String get rainbowScheme {
+    return Intl.message('Rainbow', name: 'rainbowScheme', desc: '', args: []);
+  }
+
+  /// `Fruit salad`
+  String get fruitSaladScheme {
+    return Intl.message(
+      'Fruit salad',
+      name: 'fruitSaladScheme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Access control settings`
+  String get accessControlSettings {
+    return Intl.message(
+      'Access control settings',
+      name: 'accessControlSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Assemble proxy groups and rules from app proxies and other profiles`
+  String get customProfileDesc {
+    return Intl.message(
+      'Assemble proxy groups and rules from app proxies and other profiles',
+      name: 'customProfileDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sync data via WebDAV or files`
+  String get backupAndRestoreDesc {
+    return Intl.message(
+      'Sync data via WebDAV or files',
+      name: 'backupAndRestoreDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Duplicate proxy group name`
+  String get proxyGroupNameDuplicate {
+    return Intl.message(
+      'Duplicate proxy group name',
+      name: 'proxyGroupNameDuplicate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select proxy providers`
+  String get selectProxyProviders {
+    return Intl.message(
+      'Select proxy providers',
+      name: 'selectProxyProviders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select proxies`
+  String get selectProxies {
+    return Intl.message(
+      'Select proxies',
+      name: 'selectProxies',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please select a sub-rule`
+  String get selectSubRule {
+    return Intl.message(
+      'Please select a sub-rule',
+      name: 'selectSubRule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add proxy providers`
+  String get addProxyProviders {
+    return Intl.message(
+      'Add proxy providers',
+      name: 'addProxyProviders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Proxies are empty`
+  String get proxiesEmpty {
+    return Intl.message(
+      'Proxies are empty',
+      name: 'proxiesEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No records`
+  String get noRecords {
+    return Intl.message('No records', name: 'noRecords', desc: '', args: []);
+  }
+
+  /// `Sub-rule is empty`
+  String get subRuleEmpty {
+    return Intl.message(
+      'Sub-rule is empty',
+      name: 'subRuleEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Proxy providers cannot be empty`
+  String get proxyProvidersNotEmpty {
+    return Intl.message(
+      'Proxy providers cannot be empty',
+      name: 'proxyProvidersNotEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sub-rule cannot be empty`
+  String get subRuleNotEmpty {
+    return Intl.message(
+      'Sub-rule cannot be empty',
+      name: 'subRuleNotEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Proxy providers are empty`
+  String get proxyProvidersEmpty {
+    return Intl.message(
+      'Proxy providers are empty',
+      name: 'proxyProvidersEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 hour} other{{count} hours}}`
+  String hoursCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 hour',
+      other: '$count hours',
+      name: 'hoursCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Add widget`
+  String get addWidget {
+    return Intl.message('Add widget', name: 'addWidget', desc: '', args: []);
+  }
+
+  /// `Launch`
+  String get launch {
+    return Intl.message('Launch', name: 'launch', desc: '', args: []);
+  }
+
+  /// `Add configuration`
+  String get addConfiguration {
+    return Intl.message(
+      'Add configuration',
+      name: 'addConfiguration',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fastest server`
+  String get fastestServer {
+    return Intl.message(
+      'Fastest server',
+      name: 'fastestServer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Automatic selection is unavailable in this configuration or routing mode`
+  String get fastestServerUnavailable {
+    return Intl.message(
+      'Automatic selection is unavailable in this configuration or routing mode',
+      name: 'fastestServerUnavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Control panel`
+  String get controlPanel {
+    return Intl.message(
+      'Control panel',
+      name: 'controlPanel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Inherit ({status})`
+  String realityMlkemInherit(String status) {
+    return Intl.message(
+      'Inherit ($status)',
+      name: 'realityMlkemInherit',
+      desc: '',
+      args: [status],
+    );
+  }
+
+  /// `Profile default`
+  String get realityMlkemProfile {
+    return Intl.message(
+      'Profile default',
+      name: 'realityMlkemProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Default for REALITY nodes. Profiles and individual nodes can override this setting; saved choices survive subscription updates.`
+  String get realityMlkemDescription {
+    return Intl.message(
+      'Default for REALITY nodes. Profiles and individual nodes can override this setting; saved choices survive subscription updates.',
+      name: 'realityMlkemDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Rule`
   String get rule {
     return Intl.message('Rule', name: 'rule', desc: '', args: []);
@@ -1001,10 +1433,10 @@ class AppLocalizations {
     );
   }
 
-  /// `A multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free.`
+  /// `Free, non-commercial software. Created for fun.`
   String get desc {
     return Intl.message(
-      'A multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free.',
+      'Free, non-commercial software. Created for fun.',
       name: 'desc',
       desc: '',
       args: [],
@@ -2461,10 +2893,10 @@ class AppLocalizations {
     return Intl.message('Disclaimer', name: 'disclaimer', desc: '', args: []);
   }
 
-  /// `Before using FlClash ("the Software"), please read this statement carefully and make sure you understand all of it. Tapping "Agree" means you have read, understood, and accept every term below. If you do not agree, tap "Exit" and stop using the Software.`
+  /// `Free, non-commercial software. Created for fun.\n\nBy tapping "Agree", you accept the terms of use below.`
   String get disclaimerDesc {
     return Intl.message(
-      'Before using FlClash ("the Software"), please read this statement carefully and make sure you understand all of it. Tapping "Agree" means you have read, understood, and accept every term below. If you do not agree, tap "Exit" and stop using the Software.',
+      'Free, non-commercial software. Created for fun.\n\nBy tapping "Agree", you accept the terms of use below.',
       name: 'disclaimerDesc',
       desc: '',
       args: [],
@@ -2481,10 +2913,10 @@ class AppLocalizations {
     );
   }
 
-  /// `The Software is an open-source network proxy client built on the Clash.Meta (mihomo) core. It only provides local tooling such as configuration management, rule-based routing, and traffic forwarding.`
+  /// `Flashco helps manage configurations, apply routing rules, and connect to selected network services.`
   String get disclaimerSoftwareContent {
     return Intl.message(
-      'The Software is an open-source network proxy client built on the Clash.Meta (mihomo) core. It only provides local tooling such as configuration management, rule-based routing, and traffic forwarding.',
+      'Flashco helps manage configurations, apply routing rules, and connect to selected network services.',
       name: 'disclaimerSoftwareContent',
       desc: '',
       args: [],
@@ -2611,10 +3043,10 @@ class AppLocalizations {
     );
   }
 
-  /// `The Software does not collect or upload your subscription URLs, node details, configuration content, visited websites, connection records, traffic content, or logs. This data stays on your device and the developers have no access to it.\n\nThe Software only reaches the network when you use a feature that needs it, such as fetching the subscription URL you provided when updating a profile, or contacting GitHub when checking for updates.\n\nThe Software includes no analytics or crash reporting service on any platform.`
+  /// `Flashco does not use Firebase Analytics or Crashlytics. Crash recovery and application logs are processed locally unless you export them yourself. The Android QR scanner uses Google ML Kit, which can send device and application information, errors, and scanner usage and performance diagnostics to Google.\n\nNetwork features contact VPN and subscription providers, DNS resolvers, GitHub for updates and rule resources, connectivity-test endpoints, and IP information providers. These services can receive your connection IP and request details. IP quality checks can also send the address being checked to external providers. Subscription requests include the credentials required by your provider.`
   String get disclaimerPrivacyContent {
     return Intl.message(
-      'The Software does not collect or upload your subscription URLs, node details, configuration content, visited websites, connection records, traffic content, or logs. This data stays on your device and the developers have no access to it.\n\nThe Software only reaches the network when you use a feature that needs it, such as fetching the subscription URL you provided when updating a profile, or contacting GitHub when checking for updates.\n\nThe Software includes no analytics or crash reporting service on any platform.',
+      'Flashco does not use Firebase Analytics or Crashlytics. Crash recovery and application logs are processed locally unless you export them yourself. The Android QR scanner uses Google ML Kit, which can send device and application information, errors, and scanner usage and performance diagnostics to Google.\n\nNetwork features contact VPN and subscription providers, DNS resolvers, GitHub for updates and rule resources, connectivity-test endpoints, and IP information providers. These services can receive your connection IP and request details. IP quality checks can also send the address being checked to external providers. Subscription requests include the credentials required by your provider.',
       name: 'disclaimerPrivacyContent',
       desc: '',
       args: [],
@@ -2631,10 +3063,10 @@ class AppLocalizations {
     );
   }
 
-  /// `The Software is open source under the GPL-3.0 license. You may use, modify, and distribute it freely as long as you comply with that license, which requires derivative works to be released under GPL-3.0 as well and the original copyright notices to be kept.\n\nThird-party components in the Software, including the Clash.Meta core, follow their own licenses. The original authors are not responsible for any issue arising from modified or redistributed versions.`
+  /// `The Software is distributed under GPL-3.0. You may use, modify, and distribute it in accordance with that license and with copyright notices preserved.\n\nThird-party components are distributed under their respective licenses.`
   String get disclaimerLicenseContent {
     return Intl.message(
-      'The Software is open source under the GPL-3.0 license. You may use, modify, and distribute it freely as long as you comply with that license, which requires derivative works to be released under GPL-3.0 as well and the original copyright notices to be kept.\n\nThird-party components in the Software, including the Clash.Meta core, follow their own licenses. The original authors are not responsible for any issue arising from modified or redistributed versions.',
+      'The Software is distributed under GPL-3.0. You may use, modify, and distribute it in accordance with that license and with copyright notices preserved.\n\nThird-party components are distributed under their respective licenses.',
       name: 'disclaimerLicenseContent',
       desc: '',
       args: [],

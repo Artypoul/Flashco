@@ -22,6 +22,35 @@ void main() {
     await testDatabase.close();
   });
 
+  test('all profile types carry saved ML-KEM settings into setup', () async {
+    for (final type in [
+      ProfileType.url,
+      ProfileType.file,
+      ProfileType.custom,
+    ]) {
+      final profile = Profile(
+        id: 1,
+        type: type,
+        autoUpdateDuration: Duration.zero,
+        overrides: const ProfileOverrides(
+          realityMlkemEnabled: false,
+          realityMlkem: {'node': true},
+        ),
+      );
+      final container = ProviderContainer(
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([profile])),
+        ],
+      );
+      addTearDown(container.dispose);
+      final hold = container.listen(setupStateProvider(profile.id), (_, _) {});
+      addTearDown(hold.close);
+      final state = await container.read(setupStateProvider(profile.id).future);
+      expect(state.overrides.realityMlkemEnabled, false);
+      expect(state.overrides.realityMlkem, {'node': true});
+    }
+  });
+
   testWidgets('a custom setup disposed before its queries return resolves', (
     tester,
   ) async {

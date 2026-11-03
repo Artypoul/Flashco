@@ -631,6 +631,113 @@ void main() {
 
     String url(String name) => 'http://127.0.0.1:${server.port}/$name';
 
+    test(
+      'ML-KEM stays enabled through real subscription downloads without setup',
+      () async {
+        var revision = 0;
+        server.listen((request) async {
+          revision++;
+          request.response.write(
+            await encodeYamlTask({
+              ...fastestConfig,
+              'proxies': [
+                ...fastestConfig['proxies'] as List,
+                for (final network in ['xhttp', 'grpc'])
+                  {
+                    'name': 'REALITY $revision $network',
+                    'type': 'vless',
+                    'server': 'node.example',
+                    'port': 443,
+                    'network': network,
+                    'servername': 'cover.example',
+                    'reality-opts': {
+                      'public-key': 'test-public-key',
+                      if (revision.isEven) 'support-x25519mlkem768': false,
+                    },
+                  },
+              ],
+            }),
+          );
+          await request.response.close();
+        });
+        final action = container.read(profilesActionProvider.notifier);
+        await action.addProfileFromLink(url('mlkem-default'));
+        for (var refresh = 0; refresh < 3; refresh++) {
+          final profile = Profile.fromJson(
+            jsonDecode(jsonEncode(container.read(profilesProvider).single)),
+          );
+          expect(profile.overrides.realityMlkem, isEmpty);
+          final raw = Map<String, dynamic>.from(
+            loadPlainYaml(await (await profile.file).readAsString()) as Map,
+          );
+          final result = await makeRealProfileTask(
+            MakeRealProfileState(
+              profilesPath: home.path,
+              profileId: profile.id,
+              rawConfig: raw,
+              realPatchConfig: const PatchClashConfig(),
+              overrides: profile.overrides,
+              appendSystemDns: false,
+              proxyGroups: const [],
+              rules: const [],
+              addedRules: const [],
+              defaultUA: 'test',
+            ),
+          );
+          final working = loadYaml(result.yaml) as Map;
+          final nodes = (working['proxies'] as List).where(
+            (proxy) => proxy['reality-opts'] != null,
+          );
+          expect(nodes, hasLength(2));
+          for (final node in nodes) {
+            expect(node['reality-opts']['support-x25519mlkem768'], true);
+          }
+          if (refresh < 2) {
+            action.putProfile(profile);
+            await action.updateProfile(profile);
+          }
+        }
+        expect(revision, 3);
+      },
+    );
+
+    test(
+      'node ML-KEM choices survive serialization and repeated subscription refresh',
+      () async {
+        server.listen((request) async {
+          request.response.write(await encodeYamlTask(fastestConfig));
+          await request.response.close();
+        });
+        final action = container.read(profilesActionProvider.notifier);
+        await action.addProfileFromLink(url('mlkem'));
+        final imported = container.read(profilesProvider).single;
+        final restored = Profile.fromJson(
+          jsonDecode(
+            jsonEncode(
+              imported.copyWith(
+                overrides: const ProfileOverrides(
+                  realityMlkemEnabled: false,
+                  realityMlkem: {'node': true, 'legacy': false},
+                ),
+              ),
+            ),
+          ),
+        );
+        action.putProfile(restored);
+        await action.updateProfile(restored);
+        final updated = container.read(profilesProvider).single;
+        await action.updateProfile(updated);
+        final refreshed = container.read(profilesProvider).single;
+        expect(refreshed.overrides.realityMlkemEnabled, false);
+        expect(refreshed.overrides.realityMlkem, {
+          'node': true,
+          'legacy': false,
+        });
+        expect(refreshed.url, restored.url);
+        expect(refreshed.selectedMap, restored.selectedMap);
+      },
+    );
+
     test('a subscription download selects and starts its profile', () async {
       final body = await encodeYamlTask(fastestConfig);
       server.listen((request) async {

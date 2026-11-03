@@ -53,6 +53,8 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
       : ref.watch(
           patchClashConfigProvider.select(
             (state) => ProfileOverrides(
+              realityMlkemEnabled: profile?.overrides.realityMlkemEnabled,
+              realityMlkem: profile?.overrides.realityMlkem ?? const {},
               dns: state.dns,
               dnsOverrideKeys: state.dnsOverrideKeys.intersection(
                 DnsOverrideKey.normalProfileKeys,

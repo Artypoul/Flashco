@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _url = 'https://example.invalid/subscription';
 const _existing = Config(
+  patchClashConfig: PatchClashConfig(realityMlkemEnabled: false),
   currentProfileId: 42,
   excludeSSIDs: ['home'],
   themeProps: ThemeProps(
@@ -47,6 +48,7 @@ void main() {
       expect(updated.vpnProps.systemProxy, isFalse);
       expect(updated.vpnProps.allowBypass, isFalse);
       expect(updated.patchClashConfig.mode, Mode.rule);
+      expect(updated.patchClashConfig.realityMlkemEnabled, false);
       expect(updated.patchClashConfig.tun.enable, isTrue);
       expect(updated.patchClashConfig.tun.autoRoute, isTrue);
       expect(updated.patchClashConfig.tun.stack, TunStack.mips);
@@ -92,6 +94,7 @@ void main() {
       expect(updated.currentProfileId, isNull);
       expect(updated.themeProps.themeMode, ThemeMode.light);
       expect(updated.appSettingProps.autoRun, isTrue);
+      expect(updated.patchClashConfig.realityMlkemEnabled, true);
     },
   );
 

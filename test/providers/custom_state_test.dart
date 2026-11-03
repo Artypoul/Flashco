@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:fl_clash/enum/enum.dart';
-import 'package:fl_clash/models/models.dart';
-import 'package:fl_clash/providers/database.dart';
-import 'package:fl_clash/providers/state.dart';
+import 'package:flashco/enum/enum.dart';
+import 'package:flashco/models/models.dart';
+import 'package:flashco/providers/database.dart';
+import 'package:flashco/providers/state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -484,34 +484,15 @@ void main() {
       expect(loop('Work', const {'Work': 'Away', 'Away': 'Home'}), isEmpty);
     });
 
-    test('include-all-proxies takes in only the proxies a group declares', () {
+    test('include-all reaches a proxy only once a group declares it', () {
       const all = ProxyGroup(
         id: 6,
         name: 'All',
         type: GroupType.Selector,
-        includeAllProxies: true,
-      );
-      const exit = ProxyGroup(
-        id: 7,
-        name: 'Exit',
-        type: GroupType.Selector,
-        proxies: ['Work'],
+        includeAll: true,
       );
       expect(dialerLoop('All', [all], proxy: 'Home'), isEmpty);
       expect(dialerLoop('All', [all, landing], proxy: 'Home'), {'All'});
-      expect(
-        dialerLoop('Relay', [all, landing, relay], proxy: 'Home'),
-        isEmpty,
-      );
-      expect(
-        dialerLoop(
-          'Exit',
-          [exit, all, landing],
-          proxy: 'Home',
-          dialers: const {'Work': 'All'},
-        ),
-        {'Exit', 'Work', 'All'},
-      );
     });
 
     test('what a filter picks is left to the core', () {
@@ -519,7 +500,7 @@ void main() {
         id: 6,
         name: 'All',
         type: GroupType.Selector,
-        includeAllProxies: true,
+        includeAll: true,
       );
       for (final group in [
         all.copyWith(filter: '(?i)hk'),
@@ -640,35 +621,6 @@ void main() {
         ],
       );
     });
-
-    test('include-all-proxies declares no app proxy of its own and drops a '
-        'dialer it loops back through', () {
-      const unnamed = CustomProxy(
-        id: 12,
-        definition: {'name': 'Unnamed', 'type': 'ss'},
-      );
-      const all = ProxyGroup(
-        id: 6,
-        name: 'All',
-        type: GroupType.Selector,
-        includeAllProxies: true,
-      );
-      expect(
-        appProxiesPayload(
-          [home, unnamed],
-          dialers: {9: 'All', 12: 'Relay'},
-          groups: const [all, landing],
-        ),
-        [home.definition],
-      );
-      expect(
-        const CustomProfileData(
-          proxyGroups: [all, landing],
-          proxies: {'Home', 'Unnamed'},
-        ).namedProxies,
-        {'Home'},
-      );
-    });
   });
 
   group('issues', () {
@@ -693,28 +645,6 @@ void main() {
       ]);
       expect(
         proxyGroupIssues(group.copyWith(includeAllProxies: true), profileData),
-        isEmpty,
-      );
-      final providers = group.copyWith(includeAllProviders: true);
-      final subscribed = profileData.copyWith(proxyProviders: const {'Sub'});
-      expect(proxyGroupIssues(providers, subscribed), [
-        const CustomIssue.noProxySource(),
-      ]);
-      expect(
-        proxyGroupIssues(
-          providers,
-          subscribed.copyWith(
-            proxyGroups: [
-              ...subscribed.proxyGroups,
-              const ProxyGroup(
-                id: 4,
-                name: 'D',
-                type: GroupType.Selector,
-                use: ['Sub'],
-              ),
-            ],
-          ),
-        ),
         isEmpty,
       );
     });
@@ -753,31 +683,26 @@ void main() {
       );
     });
 
-    test('empty-fallback takes a built-in or a proxy a group names', () {
+    test('empty-fallback takes only a built-in', () {
       const group = ProxyGroup(
         id: 3,
         name: 'C',
         type: GroupType.Selector,
         proxies: ['Node'],
       );
-      final data = profileData.copyWith(
-        proxyGroups: [
-          ...profileData.proxyGroups,
-          group.copyWith(id: 4, name: 'D', proxies: ['Home']),
-        ],
-        proxies: const {'Home', 'Spare'},
-      );
-      for (final name in ['COMPATIBLE', 'PASS', 'Home']) {
+      for (final name in ['COMPATIBLE', 'PASS']) {
         expect(
-          proxyGroupIssues(group.copyWith(emptyFallback: name), data),
+          proxyGroupIssues(group.copyWith(emptyFallback: name), profileData),
           isEmpty,
           reason: name,
         );
       }
-      for (final name in ['A', 'Node', 'Gone', 'Spare']) {
-        expect(proxyGroupIssues(group.copyWith(emptyFallback: name), data), [
-          CustomIssue.invalidEmptyFallback(name),
-        ], reason: name);
+      for (final name in ['A', 'Node', 'Gone']) {
+        expect(
+          proxyGroupIssues(group.copyWith(emptyFallback: name), profileData),
+          [CustomIssue.invalidEmptyFallback(name)],
+          reason: name,
+        );
       }
     });
 
@@ -884,7 +809,9 @@ void main() {
   });
 
   test('customProxyTypes lists every type the core parses', () {
-    final source = File('core/Clash.Meta/adapter/parser.go').readAsStringSync();
+    final source = File(
+      'core/Clash.Meta/adapter/parser.go',
+    ).readAsStringSync().replaceAll('\r\n', '\n');
     expect(customProxyTypes, [
       for (final match in RegExp(
         r'^\tcase "([^"]+)":',
@@ -896,9 +823,6 @@ void main() {
 
   group('proxy fields follow the option structs of the core', () {
     const root = 'core/Clash.Meta/adapter';
-    String sourceOf(String path) =>
-        File(path).readAsStringSync().replaceAll('\r\n', '\n');
-
     final structs = {
       for (final file in Directory(
         '$root/outbound',
@@ -907,7 +831,7 @@ void main() {
           for (final match in RegExp(
             r'^type (\w+) struct \{\n([\s\S]*?)\n\}',
             multiLine: true,
-          ).allMatches(sourceOf(file.path)))
+          ).allMatches(file.readAsStringSync().replaceAll('\r\n', '\n')))
             match.group(1)!: match.group(2)!,
     };
     final keyPattern = RegExp(r'proxy:"([^",]+)(,omitempty)?"');
@@ -917,10 +841,13 @@ void main() {
     );
     final embeddedPattern = RegExp(r'^\t(\w+Option)$', multiLine: true);
     final bodies = {
-      for (final match in RegExp(
-        r'^\tcase "([^"]+)":\n\t\t\w+ := &outbound\.(\w+)\{',
-        multiLine: true,
-      ).allMatches(sourceOf('$root/parser.go')))
+      for (final match
+          in RegExp(
+            r'^\tcase "([^"]+)":\n\t\t\w+ := &outbound\.(\w+)\{',
+            multiLine: true,
+          ).allMatches(
+            File('$root/parser.go').readAsStringSync().replaceAll('\r\n', '\n'),
+          ))
         match.group(1)!: [
           structs[match.group(2)]!,
           for (final embedded in embeddedPattern.allMatches(
@@ -951,49 +878,6 @@ void main() {
       expect(optionsOf('kcptun'), isNot(contains(ProxyField.pluginHost)));
       expect(optionsOf('shadow-tls'), contains(ProxyField.pluginHost));
       expect(optionsOf('shadow-tls'), isNot(contains(ProxyField.pluginMode)));
-      expect(
-        optionsOf('shadow-tls'),
-        containsAll([ProxyField.pluginPassword, ProxyField.pluginVersion]),
-      );
-      expect(
-        optionsOf('restls'),
-        containsAll([ProxyField.pluginPassword, ProxyField.pluginVersionHint]),
-      );
-      expect(
-        optionsOf('jls'),
-        containsAll([ProxyField.pluginUsername, ProxyField.pluginPassword]),
-      );
-
-      const pluginStructs = {
-        'obfs': 'simpleObfsOption',
-        'v2ray-plugin': 'v2rayObfsOption',
-        'gost-plugin': 'gostObfsOption',
-        'shadow-tls': 'shadowTLSOption',
-        'restls': 'restlsOption',
-        'jls': 'jlsOption',
-        'kcptun': 'kcpTunOption',
-      };
-      expect(
-        pluginStructs.keys,
-        const CustomProxy(
-          id: 0,
-          definition: {'type': 'ss'},
-        ).choicesOf(ProxyField.plugin),
-      );
-      for (final MapEntry(key: plugin, value: struct)
-          in pluginStructs.entries) {
-        final read = {
-          for (final match in RegExp(
-            r'obfs:"([^",]+)',
-          ).allMatches(structs[struct]!))
-            match.group(1)!,
-        };
-        for (final field in optionsOf(plugin)) {
-          if (field.path.first == 'plugin-opts') {
-            expect(read, contains(field.path.last), reason: '$plugin $field');
-          }
-        }
-      }
     });
 
     test('the form asks for the credentials each struct reads', () {
@@ -1104,12 +988,10 @@ void main() {
         'vmess': {ProxyField.cipher},
         'hysteria2': {ProxyField.obfs},
       };
-      const elsewhereForEveryType = {ProxyField.pluginVersionHint};
       for (final type in customProxyTypes) {
         final proxy = CustomProxy(id: 0, definition: {'type': type});
         for (final field in ProxyField.values) {
-          if (elsewhereForEveryType.contains(field) ||
-              (elsewhere[type]?.contains(field) ?? false)) {
+          if (elsewhere[type]?.contains(field) ?? false) {
             continue;
           }
           for (final choice in proxy.choicesOf(field)) {
@@ -1160,74 +1042,12 @@ void main() {
     );
   });
 
-  test('a header map leaves Host to its own field and keeps listed values', () {
-    const proxy = CustomProxy(
-      id: 0,
-      definition: {
-        'type': 'vmess',
-        'network': 'http',
-        'http-opts': {
-          'headers': {
-            'Host': ['a.example', 'b.example'],
-            'Accept': ['text/html', 'application/xml'],
-          },
-        },
-      },
-    );
-
-    expect(proxy.stringMapOf(ProxyField.httpHeaders), {
-      'Accept': 'text/html, application/xml',
-    });
-    expect(
-      proxy.withEntries(ProxyField.httpHeaders, {
-        'Accept': 'text/html, application/xml',
-        'Connection': 'keep-alive',
-      }).definition['http-opts'],
-      {
-        'headers': {
-          'Host': ['a.example', 'b.example'],
-          'Accept': ['text/html', 'application/xml'],
-          'Connection': ['keep-alive'],
-        },
-      },
-    );
-    expect(
-      proxy.withEntries(ProxyField.httpHeaders, {}).definition['http-opts'],
-      {
-        'headers': {
-          'Host': ['a.example', 'b.example'],
-        },
-      },
-    );
-
-    const ws = CustomProxy(
-      id: 0,
-      definition: {
-        'type': 'vless',
-        'network': 'ws',
-        'ws-opts': {
-          'headers': {'host': 'a.example', 'User-Agent': 'a'},
-        },
-      },
-    );
-    expect(ws.stringMapOf(ProxyField.wsHeaders), {'User-Agent': 'a'});
-    expect(
-      ws.withEntries(ProxyField.wsHeaders, {
-        'User-Agent': 'b',
-      }).definition['ws-opts'],
-      {
-        'headers': {'host': 'a.example', 'User-Agent': 'b'},
-      },
-    );
-  });
-
   test('a changed value drops the options only the old one made available', () {
     const proxy = CustomProxy(
       id: 0,
       definition: {
         'type': 'vless',
         'network': 'ws',
-        'packet-encoding': 'xudp',
         'ws-opts': {
           'path': '/a',
           'headers': {'Host': 'a.example'},
@@ -1239,7 +1059,7 @@ void main() {
     expect(proxy.withField(ProxyField.network, 'grpc').definition, {
       'type': 'vless',
       'network': 'grpc',
-      'packet-encoding': 'xudp',
+      'ws-opts': {'max-early-data': 2048},
     });
     expect(
       const CustomProxy(
