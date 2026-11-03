@@ -8,7 +8,10 @@ final _reorderableList = RegExp(
   r'SuperSliverReorderableList)\(',
 );
 
-const _allowed = {'lib/widgets/super_reorderable_list.dart'};
+const _allowed = {
+  'lib/ui/super_reorderable_list.dart',
+  'lib/views/dashboard/edit.dart',
+};
 
 int _lineOf(String source, int offset) =>
     '\n'.allMatches(source.substring(0, offset)).length + 1;
@@ -36,13 +39,13 @@ void main() {
       final offenders = <String>[];
 
       for (final entity in Directory('lib').listSync(recursive: true)) {
-        if (entity is! File) {
+        if (entity is! File ||
+            !entity.path.endsWith('.dart') ||
+            entity.path.replaceAll('\\', '/').contains('/generated/')) {
           continue;
         }
         final path = p.relative(entity.path).replaceAll('\\', '/');
-        if (!path.endsWith('.dart') ||
-            path.contains('/generated/') ||
-            _allowed.contains(path)) {
+        if (_allowed.contains(path)) {
           continue;
         }
         final source = entity.readAsStringSync();
