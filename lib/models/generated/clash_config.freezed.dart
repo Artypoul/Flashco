@@ -5893,7 +5893,7 @@ as List<String>,
 /// @nodoc
 mixin _$ProfileNodeFailover {
 
- bool get enabled; String get groupName; String get primaryKey; String get backupKey; String get primaryName; String get backupName;
+ bool get enabled; String get groupName; String? get routeGroupName; String get primaryKey; String get backupKey; String get primaryName; String get backupName;
 /// Create a copy of ProfileNodeFailover
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -5907,20 +5907,20 @@ $ProfileNodeFailoverCopyWith<ProfileNodeFailover> get copyWith => _$ProfileNodeF
 @override
 bool operator ==(Object other) {
   final _this = this as ProfileNodeFailover;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileNodeFailover&&(identical(other.enabled, _this.enabled) || other.enabled == _this.enabled)&&(identical(other.groupName, _this.groupName) || other.groupName == _this.groupName)&&(identical(other.primaryKey, _this.primaryKey) || other.primaryKey == _this.primaryKey)&&(identical(other.backupKey, _this.backupKey) || other.backupKey == _this.backupKey)&&(identical(other.primaryName, _this.primaryName) || other.primaryName == _this.primaryName)&&(identical(other.backupName, _this.backupName) || other.backupName == _this.backupName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileNodeFailover&&(identical(other.enabled, _this.enabled) || other.enabled == _this.enabled)&&(identical(other.groupName, _this.groupName) || other.groupName == _this.groupName)&&(identical(other.routeGroupName, _this.routeGroupName) || other.routeGroupName == _this.routeGroupName)&&(identical(other.primaryKey, _this.primaryKey) || other.primaryKey == _this.primaryKey)&&(identical(other.backupKey, _this.backupKey) || other.backupKey == _this.backupKey)&&(identical(other.primaryName, _this.primaryName) || other.primaryName == _this.primaryName)&&(identical(other.backupName, _this.backupName) || other.backupName == _this.backupName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as ProfileNodeFailover;
-  return Object.hash(runtimeType,_this.enabled,_this.groupName,_this.primaryKey,_this.backupKey,_this.primaryName,_this.backupName);
+  return Object.hash(runtimeType,_this.enabled,_this.groupName,_this.routeGroupName,_this.primaryKey,_this.backupKey,_this.primaryName,_this.backupName);
 }
 
 @override
 String toString() {
   final _this = this as ProfileNodeFailover;
-  return 'ProfileNodeFailover(enabled: ${_this.enabled}, groupName: ${_this.groupName}, primaryKey: ${_this.primaryKey}, backupKey: ${_this.backupKey}, primaryName: ${_this.primaryName}, backupName: ${_this.backupName})';
+  return 'ProfileNodeFailover(enabled: ${_this.enabled}, groupName: ${_this.groupName}, routeGroupName: ${_this.routeGroupName}, primaryKey: ${_this.primaryKey}, backupKey: ${_this.backupKey}, primaryName: ${_this.primaryName}, backupName: ${_this.backupName})';
 }
 
 
@@ -5931,7 +5931,7 @@ abstract mixin class $ProfileNodeFailoverCopyWith<$Res>  {
   factory $ProfileNodeFailoverCopyWith(ProfileNodeFailover value, $Res Function(ProfileNodeFailover) _then) = _$ProfileNodeFailoverCopyWithImpl;
 @useResult
 $Res call({
- bool enabled, String groupName, String primaryKey, String backupKey, String primaryName, String backupName
+ bool enabled, String groupName, String? routeGroupName, String primaryKey, String backupKey, String primaryName, String backupName
 });
 
 
@@ -5948,11 +5948,12 @@ class _$ProfileNodeFailoverCopyWithImpl<$Res>
 
 /// Create a copy of ProfileNodeFailover
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? enabled = null,Object? groupName = null,Object? primaryKey = null,Object? backupKey = null,Object? primaryName = null,Object? backupName = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? enabled = null,Object? groupName = null,Object? routeGroupName = freezed,Object? primaryKey = null,Object? backupKey = null,Object? primaryName = null,Object? backupName = null,}) {
   return _then(ProfileNodeFailover(
 enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
 as bool,groupName: null == groupName ? _self.groupName : groupName // ignore: cast_nullable_to_non_nullable
-as String,primaryKey: null == primaryKey ? _self.primaryKey : primaryKey // ignore: cast_nullable_to_non_nullable
+as String,routeGroupName: freezed == routeGroupName ? _self.routeGroupName : routeGroupName // ignore: cast_nullable_to_non_nullable
+as String?,primaryKey: null == primaryKey ? _self.primaryKey : primaryKey // ignore: cast_nullable_to_non_nullable
 as String,backupKey: null == backupKey ? _self.backupKey : backupKey // ignore: cast_nullable_to_non_nullable
 as String,primaryName: null == primaryName ? _self.primaryName : primaryName // ignore: cast_nullable_to_non_nullable
 as String,backupName: null == backupName ? _self.backupName : backupName // ignore: cast_nullable_to_non_nullable
@@ -6041,10 +6042,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool enabled,  String groupName,  String primaryKey,  String backupKey,  String primaryName,  String backupName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool enabled,  String groupName,  String? routeGroupName,  String primaryKey,  String backupKey,  String primaryName,  String backupName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProfileNodeFailover() when $default != null:
-return $default(_that.enabled,_that.groupName,_that.primaryKey,_that.backupKey,_that.primaryName,_that.backupName);case _:
+return $default(_that.enabled,_that.groupName,_that.routeGroupName,_that.primaryKey,_that.backupKey,_that.primaryName,_that.backupName);case _:
   return orElse();
 
 }
@@ -6062,10 +6063,10 @@ return $default(_that.enabled,_that.groupName,_that.primaryKey,_that.backupKey,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool enabled,  String groupName,  String primaryKey,  String backupKey,  String primaryName,  String backupName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool enabled,  String groupName,  String? routeGroupName,  String primaryKey,  String backupKey,  String primaryName,  String backupName)  $default,) {final _that = this;
 switch (_that) {
 case _ProfileNodeFailover():
-return $default(_that.enabled,_that.groupName,_that.primaryKey,_that.backupKey,_that.primaryName,_that.backupName);case _:
+return $default(_that.enabled,_that.groupName,_that.routeGroupName,_that.primaryKey,_that.backupKey,_that.primaryName,_that.backupName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -6082,10 +6083,10 @@ return $default(_that.enabled,_that.groupName,_that.primaryKey,_that.backupKey,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool enabled,  String groupName,  String primaryKey,  String backupKey,  String primaryName,  String backupName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool enabled,  String groupName,  String? routeGroupName,  String primaryKey,  String backupKey,  String primaryName,  String backupName)?  $default,) {final _that = this;
 switch (_that) {
 case _ProfileNodeFailover() when $default != null:
-return $default(_that.enabled,_that.groupName,_that.primaryKey,_that.backupKey,_that.primaryName,_that.backupName);case _:
+return $default(_that.enabled,_that.groupName,_that.routeGroupName,_that.primaryKey,_that.backupKey,_that.primaryName,_that.backupName);case _:
   return null;
 
 }
@@ -6097,11 +6098,12 @@ return $default(_that.enabled,_that.groupName,_that.primaryKey,_that.backupKey,_
 @JsonSerializable()
 
 class _ProfileNodeFailover implements ProfileNodeFailover {
-  const _ProfileNodeFailover({this.enabled = true, required this.groupName, required this.primaryKey, required this.backupKey, required this.primaryName, required this.backupName});
+  const _ProfileNodeFailover({this.enabled = true, required this.groupName, this.routeGroupName, required this.primaryKey, required this.backupKey, required this.primaryName, required this.backupName});
   factory _ProfileNodeFailover.fromJson(Map<String, dynamic> json) => _$ProfileNodeFailoverFromJson(json);
 
 @override@JsonKey() final  bool enabled;
 @override final  String groupName;
+@override final  String? routeGroupName;
 @override final  String primaryKey;
 @override final  String backupKey;
 @override final  String primaryName;
@@ -6120,18 +6122,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileNodeFailover&&(identical(other.enabled, enabled) || other.enabled == enabled)&&(identical(other.groupName, groupName) || other.groupName == groupName)&&(identical(other.primaryKey, primaryKey) || other.primaryKey == primaryKey)&&(identical(other.backupKey, backupKey) || other.backupKey == backupKey)&&(identical(other.primaryName, primaryName) || other.primaryName == primaryName)&&(identical(other.backupName, backupName) || other.backupName == backupName));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileNodeFailover&&(identical(other.enabled, enabled) || other.enabled == enabled)&&(identical(other.groupName, groupName) || other.groupName == groupName)&&(identical(other.routeGroupName, routeGroupName) || other.routeGroupName == routeGroupName)&&(identical(other.primaryKey, primaryKey) || other.primaryKey == primaryKey)&&(identical(other.backupKey, backupKey) || other.backupKey == backupKey)&&(identical(other.primaryName, primaryName) || other.primaryName == primaryName)&&(identical(other.backupName, backupName) || other.backupName == backupName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,enabled,groupName,primaryKey,backupKey,primaryName,backupName);
+    return Object.hash(runtimeType,enabled,groupName,routeGroupName,primaryKey,backupKey,primaryName,backupName);
 }
 
 @override
 String toString() {
-    return 'ProfileNodeFailover(enabled: $enabled, groupName: $groupName, primaryKey: $primaryKey, backupKey: $backupKey, primaryName: $primaryName, backupName: $backupName)';
+    return 'ProfileNodeFailover(enabled: $enabled, groupName: $groupName, routeGroupName: $routeGroupName, primaryKey: $primaryKey, backupKey: $backupKey, primaryName: $primaryName, backupName: $backupName)';
 }
 
 
@@ -6142,7 +6144,7 @@ abstract mixin class _$ProfileNodeFailoverCopyWith<$Res> implements $ProfileNode
   factory _$ProfileNodeFailoverCopyWith(_ProfileNodeFailover value, $Res Function(_ProfileNodeFailover) _then) = __$ProfileNodeFailoverCopyWithImpl;
 @override @useResult
 $Res call({
- bool enabled, String groupName, String primaryKey, String backupKey, String primaryName, String backupName
+ bool enabled, String groupName, String? routeGroupName, String primaryKey, String backupKey, String primaryName, String backupName
 });
 
 
@@ -6159,11 +6161,12 @@ class __$ProfileNodeFailoverCopyWithImpl<$Res>
 
 /// Create a copy of ProfileNodeFailover
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? enabled = null,Object? groupName = null,Object? primaryKey = null,Object? backupKey = null,Object? primaryName = null,Object? backupName = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? enabled = null,Object? groupName = null,Object? routeGroupName = freezed,Object? primaryKey = null,Object? backupKey = null,Object? primaryName = null,Object? backupName = null,}) {
   return _then(_ProfileNodeFailover(
 enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
 as bool,groupName: null == groupName ? _self.groupName : groupName // ignore: cast_nullable_to_non_nullable
-as String,primaryKey: null == primaryKey ? _self.primaryKey : primaryKey // ignore: cast_nullable_to_non_nullable
+as String,routeGroupName: freezed == routeGroupName ? _self.routeGroupName : routeGroupName // ignore: cast_nullable_to_non_nullable
+as String?,primaryKey: null == primaryKey ? _self.primaryKey : primaryKey // ignore: cast_nullable_to_non_nullable
 as String,backupKey: null == backupKey ? _self.backupKey : backupKey // ignore: cast_nullable_to_non_nullable
 as String,primaryName: null == primaryName ? _self.primaryName : primaryName // ignore: cast_nullable_to_non_nullable
 as String,backupName: null == backupName ? _self.backupName : backupName // ignore: cast_nullable_to_non_nullable

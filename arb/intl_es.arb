@@ -53,9 +53,14 @@
   "fastestServer": "Fastest server",
   "fastestServerUnavailable": "Automatic selection is unavailable in this configuration or routing mode",
   "controlPanel": "Control panel",
-
   "realityMlkemInherit": "Heredar ({status})",
-  "@realityMlkemInherit": {"placeholders": {"status": {"type": "String"}}},
+  "@realityMlkemInherit": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "realityMlkemProfile": "Predeterminado del perfil",
   "realityMlkemDescription": "Ajuste predeterminado de los nodos REALITY. Los perfiles y nodos pueden usar sus propios ajustes, que se conservan al actualizar la suscripción.",
   "rule": "Regla",
@@ -1033,5 +1038,19 @@
   "nodeFailoverChoose": "Elegir",
   "nodeFailoverMissing": "No está en el perfil",
   "nodeFailoverMissingDescription": "Falta un nodo o grupo guardado. Se conserva la selección y no se sustituye por otros nodos. Actualiza la suscripción o elige otro par.",
-  "nodeFailoverManaged": "Este grupo usa el par guardado en los ajustes del perfil. Cambia los nodos allí."
+  "nodeFailoverManaged": "Este grupo usa el par guardado en los ajustes del perfil. Cambia los nodos allí.",
+  "safeAutomatic": "Respaldo automático",
+  "safeHint": "Elige una tarjeta. Se comprueba cada {seconds} s y se vuelve al principal cuando se recupera.",
+  "safeActive": "Safe seleccionado",
+  "safeReady": "Toca un nodo para usar Safe",
+  "safeNoNodes": "No hay nodos compatibles. Se requieren nodos integrados sin transformaciones del proveedor.",
+  "@safeHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "safeApplyFailed": "No se pudo aplicar Safe. La selección está guardada; revisa el perfil e inténtalo de nuevo.",
+  "safeNoRoute": "No hay una ruta predeterminada seleccionable. Usa el modo global o corrige las reglas."
 }

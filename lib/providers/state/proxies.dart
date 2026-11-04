@@ -1,6 +1,59 @@
 part of '../state.dart';
 
 @riverpod
+Future<Map<String, dynamic>> safeProfileConfig(Ref ref) async {
+  final profile = ref.watch(
+    currentProfileProvider.select(
+      (p) => (
+        id: p?.id,
+        type: p?.type,
+        updated: p?.lastUpdateDate,
+        scriptId: p?.scriptId,
+        extendType: p?.extendType,
+        matchTarget: p?.matchTarget,
+      ),
+    ),
+  );
+  final id = profile.id;
+  if (id == null) return {};
+  if (profile.type == ProfileType.custom) {
+    final state = await ref.watch(setupStateProvider(id).future);
+    return {
+      'proxies': appProxiesPayload(
+        state.appProxies,
+        dialers: state.proxyDialers,
+        groups: state.proxyGroups,
+      ),
+      'proxy-groups': [for (final group in state.proxyGroups) group.definition],
+      'rules': [for (final rule in state.rules) rule.rawValue],
+    };
+  }
+  var config = await ref.watch(coreHandlerProvider).getConfig(id);
+  if (profile.extendType == ExtendType.script) {
+    final state = await ref.watch(setupStateProvider(id).future);
+    final script = await state.script?.content;
+    if (script?.isNotEmpty == true) {
+      config = await handleEvaluate(script!, config);
+    }
+  }
+  final state = await ref.watch(setupStateProvider(id).future);
+  return {
+    ...config,
+    'rules': composeProfileRules(
+      config,
+      addedRules: state.addedRules,
+      matchTarget: state.matchTarget,
+    ),
+  };
+}
+
+@riverpod
+String safeTabName(Ref ref) {
+  final config = ref.watch(safeProfileConfigProvider).asData?.value;
+  return config == null ? 'Safe' : safeGroupName(config);
+}
+
+@riverpod
 GroupsState currentGroupsState(Ref ref) {
   final mode = ref.watch(
     patchClashConfigProvider.select((state) => state.mode),
@@ -11,7 +64,48 @@ GroupsState currentGroupsState(Ref ref) {
     Mode.global => groups,
     Mode.rule => groups.where((item) => item.hidden == false),
   };
-  return GroupsState(value: shown.map(_withoutSelection).toList());
+  if (mode == Mode.direct || ref.watch(currentProfileProvider) == null) {
+    return GroupsState(value: shown.map(_withoutSelection).toList());
+  }
+  final name = ref.watch(safeTabNameProvider);
+  final config = ref.watch(safeProfileConfigProvider).asData?.value;
+  final nodes = config == null
+      ? <ProfileFailoverNode>[]
+      : safeProfileNodes(config);
+  final runtime = groups.where((group) => group.name == name).firstOrNull;
+  final proxyMap = {
+    for (final group in groups)
+      for (final proxy in group.all) proxy.name: proxy,
+  };
+  final safe = Group(
+    name: name,
+    type: GroupType.Fallback,
+    hidden: false,
+    testUrl: runtime?.testUrl,
+    all: [
+      for (final node in nodes)
+        proxyMap[node.name] ??
+            Proxy(name: node.name, type: '${node.definition['type']}'),
+    ],
+  );
+  final result = shown
+      .where((group) => group.name != name)
+      .map(
+        (group) => _withoutSelection(
+          group.copyWith(
+            all: group.all.where((proxy) => proxy.name != name).toList(),
+          ),
+        ),
+      )
+      .toList();
+  final fastest = result.indexWhere((group) => group.name == 'Fastest');
+  final index = fastest >= 0
+      ? fastest + 1
+      : result.isEmpty
+      ? 0
+      : 1;
+  result.insert(index, safe);
+  return GroupsState(value: result);
 }
 
 Group _withoutSelection(Group group) {
@@ -244,14 +338,7 @@ Map<String, String> selectedMap(Ref ref) {
   final pair = ref.watch(
     currentProfileProvider.select((profile) => profile?.overrides.nodeFailover),
   );
-  return {
-    ...selectedMap,
-    if (pair?.enabled == true) ...{
-      pair!.groupName: '',
-      if (pair.groupName != GroupName.GLOBAL.name)
-        GroupName.GLOBAL.name: pair.groupName,
-    },
-  };
+  return safeSelectedMap(selectedMap, pair);
 }
 
 @riverpod

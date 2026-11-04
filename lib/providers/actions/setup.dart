@@ -43,6 +43,17 @@ class SetupAction extends _$SetupAction {
       _recoveryTimer?.cancel();
     });
     ref.listen(appVisibleProvider, (_, _) => _syncRuntimeTicker());
+    ref.listen(patchClashConfigProvider.select((state) => state.mode), (
+      previous,
+      next,
+    ) {
+      if (previous != next &&
+          next != Mode.direct &&
+          ref.read(currentProfileProvider)?.overrides.nodeFailover?.enabled ==
+              true) {
+        applyProfileDebounce(silence: true, force: true);
+      }
+    });
     ref.listen(
       appSettingProvider.select((state) => state.showTrayTitle),
       (_, _) => _syncRuntimeTicker(),
@@ -519,6 +530,37 @@ class SetupAction extends _$SetupAction {
       proxyGroups: proxyGroups,
       rules: rules,
     );
+    final choiceConfig = <String, dynamic>{
+      ...rawConfig,
+      if (isCustom)
+        'proxy-groups': [for (final group in proxyGroups) group.definition],
+      'rules': composeProfileRules(
+        rawConfig,
+        rules: rules,
+        addedRules: setupState.addedRules,
+        matchTarget: setupState.matchTarget,
+      ),
+    };
+    final savedPair = setupState.overrides.nodeFailover;
+    final safePair = resolvedSafeChoice(
+      choiceConfig,
+      savedPair,
+      global: patchConfig.mode == Mode.global,
+    );
+    if (safePair != savedPair) {
+      ref
+          .read(profilesProvider.notifier)
+          .updateProfile(
+            profileId,
+            (profile) => profile.overrides.nodeFailover == savedPair
+                ? profile.copyWith(
+                    overrides: profile.overrides.copyWith(
+                      nodeFailover: safePair,
+                    ),
+                  )
+                : profile,
+          );
+    }
     final res = makeRealProfileTask(
       MakeRealProfileState(
         testUrl: ref.read(appSettingProvider).testUrl,
@@ -530,7 +572,7 @@ class SetupAction extends _$SetupAction {
         profileId: profileId,
         rawConfig: rawConfig,
         realPatchConfig: realPatchConfig,
-        overrides: setupState.overrides,
+        overrides: setupState.overrides.copyWith(nodeFailover: safePair),
         keepEmptyDnsOverrides: setupState.profileType != ProfileType.custom,
         appendSystemDns: appendSystemDns,
         addedRules: setupState.addedRules,

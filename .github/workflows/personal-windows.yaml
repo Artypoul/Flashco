@@ -91,6 +91,7 @@ jobs:
           test/database/subscription_interval_migration_test.dart
           test/common/profile_update_scheduler_test.dart
           test/common/profile_node_failover_test.dart
+          test/common/safe_mode_test.dart
           test/providers/node_failover_test.dart
           test/views/node_failover_test.dart
           test/widgets/edit_profile_focus_test.dart

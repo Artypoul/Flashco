@@ -271,6 +271,8 @@ extension ProfileOverridesReferences on ProfileOverrides {
     return copyWith(
       nodeFailover: nodeFailover?.copyWith(
         groupName: names[nodeFailover!.groupName] ?? nodeFailover!.groupName,
+        routeGroupName:
+            names[nodeFailover!.routeGroupName] ?? nodeFailover!.routeGroupName,
         primaryName:
             names[nodeFailover!.primaryName] ?? nodeFailover!.primaryName,
         backupName: names[nodeFailover!.backupName] ?? nodeFailover!.backupName,

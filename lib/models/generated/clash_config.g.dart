@@ -503,6 +503,7 @@ _ProfileNodeFailover _$ProfileNodeFailoverFromJson(Map<String, dynamic> json) =>
     _ProfileNodeFailover(
       enabled: json['enabled'] as bool? ?? true,
       groupName: json['groupName'] as String,
+      routeGroupName: json['routeGroupName'] as String?,
       primaryKey: json['primaryKey'] as String,
       backupKey: json['backupKey'] as String,
       primaryName: json['primaryName'] as String,
@@ -514,6 +515,7 @@ Map<String, dynamic> _$ProfileNodeFailoverToJson(
 ) => <String, dynamic>{
   'enabled': instance.enabled,
   'groupName': instance.groupName,
+  'routeGroupName': instance.routeGroupName,
   'primaryKey': instance.primaryKey,
   'backupKey': instance.backupKey,
   'primaryName': instance.primaryName,

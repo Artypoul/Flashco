@@ -1508,18 +1508,18 @@ void main() {
 
       final originalHosts = scoped.read(patchClashConfigProvider).hosts;
       expect(await setupAction.applyProfile(force: true), isTrue);
-      expect(shownGroups(), ['Proxy']);
+      expect(shownGroups(), ['Proxy', 'Safe']);
 
       rejecting = true;
       setHosts({'example.com': 'not-an-address'});
       expect(await setupAction.applyProfile(), isFalse);
-      expect(shownGroups(), isEmpty);
+      expect(shownGroups(), ['Safe']);
 
       rejecting = false;
       setHosts(originalHosts);
       expect(await setupAction.applyProfile(), isTrue);
       verify(() => core.setupConfig(any())).called(3);
-      expect(shownGroups(), ['Proxy']);
+      expect(shownGroups(), ['Proxy', 'Safe']);
     });
 
     test('a custom profile declares only the proxies and providers it names, '
@@ -1607,7 +1607,10 @@ void main() {
       expect((config['proxies'] as YamlList).single['name'], 'mine');
       expect(proxyProviders['sub']['type'], 'file');
       expect(proxyProviders['sub']['path'], await appPath.getProfilePath('42'));
-      expect((config['proxy-groups'] as YamlList).single['name'], 'g');
+      expect(
+        (config['proxy-groups'] as YamlList).map((group) => group['name']),
+        ['g', 'Safe'],
+      );
       expect(config['rules'], [
         'RULE-SET,appRules,DIRECT',
         'RULE-SET,localRules,DIRECT',

@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/icons/icons.dart';
-import 'package:flashco/models/common.dart';
+import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
 import 'common.dart';
+import 'safe.dart';
 
 class ProxiesTabView extends ConsumerStatefulWidget {
   const ProxiesTabView({super.key});
@@ -99,9 +100,15 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
     if (group == null) {
       return;
     }
-    await ref
-        .read(proxiesActionProvider.notifier)
-        .delayTestPageGroup(group.name);
+    if (group.name == ref.read(safeTabNameProvider)) {
+      await ref
+          .read(proxiesActionProvider.notifier)
+          .delayTest(group.all, group.testUrl);
+    } else {
+      await ref
+          .read(proxiesActionProvider.notifier)
+          .delayTestPageGroup(group.name);
+    }
   }
 
   Group? get currentGroup {
@@ -298,7 +305,10 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                                 child: Builder(
                                   builder: (context) {
                                     return EmojiText(
-                                      group.name,
+                                      group.name ==
+                                              ref.watch(safeTabNameProvider)
+                                          ? 'Safe'
+                                          : group.name,
                                       style: DefaultTextStyle.of(context).style,
                                     );
                                   },
@@ -326,13 +336,21 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                     controller: _tabController,
                     children: [
                       for (final group in groups)
-                        ProxyGroupView(
-                          key: ValueKey(group.name),
-                          controller: _scrollControllerOf(group.name),
-                          group: group,
-                          columns: columns,
-                          cardType: state.proxyCardType,
-                        ),
+                        if (group.name == ref.watch(safeTabNameProvider))
+                          SafeGroupView(
+                            group: group,
+                            controller: _scrollControllerOf(group.name),
+                            columns: columns,
+                            cardType: state.proxyCardType,
+                          )
+                        else
+                          ProxyGroupView(
+                            key: ValueKey(group.name),
+                            controller: _scrollControllerOf(group.name),
+                            group: group,
+                            columns: columns,
+                            cardType: state.proxyCardType,
+                          ),
                     ],
                   );
                 },
@@ -352,6 +370,7 @@ class ProxyGroupView extends ConsumerWidget {
   final ProxyCardType cardType;
   final bool shrinkWrap;
   final double topPadding;
+  final Widget Function(Proxy)? cardBuilder;
 
   const ProxyGroupView({
     super.key,
@@ -361,6 +380,7 @@ class ProxyGroupView extends ConsumerWidget {
     required this.cardType,
     this.shrinkWrap = false,
     this.topPadding = 16,
+    this.cardBuilder,
   });
 
   PageStorageKey _getPageStorageKey(WidgetRef ref) {
@@ -398,13 +418,14 @@ class ProxyGroupView extends ConsumerWidget {
         itemCount: proxies.length,
         itemBuilder: (_, index) {
           final proxy = proxies[index];
-          return ProxyCard(
-            testUrl: group.testUrl,
-            groupType: group.type,
-            type: cardType,
-            proxy: proxy,
-            groupName: group.name,
-          );
+          return cardBuilder?.call(proxy) ??
+              ProxyCard(
+                testUrl: group.testUrl,
+                groupType: group.type,
+                type: cardType,
+                proxy: proxy,
+                groupName: group.name,
+              );
         },
       ),
     );

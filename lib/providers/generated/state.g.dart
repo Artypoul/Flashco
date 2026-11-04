@@ -1721,6 +1721,88 @@ abstract class _$RuleProvider extends $Notifier<Rule> {
   }
 }
 
+@ProviderFor(safeProfileConfig)
+final safeProfileConfigProvider = SafeProfileConfigProvider._();
+
+final class SafeProfileConfigProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, dynamic>>,
+          Map<String, dynamic>,
+          FutureOr<Map<String, dynamic>>
+        >
+    with
+        $FutureModifier<Map<String, dynamic>>,
+        $FutureProvider<Map<String, dynamic>> {
+  SafeProfileConfigProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'safeProfileConfigProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$safeProfileConfigHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, dynamic>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, dynamic>> create(Ref ref) {
+    return safeProfileConfig(ref);
+  }
+}
+
+String _$safeProfileConfigHash() => r'4fd1d918a6b6012103833be39c77b26043b4c030';
+
+@ProviderFor(safeTabName)
+final safeTabNameProvider = SafeTabNameProvider._();
+
+final class SafeTabNameProvider
+    extends $FunctionalProvider<String, String, String>
+    with $Provider<String> {
+  SafeTabNameProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'safeTabNameProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$safeTabNameHash();
+
+  @$internal
+  @override
+  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String create(Ref ref) {
+    return safeTabName(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$safeTabNameHash() => r'5147d2ce90301349a2e217e656d697f31691b393';
+
 @ProviderFor(currentGroupsState)
 final currentGroupsStateProvider = CurrentGroupsStateProvider._();
 
@@ -1761,7 +1843,7 @@ final class CurrentGroupsStateProvider
 }
 
 String _$currentGroupsStateHash() =>
-    r'd4ea3c3271a77d8bd791f94c697cc94a41fff38f';
+    r'a511ff56712535e11d9826f851200c935800f7fb';
 
 @ProviderFor(proxyState)
 final proxyStateProvider = ProxyStateProvider._();
@@ -2579,7 +2661,7 @@ final class SelectedMapProvider
   }
 }
 
-String _$selectedMapHash() => r'aeefbe5fa30dc3f74a59a4a6e981fd9eca580a76';
+String _$selectedMapHash() => r'9cba978d89300718adfb349f20e766d054aa5e43';
 
 @ProviderFor(unfoldSet)
 final unfoldSetProvider = UnfoldSetProvider._();

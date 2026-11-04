@@ -53,9 +53,14 @@
   "fastestServer": "Fastest server",
   "fastestServerUnavailable": "Automatic selection is unavailable in this configuration or routing mode",
   "controlPanel": "Control panel",
-
   "realityMlkemInherit": "Hériter ({status})",
-  "@realityMlkemInherit": {"placeholders": {"status": {"type": "String"}}},
+  "@realityMlkemInherit": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "realityMlkemProfile": "Valeur du profil",
   "realityMlkemDescription": "Réglage par défaut des nœuds REALITY. Les profils et les nœuds peuvent avoir leurs propres réglages, conservés lors des mises à jour de l’abonnement.",
   "rule": "Règle",
@@ -1033,5 +1038,19 @@
   "nodeFailoverChoose": "Choisir",
   "nodeFailoverMissing": "Absent du profil",
   "nodeFailoverMissingDescription": "Un nœud ou groupe enregistré est absent. Le choix est conservé et aucun autre nœud ne le remplace. Actualisez l’abonnement ou choisissez une autre paire.",
-  "nodeFailoverManaged": "Ce groupe utilise la paire enregistrée dans les réglages du profil. Modifiez les nœuds à cet endroit."
+  "nodeFailoverManaged": "Ce groupe utilise la paire enregistrée dans les réglages du profil. Modifiez les nœuds à cet endroit.",
+  "safeAutomatic": "Secours automatique",
+  "safeHint": "Choisissez une carte. Vérification toutes les {seconds} s ; retour au principal après rétablissement.",
+  "safeActive": "Safe sélectionné",
+  "safeReady": "Touchez un nœud pour utiliser Safe",
+  "safeNoNodes": "Aucun nœud compatible. Des nœuds intégrés sans transformation du fournisseur sont nécessaires.",
+  "@safeHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "safeApplyFailed": "Impossible d’appliquer Safe. Les choix sont enregistrés ; vérifiez le profil puis réessayez.",
+  "safeNoRoute": "Aucune route par défaut sélectionnable. Utilisez le mode global ou corrigez les règles."
 }
