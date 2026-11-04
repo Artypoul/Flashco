@@ -369,8 +369,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoCloseConnectionsDesc": MessageLookupByLibrary.simpleMessage(
       "Auto close connections drops open connections when you switch proxies.",
     ),
+    "autoFailover": MessageLookupByLibrary.simpleMessage(
+      "Switch to a working node",
+    ),
     "autoInclude": MessageLookupByLibrary.simpleMessage("Auto-include"),
     "autoLaunch": MessageLookupByLibrary.simpleMessage("Auto launch"),
+    "autoReconnect": MessageLookupByLibrary.simpleMessage(
+      "Reconnect after disconnect",
+    ),
     "autoRun": MessageLookupByLibrary.simpleMessage("Auto run"),
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "Auto run starts the proxy when the app opens.",
@@ -525,6 +531,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "connected": MessageLookupByLibrary.simpleMessage("Connected"),
     "connecting": MessageLookupByLibrary.simpleMessage("Connecting…"),
     "connection": MessageLookupByLibrary.simpleMessage("Connection"),
+    "connectionRecovery": MessageLookupByLibrary.simpleMessage(
+      "Connection recovery",
+    ),
+    "connectionRecoveryDesc": MessageLookupByLibrary.simpleMessage(
+      "Retry the VPN after a disconnect and use working nodes. Manual stop cancels recovery. Profiles can inherit these settings.",
+    ),
     "connectionStats": MessageLookupByLibrary.simpleMessage("Connection stats"),
     "connectionStatsDesc": MessageLookupByLibrary.simpleMessage(
       "Live connections, recent requests and DNS queries",
@@ -1010,10 +1022,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Enter the rule content",
     ),
-    "installedAppsPermissionDeniedMessage":
-        MessageLookupByLibrary.simpleMessage(
-          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-        ),
+    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
+      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+    ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
@@ -1288,6 +1299,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "noSearchResults": MessageLookupByLibrary.simpleMessage(
       "No matching results",
     ),
+    "nodeFailover": MessageLookupByLibrary.simpleMessage(
+      "Primary and backup nodes",
+    ),
+    "nodeFailoverBackup": MessageLookupByLibrary.simpleMessage("Backup node"),
+    "nodeFailoverChoose": MessageLookupByLibrary.simpleMessage("Choose"),
+    "nodeFailoverDescription": MessageLookupByLibrary.simpleMessage(
+      "Uses only this pair in order and returns to the primary when it recovers. The check interval follows Connection recovery.",
+    ),
+    "nodeFailoverManaged": MessageLookupByLibrary.simpleMessage(
+      "This group uses the primary and backup nodes saved in profile settings. Change the pair there.",
+    ),
+    "nodeFailoverMissing": MessageLookupByLibrary.simpleMessage(
+      "Missing from profile",
+    ),
+    "nodeFailoverMissingDescription": MessageLookupByLibrary.simpleMessage(
+      "A saved node or group is missing. The choice is kept; other nodes will not replace this pair. Update the subscription or choose another pair.",
+    ),
+    "nodeFailoverPrimary": MessageLookupByLibrary.simpleMessage("Primary node"),
     "nodes": MessageLookupByLibrary.simpleMessage("Nodes"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "This external resource is not a text file",
@@ -1477,6 +1506,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "recentRequests": MessageLookupByLibrary.simpleMessage("Recent requests"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("Suggested"),
     "recordType": MessageLookupByLibrary.simpleMessage("Record type"),
+    "recoveryInterval": MessageLookupByLibrary.simpleMessage(
+      "Retry and health-check interval (seconds)",
+    ),
+    "recoveryIntervalError": MessageLookupByLibrary.simpleMessage(
+      "Enter a number from 1 to 3600",
+    ),
     "redirPort": MessageLookupByLibrary.simpleMessage("Redir port"),
     "redo": MessageLookupByLibrary.simpleMessage("Redo"),
     "regex": MessageLookupByLibrary.simpleMessage("Regex"),

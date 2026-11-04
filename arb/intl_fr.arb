@@ -1,4 +1,10 @@
 {
+  "connectionRecovery": "Rétablissement de connexion",
+  "connectionRecoveryDesc": "Réessayer le VPN et utiliser les nœuds disponibles. Un arrêt manuel annule la reprise. Les profils peuvent hériter de ces réglages.",
+  "autoReconnect": "Reconnecter après une coupure",
+  "autoFailover": "Passer à un nœud disponible",
+  "recoveryInterval": "Intervalle des tentatives et tests (secondes)",
+  "recoveryIntervalError": "Saisissez un nombre de 1 à 3600",
   "networkDetection": "Network detection",
   "serviceCheck": "Check",
   "serviceCheckedAt": "Checked at {time}",
@@ -1019,5 +1025,13 @@
   "preferred": "Préféré",
   "addToLocalProxies": "Ajouter aux proxys locaux",
   "addedToLocalProxies": "{name} ajouté aux proxys locaux",
-  "alreadyInLocalProxies": "{name} est déjà dans les proxys locaux"
+  "alreadyInLocalProxies": "{name} est déjà dans les proxys locaux",
+  "nodeFailover": "Nœuds principal et de secours",
+  "nodeFailoverDescription": "Utilise uniquement cette paire dans l’ordre et revient au nœud principal après sa récupération. L’intervalle suit les réglages de rétablissement de connexion.",
+  "nodeFailoverPrimary": "Nœud principal",
+  "nodeFailoverBackup": "Nœud de secours",
+  "nodeFailoverChoose": "Choisir",
+  "nodeFailoverMissing": "Absent du profil",
+  "nodeFailoverMissingDescription": "Un nœud ou groupe enregistré est absent. Le choix est conservé et aucun autre nœud ne le remplace. Actualisez l’abonnement ou choisissez une autre paire.",
+  "nodeFailoverManaged": "Ce groupe utilise la paire enregistrée dans les réglages du profil. Modifiez les nœuds à cet endroit."
 }

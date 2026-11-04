@@ -389,10 +389,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoCloseConnectionsDesc": MessageLookupByLibrary.simpleMessage(
       "La fermeture automatique coupe les connexions ouvertes lorsque vous changez de proxy.",
     ),
+    "autoFailover": MessageLookupByLibrary.simpleMessage(
+      "Passer à un nœud disponible",
+    ),
     "autoInclude": MessageLookupByLibrary.simpleMessage(
       "Inclure automatiquement",
     ),
     "autoLaunch": MessageLookupByLibrary.simpleMessage("Lancement automatique"),
+    "autoReconnect": MessageLookupByLibrary.simpleMessage(
+      "Reconnecter après une coupure",
+    ),
     "autoRun": MessageLookupByLibrary.simpleMessage("Démarrage automatique"),
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "Le démarrage automatique active le proxy à l’ouverture de l’app.",
@@ -565,6 +571,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "connected": MessageLookupByLibrary.simpleMessage("Connecté"),
     "connecting": MessageLookupByLibrary.simpleMessage("Connexion…"),
     "connection": MessageLookupByLibrary.simpleMessage("Connexion"),
+    "connectionRecovery": MessageLookupByLibrary.simpleMessage(
+      "Rétablissement de connexion",
+    ),
+    "connectionRecoveryDesc": MessageLookupByLibrary.simpleMessage(
+      "Réessayer le VPN et utiliser les nœuds disponibles. Un arrêt manuel annule la reprise. Les profils peuvent hériter de ces réglages.",
+    ),
     "connectionStats": MessageLookupByLibrary.simpleMessage(
       "Statistiques de connexion",
     ),
@@ -1076,10 +1088,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Saisissez le contenu de la règle",
     ),
-    "installedAppsPermissionDeniedMessage":
-        MessageLookupByLibrary.simpleMessage(
-          "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
-        ),
+    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
+      "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
+    ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Ce système masque la liste des apps installées tant que l’autorisation n’est pas accordée. Accordez-la pour configurer le proxy par app.",
     ),
@@ -1378,6 +1389,28 @@ class MessageLookup extends MessageLookupByLibrary {
       "Ne pas résoudre le nom d’hôte",
     ),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("Aucun résultat"),
+    "nodeFailover": MessageLookupByLibrary.simpleMessage(
+      "Nœuds principal et de secours",
+    ),
+    "nodeFailoverBackup": MessageLookupByLibrary.simpleMessage(
+      "Nœud de secours",
+    ),
+    "nodeFailoverChoose": MessageLookupByLibrary.simpleMessage("Choisir"),
+    "nodeFailoverDescription": MessageLookupByLibrary.simpleMessage(
+      "Utilise uniquement cette paire dans l’ordre et revient au nœud principal après sa récupération. L’intervalle suit les réglages de rétablissement de connexion.",
+    ),
+    "nodeFailoverManaged": MessageLookupByLibrary.simpleMessage(
+      "Ce groupe utilise la paire enregistrée dans les réglages du profil. Modifiez les nœuds à cet endroit.",
+    ),
+    "nodeFailoverMissing": MessageLookupByLibrary.simpleMessage(
+      "Absent du profil",
+    ),
+    "nodeFailoverMissingDescription": MessageLookupByLibrary.simpleMessage(
+      "Un nœud ou groupe enregistré est absent. Le choix est conservé et aucun autre nœud ne le remplace. Actualisez l’abonnement ou choisissez une autre paire.",
+    ),
+    "nodeFailoverPrimary": MessageLookupByLibrary.simpleMessage(
+      "Nœud principal",
+    ),
     "nodes": MessageLookupByLibrary.simpleMessage("Nœuds"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "Cette ressource externe n’est pas un fichier texte",
@@ -1589,6 +1622,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "recentRequests": MessageLookupByLibrary.simpleMessage("Requêtes récentes"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("Suggestions"),
     "recordType": MessageLookupByLibrary.simpleMessage("Type d’enregistrement"),
+    "recoveryInterval": MessageLookupByLibrary.simpleMessage(
+      "Intervalle des tentatives et tests (secondes)",
+    ),
+    "recoveryIntervalError": MessageLookupByLibrary.simpleMessage(
+      "Saisissez un nombre de 1 à 3600",
+    ),
     "redirPort": MessageLookupByLibrary.simpleMessage("Port Redir"),
     "redo": MessageLookupByLibrary.simpleMessage("Rétablir"),
     "regex": MessageLookupByLibrary.simpleMessage("Regex"),

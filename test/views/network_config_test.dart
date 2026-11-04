@@ -1,3 +1,4 @@
+import 'package:flashco/views/config/connection_recovery.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/providers/app.dart';
@@ -243,11 +244,14 @@ void main() {
 
     test('keep-alive rows stay off Android and the mark is Linux only', () {
       expect(
-        outboundItems(isDesktop: false, isLinux: false).single,
-        isA<RealityMlkemItem>(),
+        outboundItems(
+          isDesktop: false,
+          isLinux: false,
+        ).whereType<ConnectionRecoveryItem>(),
+        hasLength(1),
       );
-      expect(outboundItems(isDesktop: true, isLinux: false), hasLength(4));
-      expect(outboundItems(isDesktop: true, isLinux: true), hasLength(5));
+      expect(outboundItems(isDesktop: true, isLinux: false), hasLength(5));
+      expect(outboundItems(isDesktop: true, isLinux: true), hasLength(6));
     });
   });
 }

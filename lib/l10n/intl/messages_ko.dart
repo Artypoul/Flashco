@@ -316,8 +316,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoCloseConnectionsDesc": MessageLookupByLibrary.simpleMessage(
       "연결 자동 종료는 프록시를 전환할 때 열려 있는 연결을 끊습니다.",
     ),
+    "autoFailover": MessageLookupByLibrary.simpleMessage("사용 가능한 노드로 전환"),
     "autoInclude": MessageLookupByLibrary.simpleMessage("자동 포함"),
     "autoLaunch": MessageLookupByLibrary.simpleMessage("자동 실행"),
+    "autoReconnect": MessageLookupByLibrary.simpleMessage("연결 끊김 후 재연결"),
     "autoRun": MessageLookupByLibrary.simpleMessage("자동 시작"),
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "자동 시작은 앱을 열 때 프록시를 시작합니다.",
@@ -438,6 +440,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "connected": MessageLookupByLibrary.simpleMessage("연결됨"),
     "connecting": MessageLookupByLibrary.simpleMessage("연결 중…"),
     "connection": MessageLookupByLibrary.simpleMessage("연결"),
+    "connectionRecovery": MessageLookupByLibrary.simpleMessage("연결 복구"),
+    "connectionRecoveryDesc": MessageLookupByLibrary.simpleMessage(
+      "연결이 끊기면 VPN을 재시도하고 사용 가능한 노드를 선택합니다. 수동 중지는 복구를 취소합니다. 프로필은 설정을 상속할 수 있습니다.",
+    ),
     "connectionStats": MessageLookupByLibrary.simpleMessage("연결 통계"),
     "connectionStatsDesc": MessageLookupByLibrary.simpleMessage(
       "실시간 연결, 최근 요청, DNS 쿼리",
@@ -1095,6 +1101,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("IP 확인 안 함"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("호스트 이름 확인 안 함"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("일치하는 결과 없음"),
+    "nodeFailover": MessageLookupByLibrary.simpleMessage("기본 및 예비 노드"),
+    "nodeFailoverBackup": MessageLookupByLibrary.simpleMessage("예비 노드"),
+    "nodeFailoverChoose": MessageLookupByLibrary.simpleMessage("선택"),
+    "nodeFailoverDescription": MessageLookupByLibrary.simpleMessage(
+      "이 두 노드만 순서대로 사용하고 기본 노드가 복구되면 돌아갑니다. 확인 간격은 연결 복구 설정을 따릅니다.",
+    ),
+    "nodeFailoverManaged": MessageLookupByLibrary.simpleMessage(
+      "이 그룹은 프로필에 저장된 기본 및 예비 노드를 사용합니다. 프로필 설정에서 변경하세요.",
+    ),
+    "nodeFailoverMissing": MessageLookupByLibrary.simpleMessage("프로필에 없음"),
+    "nodeFailoverMissingDescription": MessageLookupByLibrary.simpleMessage(
+      "저장된 노드 또는 그룹이 없습니다. 선택은 유지되며 다른 노드로 대체되지 않습니다. 구독을 갱신하거나 다른 노드를 선택하세요.",
+    ),
+    "nodeFailoverPrimary": MessageLookupByLibrary.simpleMessage("기본 노드"),
     "nodes": MessageLookupByLibrary.simpleMessage("노드"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "이 외부 리소스는 텍스트 파일이 아닙니다",
@@ -1254,6 +1274,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "recentRequests": MessageLookupByLibrary.simpleMessage("최근 요청"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("추천"),
     "recordType": MessageLookupByLibrary.simpleMessage("레코드 유형"),
+    "recoveryInterval": MessageLookupByLibrary.simpleMessage("재시도 및 확인 간격 (초)"),
+    "recoveryIntervalError": MessageLookupByLibrary.simpleMessage(
+      "1에서 3600 사이의 숫자를 입력하세요",
+    ),
     "redirPort": MessageLookupByLibrary.simpleMessage("Redir 포트"),
     "redo": MessageLookupByLibrary.simpleMessage("다시 실행"),
     "regex": MessageLookupByLibrary.simpleMessage("정규식"),

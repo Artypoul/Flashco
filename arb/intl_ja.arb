@@ -1,4 +1,10 @@
 {
+  "connectionRecovery": "接続の復旧",
+  "connectionRecoveryDesc": "切断後にVPNを再接続し、利用可能なノードを使用します。手動停止で復旧を中止します。プロファイルで設定を継承できます。",
+  "autoReconnect": "切断後に再接続",
+  "autoFailover": "利用可能なノードに切り替え",
+  "recoveryInterval": "再試行と確認の間隔（秒）",
+  "recoveryIntervalError": "1から3600の数値を入力してください",
   "networkDetection": "ネットワーク検出",
   "serviceCheck": "検査",
   "serviceCheckedAt": "{time} に検査",
@@ -1019,5 +1025,13 @@
   "preferred": "優先",
   "addToLocalProxies": "ローカルプロキシに追加",
   "addedToLocalProxies": "{name} をローカルプロキシに追加しました",
-  "alreadyInLocalProxies": "{name} はすでにローカルプロキシにあります"
+  "alreadyInLocalProxies": "{name} はすでにローカルプロキシにあります",
+  "nodeFailover": "優先ノードと予備ノード",
+  "nodeFailoverDescription": "この2つだけを順番に使用し、優先ノードが復旧すると戻ります。確認間隔は接続の復元設定に従います。",
+  "nodeFailoverPrimary": "優先ノード",
+  "nodeFailoverBackup": "予備ノード",
+  "nodeFailoverChoose": "選択",
+  "nodeFailoverMissing": "プロファイルにありません",
+  "nodeFailoverMissingDescription": "保存したノードまたはグループがありません。選択は保持され、他のノードには置き換わりません。サブスクリプションを更新するか選択を変更してください。",
+  "nodeFailoverManaged": "このグループはプロファイルに保存したノードの組で制御されます。プロファイル設定で変更してください。"
 }

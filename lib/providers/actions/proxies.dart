@@ -91,6 +91,10 @@ class ProxiesAction extends _$ProxiesAction {
   }
 
   void changeProxyDebounce(String groupName, String proxyName) {
+    if (_isManagedPair(groupName)) {
+      dialogs.showNotifier(currentAppLocalizations.nodeFailoverManaged);
+      return;
+    }
     _pendingSelectedRollback.putIfAbsent(
       groupName,
       () => _currentSelectedName(groupName),
@@ -178,6 +182,7 @@ class ProxiesAction extends _$ProxiesAction {
     required String groupName,
     required String proxyName,
   }) async {
+    if (_isManagedPair(groupName) && proxyName.isNotEmpty) return;
     final profilesAction = ref.read(profilesActionProvider.notifier);
     final rollbackName =
         _pendingSelectedRollback.remove(groupName) ??
@@ -218,6 +223,12 @@ class ProxiesAction extends _$ProxiesAction {
         logLevel: coreFailureLogLevel(error),
       );
     }
+  }
+
+  bool _isManagedPair(String groupName) {
+    final pair = ref.read(currentProfileProvider)?.overrides.nodeFailover;
+    return pair?.enabled == true &&
+        (pair!.groupName == groupName || groupName == GroupName.GLOBAL.name);
   }
 
   Future<String> updateProvider(

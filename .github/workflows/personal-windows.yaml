@@ -88,12 +88,27 @@ jobs:
           flutter test test/common/personal_defaults_test.dart
           test/models/tun_test.dart
           test/database/initial_rules_test.dart
+          test/database/subscription_interval_migration_test.dart
+          test/common/profile_update_scheduler_test.dart
+          test/common/profile_node_failover_test.dart
+          test/providers/node_failover_test.dart
+          test/views/node_failover_test.dart
+          test/widgets/edit_profile_focus_test.dart
           test/common/final_routing_yaml_test.dart
+          test/common/automatic_failover_test.dart
           test/common/reality_mlkem_test.dart
           test/providers/profiles_action_test.dart
           test/providers/setup_state_test.dart
+          test/providers/setup_action_test.dart
           test/views/network_config_test.dart
           test/views/reality_mlkem_test.dart
+          test/views/connection_recovery_test.dart
+
+      - name: Verify primary and backup recovery in core
+        working-directory: core
+        env:
+          CGO_ENABLED: '0'
+        run: go test . -run '^TestProfileNodePairFallsBackAndReturnsToPrimary$' -count=1
 
       - name: Build personal Windows EXE and ZIP
         env:

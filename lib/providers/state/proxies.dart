@@ -241,7 +241,17 @@ Map<String, String> selectedMap(Ref ref) {
   final selectedMap = ref.watch(
     currentProfileProvider.select((state) => state?.selectedMap ?? {}),
   );
-  return selectedMap;
+  final pair = ref.watch(
+    currentProfileProvider.select((profile) => profile?.overrides.nodeFailover),
+  );
+  return {
+    ...selectedMap,
+    if (pair?.enabled == true) ...{
+      pair!.groupName: '',
+      if (pair.groupName != GroupName.GLOBAL.name)
+        GroupName.GLOBAL.name: pair.groupName,
+    },
+  };
 }
 
 @riverpod

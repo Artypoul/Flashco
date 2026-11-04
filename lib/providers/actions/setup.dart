@@ -21,6 +21,9 @@ class SetupAction extends _$SetupAction {
   CoreController get _core => ref.read(coreHandlerProvider);
 
   Timer? _runtimeTimer;
+  Timer? _recoveryTimer;
+  bool _recovering = false;
+  bool _disposed = false;
   final _setupScheduler = SerialTaskScheduler();
   final _listenerScheduler = SerialTaskScheduler();
   _RunRequest? _latestRunRequest;
@@ -35,6 +38,10 @@ class SetupAction extends _$SetupAction {
   @override
   void build() {
     ref.onDispose(_stopRuntimeTicker);
+    ref.onDispose(() {
+      _disposed = true;
+      _recoveryTimer?.cancel();
+    });
     ref.listen(appVisibleProvider, (_, _) => _syncRuntimeTicker());
     ref.listen(
       appSettingProvider.select((state) => state.showTrayTitle),
@@ -150,6 +157,10 @@ class SetupAction extends _$SetupAction {
       return Future.value(true);
     }
 
+    if (!running) {
+      _recoveryTimer?.cancel();
+      _recoveryTimer = null;
+    }
     final request = _RunRequest(
       running: running,
       initialize: running && initialize,
@@ -163,6 +174,56 @@ class SetupAction extends _$SetupAction {
     return running ? _start(request) : _stop(request);
   }
 
+  @protected
+  Timer scheduleRecovery(Duration interval, void Function() callback) =>
+      Timer(interval, callback);
+
+  void recoverAfterCrash() {
+    if (_disposed ||
+        _recoveryTimer != null ||
+        _recovering ||
+        ref.read(safeModeProvider) ||
+        ref.read(suspendProvider) ||
+        _latestRunRequest?.running != true) {
+      return;
+    }
+    final profile = ref.read(currentProfileProvider);
+    final global = ref.read(patchClashConfigProvider);
+    if (!(profile?.overrides.autoReconnect ?? global.autoReconnect)) return;
+    final request = _latestRunRequest;
+    final interval =
+        profile?.overrides.reconnectInterval ?? global.reconnectInterval;
+    _recoveryTimer = scheduleRecovery(
+      Duration(seconds: interval.clamp(1, 3600)),
+      () async {
+        _recoveryTimer = null;
+        if (_disposed ||
+            !identical(request, _latestRunRequest) ||
+            ref.read(safeModeProvider) ||
+            ref.read(suspendProvider)) {
+          return;
+        }
+        final current = ref.read(currentProfileProvider);
+        if (!(current?.overrides.autoReconnect ??
+            ref.read(patchClashConfigProvider).autoReconnect)) {
+          return;
+        }
+        _recovering = true;
+        var recovered = false;
+        try {
+          recovered = await ref.read(coreActionProvider.notifier).restartCore();
+        } catch (error) {
+          commonPrint.log('Automatic recovery failed: ${compactError(error)}');
+        } finally {
+          _recovering = false;
+          if (!_disposed && !recovered && _latestRunRequest?.running == true) {
+            recoverAfterCrash();
+          }
+        }
+      },
+    );
+  }
+
   Future<bool> _start(_RunRequest request) async {
     if (request.initialize) {
       var applied = false;
@@ -172,7 +233,7 @@ class SetupAction extends _$SetupAction {
         applied = false;
       }
       if (!applied && _isCurrent(request)) {
-        await globalState.safeRun(() => setRunning(false));
+        if (!_recovering) await globalState.safeRun(() => setRunning(false));
         return false;
       }
       if (!applied || !_isCurrent(request)) {
@@ -460,6 +521,7 @@ class SetupAction extends _$SetupAction {
     );
     final res = makeRealProfileTask(
       MakeRealProfileState(
+        testUrl: ref.read(appSettingProvider).testUrl,
         rules: rules,
         proxyGroups: proxyGroups,
         injectedProxyProviders: injected.proxies,

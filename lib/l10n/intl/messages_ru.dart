@@ -377,10 +377,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoCloseConnectionsDesc": MessageLookupByLibrary.simpleMessage(
       "Автозакрытие соединений обрывает открытые соединения при смене прокси.",
     ),
+    "autoFailover": MessageLookupByLibrary.simpleMessage(
+      "Переключаться на рабочую ноду",
+    ),
     "autoInclude": MessageLookupByLibrary.simpleMessage(
       "Автоматическое включение",
     ),
     "autoLaunch": MessageLookupByLibrary.simpleMessage("Автозапуск"),
+    "autoReconnect": MessageLookupByLibrary.simpleMessage(
+      "Переподключаться после обрыва",
+    ),
     "autoRun": MessageLookupByLibrary.simpleMessage("Автовключение"),
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "Автовключение запускает прокси при открытии приложения.",
@@ -543,6 +549,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "connected": MessageLookupByLibrary.simpleMessage("Подключено"),
     "connecting": MessageLookupByLibrary.simpleMessage("Подключение…"),
     "connection": MessageLookupByLibrary.simpleMessage("Соединение"),
+    "connectionRecovery": MessageLookupByLibrary.simpleMessage(
+      "Восстановление соединения",
+    ),
+    "connectionRecoveryDesc": MessageLookupByLibrary.simpleMessage(
+      "Повторять подключение после обрыва и выбирать рабочие ноды. Ручная остановка отменяет восстановление. Профили могут наследовать настройки.",
+    ),
     "connectionStats": MessageLookupByLibrary.simpleMessage(
       "Статистика подключений",
     ),
@@ -1050,10 +1062,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Введите содержимое правила",
     ),
-    "installedAppsPermissionDeniedMessage":
-        MessageLookupByLibrary.simpleMessage(
-          "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
-        ),
+    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
+      "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
+    ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Эта система не выдаёт список установленных приложений без разрешения. Предоставьте его, чтобы настроить прокси для отдельных приложений.",
     ),
@@ -1346,6 +1357,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "noSearchResults": MessageLookupByLibrary.simpleMessage(
       "Ничего не найдено",
     ),
+    "nodeFailover": MessageLookupByLibrary.simpleMessage(
+      "Основная и резервная ноды",
+    ),
+    "nodeFailoverBackup": MessageLookupByLibrary.simpleMessage(
+      "Резервная нода",
+    ),
+    "nodeFailoverChoose": MessageLookupByLibrary.simpleMessage("Выбрать"),
+    "nodeFailoverDescription": MessageLookupByLibrary.simpleMessage(
+      "Использует только выбранную пару по порядку и возвращается к основной после восстановления. Интервал проверки задаётся в настройках восстановления соединения.",
+    ),
+    "nodeFailoverManaged": MessageLookupByLibrary.simpleMessage(
+      "Этой группой управляет пара нод из настроек профиля. Измените основную и резервную ноды там.",
+    ),
+    "nodeFailoverMissing": MessageLookupByLibrary.simpleMessage(
+      "Отсутствует в профиле",
+    ),
+    "nodeFailoverMissingDescription": MessageLookupByLibrary.simpleMessage(
+      "Выбранная нода или группа отсутствует. Выбор сохранён; другие ноды не заменят эту пару. Обновите подписку или выберите другую пару.",
+    ),
+    "nodeFailoverPrimary": MessageLookupByLibrary.simpleMessage(
+      "Основная нода",
+    ),
     "nodes": MessageLookupByLibrary.simpleMessage("Узлы"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "Этот внешний ресурс не является текстовым файлом",
@@ -1541,6 +1574,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "recentRequests": MessageLookupByLibrary.simpleMessage("Последние запросы"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("Рекомендуемые"),
     "recordType": MessageLookupByLibrary.simpleMessage("Тип записи"),
+    "recoveryInterval": MessageLookupByLibrary.simpleMessage(
+      "Интервал попыток и проверок (секунды)",
+    ),
+    "recoveryIntervalError": MessageLookupByLibrary.simpleMessage(
+      "Введите число от 1 до 3600",
+    ),
     "redirPort": MessageLookupByLibrary.simpleMessage("Порт Redir"),
     "redo": MessageLookupByLibrary.simpleMessage("Повторить"),
     "regex": MessageLookupByLibrary.simpleMessage("Регулярное выражение"),

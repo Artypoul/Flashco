@@ -195,10 +195,17 @@ SharedState sharedState(Ref ref) {
     ),
   );
   final currentProfileName = currentProfile.label;
-  final selectedMap = currentProfile.selectedMap;
+  final selectedMap = ref.watch(selectedMapProvider);
   final onlyStatisticsProxy = appSetting.onlyStatisticsProxy;
   final testUrl = appSetting.testUrl;
+  final recoveryProfile = ref.watch(currentProfileProvider)?.overrides;
+  final recoveryGlobal = ref.watch(patchClashConfigProvider);
   return SharedState(
+    autoReconnect:
+        !ref.watch(safeModeProvider) &&
+        (recoveryProfile?.autoReconnect ?? recoveryGlobal.autoReconnect),
+    reconnectInterval:
+        recoveryProfile?.reconnectInterval ?? recoveryGlobal.reconnectInterval,
     currentProfileName: currentProfileName,
     onlyStatisticsProxy: onlyStatisticsProxy,
     showStopAction: appSetting.showStopAction,

@@ -373,6 +373,18 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
         .toList();
   }
   rawConfig['rules'] = rules;
+  applyAutomaticFailover(
+    rawConfig,
+    enabled: overrides.autoFailover ?? realPatchConfig.autoFailover,
+    interval: overrides.reconnectInterval ?? realPatchConfig.reconnectInterval,
+    testUrl: data.testUrl,
+  );
+  applyProfileNodeFailover(
+    rawConfig,
+    choice: overrides.nodeFailover,
+    interval: overrides.reconnectInterval ?? realPatchConfig.reconnectInterval,
+    testUrl: data.testUrl,
+  );
   applyRealityMlkemOverrides(
     rawConfig,
     overrides.realityMlkem,

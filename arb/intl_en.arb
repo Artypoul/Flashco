@@ -1,4 +1,10 @@
 {
+  "connectionRecovery": "Connection recovery",
+  "connectionRecoveryDesc": "Retry the VPN after a disconnect and use working nodes. Manual stop cancels recovery. Profiles can inherit these settings.",
+  "autoReconnect": "Reconnect after disconnect",
+  "autoFailover": "Switch to a working node",
+  "recoveryInterval": "Retry and health-check interval (seconds)",
+  "recoveryIntervalError": "Enter a number from 1 to 3600",
   "networkDetection": "Network detection",
   "serviceCheck": "Check",
   "serviceCheckedAt": "Checked at {time}",
@@ -1019,5 +1025,13 @@
   "preferred": "Preferred",
   "addToLocalProxies": "Add to local proxies",
   "addedToLocalProxies": "Added {name} to local proxies",
-  "alreadyInLocalProxies": "{name} is already in local proxies"
+  "alreadyInLocalProxies": "{name} is already in local proxies",
+  "nodeFailover": "Primary and backup nodes",
+  "nodeFailoverDescription": "Uses only this pair in order and returns to the primary when it recovers. The check interval follows Connection recovery.",
+  "nodeFailoverPrimary": "Primary node",
+  "nodeFailoverBackup": "Backup node",
+  "nodeFailoverChoose": "Choose",
+  "nodeFailoverMissing": "Missing from profile",
+  "nodeFailoverMissingDescription": "A saved node or group is missing. The choice is kept; other nodes will not replace this pair. Update the subscription or choose another pair.",
+  "nodeFailoverManaged": "This group uses the primary and backup nodes saved in profile settings. Change the pair there."
 }

@@ -1,3 +1,4 @@
+import 'connection_recovery.dart';
 import 'dart:io';
 
 import 'package:flashco/common/common.dart';
@@ -448,6 +449,7 @@ class TunSection extends ConsumerWidget {
 // (component/keepalive), and only Linux honours a routing mark.
 List<Widget> outboundItems({required bool isDesktop, required bool isLinux}) {
   return [
+    const ConnectionRecoveryItem(),
     const RealityMlkemItem(),
     if (isDesktop) ...[
       ConfigToggleItem(

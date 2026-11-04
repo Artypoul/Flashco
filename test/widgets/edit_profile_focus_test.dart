@@ -203,6 +203,12 @@ void main() {
         currentAppLocalizations.profile,
       );
       for (var i = 0; i < 20 && row.evaluate().isEmpty; i++) {
+        if (i == 0) {
+          await tester.drag(
+            find.byType(Scrollable).first,
+            const Offset(0, -180),
+          );
+        }
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 20)),
         );
@@ -220,4 +226,35 @@ void main() {
       expect(find.byType(MetaChip), findsNothing);
     },
   );
+
+  testWidgets('the subscription interval is editable and rejects zero', (
+    tester,
+  ) async {
+    final action = _RecordingProfilesAction();
+    await pumpEditProfile(
+      tester,
+      overrides: [profilesActionProvider.overrideWith(() => action)],
+    );
+    final field = find.widgetWithText(
+      TextFormField,
+      currentAppLocalizations.autoUpdateInterval,
+    );
+    expect(tester.widget<TextFormField>(field).controller!.text, '10');
+    await tester.ensureVisible(field);
+    await tester.enterText(field, '0');
+    await tester.tap(find.byTooltip(currentAppLocalizations.save));
+    await tester.pump();
+    expect(action.put, isEmpty);
+    expect(
+      find.text(
+        currentAppLocalizations.profileAutoUpdateIntervalInvalidValidationDesc,
+      ),
+      findsOneWidget,
+    );
+    await tester.enterText(field, '17');
+    await tester.tap(find.byTooltip(currentAppLocalizations.save));
+    await tester.pumpAndSettle();
+    expect(action.put.single.autoUpdateDuration, const Duration(minutes: 17));
+    expect(action.put.single.autoUpdate, true);
+  });
 }

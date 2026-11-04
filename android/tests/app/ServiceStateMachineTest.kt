@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -464,6 +466,61 @@ class ServiceStateMachineTest {
 
         assertFalse(machine.requestStart().await())
         assertEquals(0, host.stoppedNotifications)
+    }
+
+    @Test
+    fun `service loss retries failures then recovers with the configured interval`() = runTest {
+        val host = FakeHost(backgroundScope)
+        val machine = ServiceStateMachine(host)
+        machine.syncSharedState(configuredState().copy(autoReconnect = true, reconnectInterval = 2))
+        machine.requestStart().await()
+        host.runtime = null
+        host.startSucceeds = false
+        machine.handleServiceLost(machine.captureRequestToken())
+        runCurrent()
+        advanceTimeBy(2000)
+        runCurrent()
+        assertEquals(2, host.startCalls)
+        assertTrue(machine.isRunRequested)
+        host.startSucceeds = true
+        advanceTimeBy(2000)
+        runCurrent()
+        assertEquals(3, host.startCalls)
+        assertEquals(RunState.STARTED, machine.runState.value)
+        assertEquals(0, host.stoppedNotifications)
+    }
+
+    @Test
+    fun `manual stop during recovery never restarts the service`() = runTest {
+        val host = FakeHost(backgroundScope)
+        val machine = ServiceStateMachine(host)
+        machine.syncSharedState(configuredState().copy(autoReconnect = true, reconnectInterval = 1))
+        machine.requestStart().await()
+        host.runtime = null
+        machine.handleServiceLost(machine.captureRequestToken())
+        runCurrent()
+        machine.requestStop().await()
+        advanceTimeBy(5000)
+        runCurrent()
+        assertEquals(1, host.startCalls)
+        assertFalse(machine.isRunRequested)
+    }
+
+    @Test
+    fun `revoked VPN permission prevents automatic recovery`() = runTest {
+        val host = FakeHost(backgroundScope)
+        val machine = ServiceStateMachine(host)
+        machine.syncSharedState(configuredState().copy(autoReconnect = true, reconnectInterval = 1))
+        machine.requestStart().await()
+        host.runtime = null
+        host.vpnPermissionGranted = false
+        machine.handleServiceLost(machine.captureRequestToken())
+        runCurrent()
+        advanceTimeBy(1000)
+        runCurrent()
+        assertEquals(1, host.startCalls)
+        assertFalse(machine.isRunRequested)
+        assertEquals(1, host.stoppedNotifications)
     }
 
     @Test

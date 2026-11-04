@@ -1,3 +1,4 @@
+import 'package:flashco/views/config/connection_recovery.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -12,12 +13,14 @@ import 'package:flashco/providers/action.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/core.dart';
 import 'package:flashco/providers/database.dart';
+import 'package:flashco/providers/state.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'reality_mlkem.dart';
+import 'node_failover.dart';
 
 class EditProfileView extends ConsumerStatefulWidget {
   final Profile profile;
@@ -41,6 +44,8 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   late bool _autoUpdate;
   late Map<String, bool> _realityMlkem;
   bool? _realityMlkemEnabled;
+  late ConnectionRecoveryChoice _recovery;
+  ProfileNodeFailover? _nodeFailover;
   String? _rawText;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _fileInfoNotifier = ValueNotifier<FileInfo?>(null);
@@ -56,6 +61,12 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
       text: widget.profile.ageSecretKey,
     );
     _autoUpdate = widget.profile.autoUpdate;
+    _nodeFailover = widget.profile.overrides.nodeFailover;
+    _recovery = (
+      reconnect: widget.profile.overrides.autoReconnect,
+      failover: widget.profile.overrides.autoFailover,
+      interval: widget.profile.overrides.reconnectInterval,
+    );
     _realityMlkem = widget.profile.overrides.realityMlkem;
     _realityMlkemEnabled = widget.profile.overrides.realityMlkemEnabled;
     _autoUpdateDurationController = TextEditingController(
@@ -80,6 +91,10 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     if (!_formKey.currentState!.validate()) return;
     var profile = widget.profile.copyWith(
       overrides: widget.profile.overrides.copyWith(
+        autoReconnect: _recovery.reconnect,
+        autoFailover: _recovery.failover,
+        reconnectInterval: _recovery.interval,
+        nodeFailover: _nodeFailover,
         realityMlkem: _realityMlkem,
         realityMlkemEnabled: _realityMlkemEnabled,
       ),
@@ -124,7 +139,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
         globalState.safeRun(() async {
           await Future.delayed(commonDuration);
           if (hasUpdate) {
-            await profilesAction.updateProfile(profile);
+            await profilesAction.updateProfile(profile, saveEdits: true);
           }
         }),
       );
@@ -170,6 +185,36 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
       _realityMlkem = selection.nodes;
       _realityMlkemEnabled = selection.enabled;
     });
+  }
+
+  Future<void> _editNodeFailover() async {
+    final config = await globalState.safeRun(() async {
+      if (widget.profile.type != ProfileType.custom) {
+        return ref.read(coreHandlerProvider).getConfig(widget.profile.id);
+      }
+      final groups = await ref.read(
+        proxyGroupsProvider(widget.profile.id).future,
+      );
+      if (!mounted) return <String, dynamic>{};
+      final proxies = await ref.read(customProxiesProvider.future);
+      return <String, dynamic>{
+        'proxies': appProxiesPayload(
+          proxies,
+          dialers: const {},
+          groups: groups,
+        ),
+        'proxy-groups': [for (final group in groups) group.definition],
+      };
+    });
+    if (config == null || !mounted) return;
+    final value = await dialogs.showCommonDialog<NodeFailoverSelection>(
+      child: NodeFailoverDialog(
+        nodes: profileFailoverNodes(config),
+        groups: profileFailoverGroups(config),
+        initial: _nodeFailover,
+      ),
+    );
+    if (value != null && mounted) setState(() => _nodeFailover = value.pair);
   }
 
   Future<void> _handleSaveEdit(BuildContext context, String data) async {
@@ -291,9 +336,31 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
           _AutoUpdateIntervalField(controller: _autoUpdateDurationController),
       ],
       ListItem(
+        title: Text(appLocalizations.connectionRecovery),
+        onTap: () async {
+          final value = await dialogs
+              .showCommonDialog<ConnectionRecoveryChoice>(
+                child: ConnectionRecoveryDialog(
+                  initial: _recovery,
+                  global: ref.read(patchClashConfigProvider),
+                ),
+              );
+          if (value != null && mounted) setState(() => _recovery = value);
+        },
+      ),
+      ListItem(
         title: const Text('REALITY · ML-KEM'),
         subtitle: Text(appLocalizations.realityMlkemDescription),
         onTap: _editRealityMlkem,
+      ),
+      ListItem(
+        title: Text(appLocalizations.nodeFailover),
+        subtitle: Text(
+          _nodeFailover?.enabled == true
+              ? '${_nodeFailover!.primaryName} → ${_nodeFailover!.backupName}'
+              : appLocalizations.disabled,
+        ),
+        onTap: _editNodeFailover,
       ),
       if (widget.profile.type != ProfileType.custom)
         _ProfileFileItem(
@@ -471,9 +538,7 @@ class _AutoUpdateIntervalField extends StatelessWidget {
           if (value == null || value.isEmpty) {
             return appLocalizations.profileAutoUpdateIntervalNullValidationDesc;
           }
-          try {
-            int.parse(value);
-          } catch (_) {
+          if ((int.tryParse(value) ?? 0) <= 0) {
             return appLocalizations
                 .profileAutoUpdateIntervalInvalidValidationDesc;
           }

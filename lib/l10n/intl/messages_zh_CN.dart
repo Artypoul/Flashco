@@ -305,8 +305,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoCloseConnectionsDesc": MessageLookupByLibrary.simpleMessage(
       "自动关闭连接会在切换代理后断开已有连接。",
     ),
+    "autoFailover": MessageLookupByLibrary.simpleMessage("切换到可用节点"),
     "autoInclude": MessageLookupByLibrary.simpleMessage("自动包含"),
     "autoLaunch": MessageLookupByLibrary.simpleMessage("自启动"),
+    "autoReconnect": MessageLookupByLibrary.simpleMessage("断开后重新连接"),
     "autoRun": MessageLookupByLibrary.simpleMessage("自动运行"),
     "autoRunDesc": MessageLookupByLibrary.simpleMessage("自动运行会在打开应用时启动代理。"),
     "autoSetSystemDns": MessageLookupByLibrary.simpleMessage("自动设置系统DNS"),
@@ -411,6 +413,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "connected": MessageLookupByLibrary.simpleMessage("已连接"),
     "connecting": MessageLookupByLibrary.simpleMessage("连接中…"),
     "connection": MessageLookupByLibrary.simpleMessage("连接"),
+    "connectionRecovery": MessageLookupByLibrary.simpleMessage("连接恢复"),
+    "connectionRecoveryDesc": MessageLookupByLibrary.simpleMessage(
+      "断开后重试 VPN 并使用可用节点。手动停止会取消恢复。配置可以继承这些设置。",
+    ),
     "connectionStats": MessageLookupByLibrary.simpleMessage("连接统计"),
     "connectionStatsDesc": MessageLookupByLibrary.simpleMessage(
       "实时连接、最近请求、DNS查询",
@@ -1004,6 +1010,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("不解析IP"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("不解析主机名"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("没有匹配的结果"),
+    "nodeFailover": MessageLookupByLibrary.simpleMessage("主节点和备用节点"),
+    "nodeFailoverBackup": MessageLookupByLibrary.simpleMessage("备用节点"),
+    "nodeFailoverChoose": MessageLookupByLibrary.simpleMessage("选择"),
+    "nodeFailoverDescription": MessageLookupByLibrary.simpleMessage(
+      "仅按顺序使用此节点对，主节点恢复后切回。检测间隔使用连接恢复设置。",
+    ),
+    "nodeFailoverManaged": MessageLookupByLibrary.simpleMessage(
+      "此组由配置中保存的主节点和备用节点控制，请在配置设置中更改。",
+    ),
+    "nodeFailoverMissing": MessageLookupByLibrary.simpleMessage("配置中不存在"),
+    "nodeFailoverMissingDescription": MessageLookupByLibrary.simpleMessage(
+      "已保存的节点或组不存在。选择会保留，不会使用其他节点替代。请更新订阅或重新选择。",
+    ),
+    "nodeFailoverPrimary": MessageLookupByLibrary.simpleMessage("主节点"),
     "nodes": MessageLookupByLibrary.simpleMessage("节点"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage("该外部资源不是文本文件"),
     "none": MessageLookupByLibrary.simpleMessage("无"),
@@ -1151,6 +1171,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "recentRequests": MessageLookupByLibrary.simpleMessage("最近请求"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("推荐"),
     "recordType": MessageLookupByLibrary.simpleMessage("记录类型"),
+    "recoveryInterval": MessageLookupByLibrary.simpleMessage("重试及检查间隔（秒）"),
+    "recoveryIntervalError": MessageLookupByLibrary.simpleMessage(
+      "请输入 1 到 3600 之间的数字",
+    ),
     "redirPort": MessageLookupByLibrary.simpleMessage("Redir端口"),
     "redo": MessageLookupByLibrary.simpleMessage("重做"),
     "regex": MessageLookupByLibrary.simpleMessage("正则"),

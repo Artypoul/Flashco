@@ -43,7 +43,9 @@ void main() {
       );
 
       await expectLater(
-        container.read(profilesActionProvider.notifier).updateProfile(edited),
+        container
+            .read(profilesActionProvider.notifier)
+            .updateProfile(edited, saveEdits: true),
         throwsA(anything),
       );
 

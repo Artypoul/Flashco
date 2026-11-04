@@ -715,7 +715,19 @@ void main() {
           jsonDecode(
             jsonEncode(
               imported.copyWith(
+                autoUpdate: false,
+                autoUpdateDuration: const Duration(minutes: 17),
                 overrides: const ProfileOverrides(
+                  autoReconnect: false,
+                  autoFailover: false,
+                  reconnectInterval: 23,
+                  nodeFailover: ProfileNodeFailover(
+                    groupName: 'Route',
+                    primaryKey: 'a',
+                    backupKey: 'b',
+                    primaryName: 'A',
+                    backupName: 'B',
+                  ),
                   realityMlkemEnabled: false,
                   realityMlkem: {'node': true, 'legacy': false},
                 ),
@@ -728,6 +740,15 @@ void main() {
         final updated = container.read(profilesProvider).single;
         await action.updateProfile(updated);
         final refreshed = container.read(profilesProvider).single;
+        expect(refreshed.autoUpdate, false);
+        expect(refreshed.autoUpdateDuration, const Duration(minutes: 17));
+        expect(refreshed.overrides.autoReconnect, false);
+        expect(refreshed.overrides.autoFailover, false);
+        expect(refreshed.overrides.reconnectInterval, 23);
+        expect(
+          refreshed.overrides.nodeFailover,
+          restored.overrides.nodeFailover,
+        );
         expect(refreshed.overrides.realityMlkemEnabled, false);
         expect(refreshed.overrides.realityMlkem, {
           'node': true,
@@ -737,6 +758,86 @@ void main() {
         expect(refreshed.selectedMap, restored.selectedMap);
       },
     );
+
+    test('interval edits made during a download remain saved', () async {
+      final entered = Completer<void>();
+      final release = Completer<void>();
+      final body = await encodeYamlTask(fastestConfig);
+      server.listen((request) async {
+        entered.complete();
+        await release.future;
+        request.response.write(body);
+        await request.response.close();
+      });
+      final profile = Profile.normal(url: url('interval'));
+      final action = container.read(profilesActionProvider.notifier);
+      action.putProfile(profile);
+      final download = action.updateProfile(profile);
+      await entered.future;
+      action.putProfile(
+        profile.copyWith(
+          autoUpdate: false,
+          autoUpdateDuration: const Duration(minutes: 23),
+          overrides: const ProfileOverrides(
+            nodeFailover: ProfileNodeFailover(
+              groupName: 'Edited route',
+              primaryKey: 'new-primary',
+              backupKey: 'new-backup',
+              primaryName: 'Primary',
+              backupName: 'Backup',
+            ),
+          ),
+        ),
+      );
+      release.complete();
+      await download;
+      final saved = container.read(profilesProvider).single;
+      expect(saved.autoUpdate, false);
+      expect(saved.autoUpdateDuration, const Duration(minutes: 23));
+      expect(saved.overrides.nodeFailover?.groupName, 'Edited route');
+      expect(saved.lastUpdateDate, isNotNull);
+    });
+
+    test('a queued batch refresh uses the latest saved node pair', () async {
+      final entered = Completer<void>();
+      final release = Completer<void>();
+      final body = await encodeYamlTask(fastestConfig);
+      server.listen((request) async {
+        if (request.uri.path == '/first') {
+          entered.complete();
+          await release.future;
+        }
+        request.response.write(body);
+        await request.response.close();
+      });
+      final action = container.read(profilesActionProvider.notifier);
+      final first = Profile.normal(url: url('first'));
+      final second = Profile.normal(url: url('second'));
+      action.putProfile(first);
+      action.putProfile(second);
+      final refreshing = action.updateProfiles();
+      await entered.future;
+      const pair = ProfileNodeFailover(
+        groupName: 'New route',
+        primaryKey: 'p',
+        backupKey: 'b',
+        primaryName: 'Primary',
+        backupName: 'Backup',
+      );
+      action.putProfile(
+        second.copyWith(overrides: const ProfileOverrides(nodeFailover: pair)),
+      );
+      release.complete();
+      await refreshing;
+      expect(
+        container
+            .read(profilesProvider)
+            .getProfile(second.id)
+            ?.overrides
+            .nodeFailover,
+        pair,
+      );
+    });
 
     test('a subscription download selects and starts its profile', () async {
       final body = await encodeYamlTask(fastestConfig);

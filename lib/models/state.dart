@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flashco/common/constant.dart' show defaultTestUrl;
 import 'package:flashco/enum/enum.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -295,6 +296,8 @@ abstract class SelectedProxyState with _$SelectedProxyState {
 @freezed
 abstract class SharedState with _$SharedState {
   const factory SharedState({
+    @Default(false) bool autoReconnect,
+    @Default(15) int reconnectInterval,
     SetupParams? setupParams,
     VpnOptions? vpnOptions,
     required String stopTip,
@@ -328,6 +331,7 @@ abstract class ComputeGroupsState with _$ComputeGroupsState {
 @freezed
 abstract class MakeRealProfileState with _$MakeRealProfileState {
   const factory MakeRealProfileState({
+    @Default(defaultTestUrl) String testUrl,
     required String profilesPath,
     required int profileId,
     required Map<String, dynamic> rawConfig,

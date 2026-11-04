@@ -55,6 +55,66 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `Connection recovery`
+  String get connectionRecovery {
+    return Intl.message(
+      'Connection recovery',
+      name: 'connectionRecovery',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Retry the VPN after a disconnect and use working nodes. Manual stop cancels recovery. Profiles can inherit these settings.`
+  String get connectionRecoveryDesc {
+    return Intl.message(
+      'Retry the VPN after a disconnect and use working nodes. Manual stop cancels recovery. Profiles can inherit these settings.',
+      name: 'connectionRecoveryDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reconnect after disconnect`
+  String get autoReconnect {
+    return Intl.message(
+      'Reconnect after disconnect',
+      name: 'autoReconnect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Switch to a working node`
+  String get autoFailover {
+    return Intl.message(
+      'Switch to a working node',
+      name: 'autoFailover',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Retry and health-check interval (seconds)`
+  String get recoveryInterval {
+    return Intl.message(
+      'Retry and health-check interval (seconds)',
+      name: 'recoveryInterval',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter a number from 1 to 3600`
+  String get recoveryIntervalError {
+    return Intl.message(
+      'Enter a number from 1 to 3600',
+      name: 'recoveryIntervalError',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Network detection`
   String get networkDetection {
     return Intl.message(
@@ -8405,7 +8465,8 @@ class AppLocalizations {
   String customImportDroppedSubRules(num count, Object label) {
     return Intl.plural(
       count,
-      one: '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
+      one:
+          '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
       other:
           '$label SUB-RULE rules were dropped, since custom profiles do not support sub-rules',
       name: 'customImportDroppedSubRules',
@@ -8511,6 +8572,86 @@ class AppLocalizations {
       name: 'alreadyInLocalProxies',
       desc: '',
       args: [name],
+    );
+  }
+
+  /// `Primary and backup nodes`
+  String get nodeFailover {
+    return Intl.message(
+      'Primary and backup nodes',
+      name: 'nodeFailover',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Uses only this pair in order and returns to the primary when it recovers. The check interval follows Connection recovery.`
+  String get nodeFailoverDescription {
+    return Intl.message(
+      'Uses only this pair in order and returns to the primary when it recovers. The check interval follows Connection recovery.',
+      name: 'nodeFailoverDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Primary node`
+  String get nodeFailoverPrimary {
+    return Intl.message(
+      'Primary node',
+      name: 'nodeFailoverPrimary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup node`
+  String get nodeFailoverBackup {
+    return Intl.message(
+      'Backup node',
+      name: 'nodeFailoverBackup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose`
+  String get nodeFailoverChoose {
+    return Intl.message(
+      'Choose',
+      name: 'nodeFailoverChoose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Missing from profile`
+  String get nodeFailoverMissing {
+    return Intl.message(
+      'Missing from profile',
+      name: 'nodeFailoverMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A saved node or group is missing. The choice is kept; other nodes will not replace this pair. Update the subscription or choose another pair.`
+  String get nodeFailoverMissingDescription {
+    return Intl.message(
+      'A saved node or group is missing. The choice is kept; other nodes will not replace this pair. Update the subscription or choose another pair.',
+      name: 'nodeFailoverMissingDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This group uses the primary and backup nodes saved in profile settings. Change the pair there.`
+  String get nodeFailoverManaged {
+    return Intl.message(
+      'This group uses the primary and backup nodes saved in profile settings. Change the pair there.',
+      name: 'nodeFailoverManaged',
+      desc: '',
+      args: [],
     );
   }
 }

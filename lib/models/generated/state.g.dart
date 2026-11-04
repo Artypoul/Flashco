@@ -7,6 +7,8 @@ part of '../state.dart';
 // **************************************************************************
 
 _SharedState _$SharedStateFromJson(Map<String, dynamic> json) => _SharedState(
+  autoReconnect: json['autoReconnect'] as bool? ?? false,
+  reconnectInterval: (json['reconnectInterval'] as num?)?.toInt() ?? 15,
   setupParams: json['setupParams'] == null
       ? null
       : SetupParams.fromJson(json['setupParams'] as Map<String, dynamic>),
@@ -24,6 +26,8 @@ _SharedState _$SharedStateFromJson(Map<String, dynamic> json) => _SharedState(
 
 Map<String, dynamic> _$SharedStateToJson(_SharedState instance) =>
     <String, dynamic>{
+      'autoReconnect': instance.autoReconnect,
+      'reconnectInterval': instance.reconnectInterval,
       'setupParams': instance.setupParams,
       'vpnOptions': instance.vpnOptions,
       'stopTip': instance.stopTip,

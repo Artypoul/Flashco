@@ -76,7 +76,33 @@ class TestCommonAction extends CommonAction {
   }
 }
 
+class _RecoveryTimer implements Timer {
+  _RecoveryTimer(this.interval, this.callback);
+  final Duration interval;
+  final void Function() callback;
+  @override
+  bool isActive = true;
+  @override
+  int tick = 0;
+  @override
+  void cancel() => isActive = false;
+  void fire() {
+    if (!isActive) return;
+    isActive = false;
+    tick++;
+    callback();
+  }
+}
+
 class TestSetupAction extends SetupAction {
+  final recoveryTimers = <_RecoveryTimer>[];
+  @override
+  Timer scheduleRecovery(Duration interval, void Function() callback) {
+    final timer = _RecoveryTimer(interval, callback);
+    recoveryTimers.add(timer);
+    return timer;
+  }
+
   final List<bool> coreRunningCalls = [];
   final List<String> events = [];
   final List<Completer<void>> pendingCoreCalls = [];
@@ -143,6 +169,19 @@ class _AuthorizationSetupAction extends SetupAction {
   }
 }
 
+class _RecoveryCoreAction extends CoreAction {
+  int attempts = 0;
+  bool succeeds = true;
+  Completer<bool>? pending;
+  @override
+  void build() {}
+  @override
+  Future<bool> restartCore() async {
+    attempts++;
+    return pending == null ? succeeds : pending!.future;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() {
@@ -196,6 +235,92 @@ void main() {
   void markInitialized() {
     container.read(initProvider.notifier).value = true;
   }
+
+  group('automatic recovery', () {
+    late _RecoveryCoreAction recoveryCore;
+    Future<void> prepare({
+      bool enabled = true,
+      bool disposePrevious = true,
+    }) async {
+      if (disposePrevious) container.dispose();
+      recoveryCore = _RecoveryCoreAction();
+      action = TestSetupAction();
+      container = ProviderContainer(
+        overrides: [
+          profilesProvider.overrideWith(TestProfiles.new),
+          setupActionProvider.overrideWith(() => action),
+          commonActionProvider.overrideWith(TestCommonAction.new),
+          coreActionProvider.overrideWith(() => recoveryCore),
+          vpnRouteAddressProvider.overrideWith((ref) async => const <String>[]),
+          patchClashConfigProvider.overrideWithBuild(
+            (_, _) =>
+                PatchClashConfig(autoReconnect: enabled, reconnectInterval: 2),
+          ),
+        ],
+      );
+      globalState.container = container;
+      container.read(setupActionProvider.notifier);
+      markInitialized();
+      await action.setRunning(true);
+    }
+
+    Future<void> flush() => Future<void>(() {});
+
+    test('retries a failed recovery with the saved interval', () async {
+      await prepare();
+      recoveryCore.succeeds = false;
+      action.recoverAfterCrash();
+      expect(action.recoveryTimers.single.interval, const Duration(seconds: 2));
+      action.recoveryTimers.last.fire();
+      await flush();
+      expect(recoveryCore.attempts, 1);
+      recoveryCore.succeeds = true;
+      action.recoveryTimers.last.fire();
+      await flush();
+      expect(recoveryCore.attempts, 2);
+      expect(action.recoveryTimers, hasLength(2));
+    });
+    test('manual stop cancels a queued recovery', () async {
+      await prepare();
+      action.recoverAfterCrash();
+      await action.setRunning(false);
+      action.recoveryTimers.single.fire();
+      await flush();
+      expect(recoveryCore.attempts, 0);
+    });
+    test('manual stop during an attempt cancels subsequent retries', () async {
+      await prepare();
+      recoveryCore.pending = Completer<bool>();
+      action.recoverAfterCrash();
+      action.recoveryTimers.last.fire();
+      await flush();
+      expect(recoveryCore.attempts, 1);
+      await action.setRunning(false);
+      recoveryCore.pending!.complete(false);
+      await flush();
+      expect(action.recoveryTimers, hasLength(1));
+    });
+    test('disposing during recovery never schedules another attempt', () async {
+      await prepare();
+      recoveryCore.pending = Completer<bool>();
+      final pending = recoveryCore.pending!;
+      final originalAction = action;
+      action.recoverAfterCrash();
+      action.recoveryTimers.last.fire();
+      await flush();
+      container.dispose();
+      pending.complete(false);
+      await flush();
+      expect(originalAction.recoveryTimers, hasLength(1));
+      await prepare(disposePrevious: false);
+    });
+
+    test('disabled recovery never requests a restart', () async {
+      await prepare(enabled: false);
+      action.recoverAfterCrash();
+      expect(action.recoveryTimers, isEmpty);
+    });
+  });
 
   group('setRunning gating', () {
     test('each explicit stop replaces the authoritative run token', () async {

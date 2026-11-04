@@ -1,4 +1,10 @@
 {
+  "connectionRecovery": "Recuperación de conexión",
+  "connectionRecoveryDesc": "Reintentar la VPN y utilizar nodos disponibles. La parada manual cancela la recuperación. Los perfiles pueden heredar estos ajustes.",
+  "autoReconnect": "Reconectar tras desconexión",
+  "autoFailover": "Cambiar a un nodo disponible",
+  "recoveryInterval": "Intervalo de reintentos y pruebas (segundos)",
+  "recoveryIntervalError": "Introduce un número entre 1 y 3600",
   "networkDetection": "Network detection",
   "serviceCheck": "Check",
   "serviceCheckedAt": "Checked at {time}",
@@ -1019,5 +1025,13 @@
   "preferred": "Preferido",
   "addToLocalProxies": "Añadir a proxies locales",
   "addedToLocalProxies": "{name} añadido a proxies locales",
-  "alreadyInLocalProxies": "{name} ya está en proxies locales"
+  "alreadyInLocalProxies": "{name} ya está en proxies locales",
+  "nodeFailover": "Nodos principal y de reserva",
+  "nodeFailoverDescription": "Usa solo este par en orden y vuelve al principal cuando se recupera. El intervalo sigue los ajustes de recuperación de conexión.",
+  "nodeFailoverPrimary": "Nodo principal",
+  "nodeFailoverBackup": "Nodo de reserva",
+  "nodeFailoverChoose": "Elegir",
+  "nodeFailoverMissing": "No está en el perfil",
+  "nodeFailoverMissingDescription": "Falta un nodo o grupo guardado. Se conserva la selección y no se sustituye por otros nodos. Actualiza la suscripción o elige otro par.",
+  "nodeFailoverManaged": "Este grupo usa el par guardado en los ajustes del perfil. Cambia los nodos allí."
 }

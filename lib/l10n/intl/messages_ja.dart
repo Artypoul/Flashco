@@ -312,8 +312,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoCloseConnectionsDesc": MessageLookupByLibrary.simpleMessage(
       "プロキシを切り替えると、既存の接続を自動的に閉じます。",
     ),
+    "autoFailover": MessageLookupByLibrary.simpleMessage("利用可能なノードに切り替え"),
     "autoInclude": MessageLookupByLibrary.simpleMessage("自動で含める"),
     "autoLaunch": MessageLookupByLibrary.simpleMessage("自動起動"),
+    "autoReconnect": MessageLookupByLibrary.simpleMessage("切断後に再接続"),
     "autoRun": MessageLookupByLibrary.simpleMessage("自動実行"),
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "自動実行はアプリを開いたときにプロキシを開始します。",
@@ -444,6 +446,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "connected": MessageLookupByLibrary.simpleMessage("接続済み"),
     "connecting": MessageLookupByLibrary.simpleMessage("接続中…"),
     "connection": MessageLookupByLibrary.simpleMessage("接続"),
+    "connectionRecovery": MessageLookupByLibrary.simpleMessage("接続の復旧"),
+    "connectionRecoveryDesc": MessageLookupByLibrary.simpleMessage(
+      "切断後にVPNを再接続し、利用可能なノードを使用します。手動停止で復旧を中止します。プロファイルで設定を継承できます。",
+    ),
     "connectionStats": MessageLookupByLibrary.simpleMessage("接続統計"),
     "connectionStatsDesc": MessageLookupByLibrary.simpleMessage(
       "ライブ接続、最近のリクエスト、DNS クエリ",
@@ -1097,6 +1103,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("IPを解決しない"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("ホスト名を解決しない"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("一致する結果はありません"),
+    "nodeFailover": MessageLookupByLibrary.simpleMessage("優先ノードと予備ノード"),
+    "nodeFailoverBackup": MessageLookupByLibrary.simpleMessage("予備ノード"),
+    "nodeFailoverChoose": MessageLookupByLibrary.simpleMessage("選択"),
+    "nodeFailoverDescription": MessageLookupByLibrary.simpleMessage(
+      "この2つだけを順番に使用し、優先ノードが復旧すると戻ります。確認間隔は接続の復元設定に従います。",
+    ),
+    "nodeFailoverManaged": MessageLookupByLibrary.simpleMessage(
+      "このグループはプロファイルに保存したノードの組で制御されます。プロファイル設定で変更してください。",
+    ),
+    "nodeFailoverMissing": MessageLookupByLibrary.simpleMessage("プロファイルにありません"),
+    "nodeFailoverMissingDescription": MessageLookupByLibrary.simpleMessage(
+      "保存したノードまたはグループがありません。選択は保持され、他のノードには置き換わりません。サブスクリプションを更新するか選択を変更してください。",
+    ),
+    "nodeFailoverPrimary": MessageLookupByLibrary.simpleMessage("優先ノード"),
     "nodes": MessageLookupByLibrary.simpleMessage("ノード"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "この外部リソースはテキストファイルではありません",
@@ -1262,6 +1282,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "recentRequests": MessageLookupByLibrary.simpleMessage("最近のリクエスト"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("おすすめ"),
     "recordType": MessageLookupByLibrary.simpleMessage("レコードタイプ"),
+    "recoveryInterval": MessageLookupByLibrary.simpleMessage("再試行と確認の間隔（秒）"),
+    "recoveryIntervalError": MessageLookupByLibrary.simpleMessage(
+      "1から3600の数値を入力してください",
+    ),
     "redirPort": MessageLookupByLibrary.simpleMessage("Redirポート"),
     "redo": MessageLookupByLibrary.simpleMessage("やり直す"),
     "regex": MessageLookupByLibrary.simpleMessage("正規表現"),

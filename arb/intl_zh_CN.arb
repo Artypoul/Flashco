@@ -1,4 +1,10 @@
 {
+  "connectionRecovery": "连接恢复",
+  "connectionRecoveryDesc": "断开后重试 VPN 并使用可用节点。手动停止会取消恢复。配置可以继承这些设置。",
+  "autoReconnect": "断开后重新连接",
+  "autoFailover": "切换到可用节点",
+  "recoveryInterval": "重试及检查间隔（秒）",
+  "recoveryIntervalError": "请输入 1 到 3600 之间的数字",
   "networkDetection": "网络检测",
   "serviceCheck": "检测",
   "serviceCheckedAt": "检测于 {time}",
@@ -1019,5 +1025,13 @@
   "preferred": "首选",
   "addToLocalProxies": "添加到本地代理",
   "addedToLocalProxies": "已将 {name} 添加到本地代理",
-  "alreadyInLocalProxies": "本地代理中已有 {name}"
+  "alreadyInLocalProxies": "本地代理中已有 {name}",
+  "nodeFailover": "主节点和备用节点",
+  "nodeFailoverDescription": "仅按顺序使用此节点对，主节点恢复后切回。检测间隔使用连接恢复设置。",
+  "nodeFailoverPrimary": "主节点",
+  "nodeFailoverBackup": "备用节点",
+  "nodeFailoverChoose": "选择",
+  "nodeFailoverMissing": "配置中不存在",
+  "nodeFailoverMissingDescription": "已保存的节点或组不存在。选择会保留，不会使用其他节点替代。请更新订阅或重新选择。",
+  "nodeFailoverManaged": "此组由配置中保存的主节点和备用节点控制，请在配置设置中更改。"
 }
