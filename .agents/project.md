@@ -2,11 +2,32 @@
 
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
+## Current Baseline — 2026-11-04
+
+- Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The latest verified application change is
+  [`9338711d`](https://github.com/Artypoul/Flashco/commit/9338711d4a1eb7428c74027361f94d1027424e38).
+  Later documentation commits do not change which application revision an artifact contains.
+- Database schema: 22 (`lib/database/database.dart`); application settings migration: 2 (`lib/common/migration.dart`).
+  These are separate version counters.
+- Shared settings support editable REALITY ML-KEM defaults, automatic reconnect/failover and a persistent profile-level
+  primary/backup pair. Subscription refresh defaults to ten minutes and uses each profile's saved interval.
+  Product behavior and provider limitations are defined in [PRODUCT.md](../PRODUCT.md).
+- Personal workflows: `personal-windows.yaml` produces EXE/ZIP and `personal-android.yaml` produces a universal APK.
+  Both take the required `subscription_url` input without committing its value. Both run 18 Flutter suites and the
+  ordered pair recovery test in the Go core before packaging.
+- The Windows [41806428363](https://github.com/Artypoul/Flashco/actions/runs/41806428363) and Android
+  [41806445081](https://github.com/Artypoul/Flashco/actions/runs/41806445081) runs succeeded for `9338711d`.
+  Artifact provenance and validation limits are recorded in [history.md](../history.md); current handoff state is in
+  [память.md](../память.md).
+- Known verification limit: the full local suite still reports the pre-existing `test/lint/typography_test.dart`
+  failure against the donor `AppTextStyle` architecture. Targeted profile/state checks and both personal builds passed;
+  do not describe the full suite as green.
+- Maintain these documents using [documentation.md](documentation.md).
+
 ## Version Notes
 
-- Flutter stays on the 3.47.x line. Release CI pins 3.47.4 and is the source
-  of truth for release builds; `.fvmrc` and local SDKs may sit on another 3.47
-  patch. The editor in `plugins/code_forge` came from `code_forge` 10.14.0, which
+- Build, release and personal CI currently pin Flutter 3.47.6 and Go 1.27.1; Android uses NDK r28c.
+  Workflow definitions are the source of truth for these pins. The editor in `plugins/code_forge` came from `code_forge` 10.14.0, which
   needs Dart 3.13.2, so the CI pin cannot go below Flutter 3.47.2.
 - Before moving the pin, walk `flutter-upgrade.md`: it lists the workarounds tied to
   the current SDK, such as Impeller disabled on the Intel macOS release build.
@@ -16,12 +37,10 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 
 ## Forked Dependencies
 
-Two `pubspec.yaml` dependencies are pinned to a fork by commit SHA. Both forks
-live under `chen08209`, the same account that owns this repository, so they are
-maintained in-house rather than tracked from a third party: advancing a pin is a
-local decision, and there is no external maintainer to wait on for the patch
-itself. What each fork still waits on is the *upstream* fix that would let the pin
-be dropped entirely, recorded below.
+Two `pubspec.yaml` dependencies are pinned by commit SHA to donor-maintained forks under `chen08209`.
+They are separate from the current `Artypoul/Flashco` repository; do not assume write access to them.
+The Core submodule points to `Artypoul/Clash.Meta` (see `.gitmodules`). The upstream fixes needed to remove
+the remaining dependency pins are recorded below.
 
 Each entry records what the fork changes and what has to be true before it can go
 back to the published package, so a future upgrade does not have to rediscover it.

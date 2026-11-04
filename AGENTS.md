@@ -11,6 +11,8 @@ Read these files before making changes:
 - [.agents/commands.md](.agents/commands.md): build, development, code generation, and test commands.
 - [.agents/rules.md](.agents/rules.md): lint, testing, generated-code, and workflow rules.
 - [PRODUCT.md](PRODUCT.md): confirmed product requirements, build behavior, routing, and operational conventions.
+- [память.md](память.md): current work point and blockers; use [history.md](history.md) for confirmed prior results.
+- [.agents/documentation.md](.agents/documentation.md): required documentation updates and completion evidence.
 
 Read these only when the task touches their area:
 
@@ -63,6 +65,9 @@ Read these only when the task touches their area:
 - Before reporting a change done, run `flutter pub get`, `flutter analyze --no-fatal-infos`, and the `flutter test`
   suites that cover it, as CI does. If a toolchain the build hook needs is missing (Go, and on Linux and Windows
   cargo), say which check was skipped rather than dropping it silently.
+- Before reporting completion, synchronize the affected history, memory and project context under
+  [.agents/documentation.md](.agents/documentation.md). Record the actual code commit, check/build outcomes and remaining
+  blockers. For Markdown-only maintenance, follow that document's factual/link/diff checks instead of unrelated app tests.
 
 ## Repo Skills
 
