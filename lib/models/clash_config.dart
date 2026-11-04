@@ -1458,6 +1458,7 @@ abstract class ProfileNodeFailover with _$ProfileNodeFailover {
   const factory ProfileNodeFailover({
     @Default(true) bool enabled,
     required String groupName,
+    String? routeGroupName,
     required String primaryKey,
     required String backupKey,
     required String primaryName,

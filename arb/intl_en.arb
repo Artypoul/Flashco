@@ -53,9 +53,14 @@
   "fastestServer": "Fastest server",
   "fastestServerUnavailable": "Automatic selection is unavailable in this configuration or routing mode",
   "controlPanel": "Control panel",
-
   "realityMlkemInherit": "Inherit ({status})",
-  "@realityMlkemInherit": {"placeholders": {"status": {"type": "String"}}},
+  "@realityMlkemInherit": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "realityMlkemProfile": "Profile default",
   "realityMlkemDescription": "Default for REALITY nodes. Profiles and individual nodes can override this setting; saved choices survive subscription updates.",
   "rule": "Rule",
@@ -1033,5 +1038,19 @@
   "nodeFailoverChoose": "Choose",
   "nodeFailoverMissing": "Missing from profile",
   "nodeFailoverMissingDescription": "A saved node or group is missing. The choice is kept; other nodes will not replace this pair. Update the subscription or choose another pair.",
-  "nodeFailoverManaged": "This group uses the primary and backup nodes saved in profile settings. Change the pair there."
+  "nodeFailoverManaged": "This group uses the primary and backup nodes saved in profile settings. Change the pair there.",
+  "safeAutomatic": "Automatic backup",
+  "safeHint": "Tap a card to choose. Checks every {seconds} s; returns to the primary when it recovers.",
+  "safeActive": "Safe selected",
+  "safeReady": "Tap a node to use Safe",
+  "safeNoNodes": "No supported nodes in this profile. Inline nodes without provider transformations are required.",
+  "@safeHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "safeApplyFailed": "Safe could not be applied. Your node choices are saved; retry after checking the profile.",
+  "safeNoRoute": "This profile has no selectable default route. Choose Global mode or correct its routing rules."
 }

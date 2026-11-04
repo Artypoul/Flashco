@@ -53,9 +53,14 @@
   "fastestServer": "最快服务器",
   "fastestServerUnavailable": "此配置或路由模式不支持自动选择",
   "controlPanel": "控制面板",
-
   "realityMlkemInherit": "继承（{status}）",
-  "@realityMlkemInherit": {"placeholders": {"status": {"type": "String"}}},
+  "@realityMlkemInherit": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "realityMlkemProfile": "配置默认值",
   "realityMlkemDescription": "REALITY 节点的全局设置。配置和各个节点可保存自己的设置，订阅更新后仍然保留。",
   "rule": "规则",
@@ -1033,5 +1038,19 @@
   "nodeFailoverChoose": "选择",
   "nodeFailoverMissing": "配置中不存在",
   "nodeFailoverMissingDescription": "已保存的节点或组不存在。选择会保留，不会使用其他节点替代。请更新订阅或重新选择。",
-  "nodeFailoverManaged": "此组由配置中保存的主节点和备用节点控制，请在配置设置中更改。"
+  "nodeFailoverManaged": "此组由配置中保存的主节点和备用节点控制，请在配置设置中更改。",
+  "safeAutomatic": "自动备用",
+  "safeHint": "点按卡片选择。每 {seconds} 秒检查一次；主节点恢复后自动返回。",
+  "safeActive": "已选择 Safe",
+  "safeReady": "点按节点使用 Safe",
+  "safeNoNodes": "此配置没有支持的节点。需要不含提供商转换的内联节点。",
+  "@safeHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "safeApplyFailed": "无法应用 Safe。节点选择已保存；请检查配置后重试。",
+  "safeNoRoute": "此配置没有可选择的默认路由。请使用全局模式或修正规则。"
 }

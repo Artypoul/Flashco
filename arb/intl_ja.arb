@@ -53,9 +53,14 @@
   "fastestServer": "最速のサーバー",
   "fastestServerUnavailable": "この設定またはルーティングモードでは自動選択を利用できません",
   "controlPanel": "コントロールパネル",
-
   "realityMlkemInherit": "継承（{status}）",
-  "@realityMlkemInherit": {"placeholders": {"status": {"type": "String"}}},
+  "@realityMlkemInherit": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "realityMlkemProfile": "プロファイルの既定値",
   "realityMlkemDescription": "REALITYノードの共通設定です。プロファイルや各ノードで変更でき、サブスクリプション更新後も保存した設定が維持されます。",
   "rule": "ルール",
@@ -1033,5 +1038,19 @@
   "nodeFailoverChoose": "選択",
   "nodeFailoverMissing": "プロファイルにありません",
   "nodeFailoverMissingDescription": "保存したノードまたはグループがありません。選択は保持され、他のノードには置き換わりません。サブスクリプションを更新するか選択を変更してください。",
-  "nodeFailoverManaged": "このグループはプロファイルに保存したノードの組で制御されます。プロファイル設定で変更してください。"
+  "nodeFailoverManaged": "このグループはプロファイルに保存したノードの組で制御されます。プロファイル設定で変更してください。",
+  "safeAutomatic": "バックアップを自動選択",
+  "safeHint": "カードで選択。{seconds} 秒ごとに確認し、復旧後はメインに戻ります。",
+  "safeActive": "Safe を選択済み",
+  "safeReady": "ノードをタップして Safe を使用",
+  "safeNoNodes": "対応するノードがありません。プロバイダー変換のないインラインノードが必要です。",
+  "@safeHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "safeApplyFailed": "Safe を適用できません。選択は保存済みです。設定を確認して再試行してください。",
+  "safeNoRoute": "選択可能なデフォルト経路がありません。グローバルモードを選ぶかルールを修正してください。"
 }

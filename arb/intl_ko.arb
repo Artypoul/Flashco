@@ -53,9 +53,14 @@
   "fastestServer": "Fastest server",
   "fastestServerUnavailable": "Automatic selection is unavailable in this configuration or routing mode",
   "controlPanel": "Control panel",
-
   "realityMlkemInherit": "상속 ({status})",
-  "@realityMlkemInherit": {"placeholders": {"status": {"type": "String"}}},
+  "@realityMlkemInherit": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "realityMlkemProfile": "프로필 기본값",
   "realityMlkemDescription": "REALITY 노드의 공통 설정입니다. 프로필과 개별 노드에서 재정의할 수 있으며 구독 업데이트 후에도 저장된 설정이 유지됩니다.",
   "rule": "규칙",
@@ -1033,5 +1038,19 @@
   "nodeFailoverChoose": "선택",
   "nodeFailoverMissing": "프로필에 없음",
   "nodeFailoverMissingDescription": "저장된 노드 또는 그룹이 없습니다. 선택은 유지되며 다른 노드로 대체되지 않습니다. 구독을 갱신하거나 다른 노드를 선택하세요.",
-  "nodeFailoverManaged": "이 그룹은 프로필에 저장된 기본 및 예비 노드를 사용합니다. 프로필 설정에서 변경하세요."
+  "nodeFailoverManaged": "이 그룹은 프로필에 저장된 기본 및 예비 노드를 사용합니다. 프로필 설정에서 변경하세요.",
+  "safeAutomatic": "자동 예비 노드",
+  "safeHint": "카드를 눌러 선택하세요. {seconds}초마다 확인하며 기본 노드가 복구되면 돌아갑니다.",
+  "safeActive": "Safe 선택됨",
+  "safeReady": "노드를 눌러 Safe 사용",
+  "safeNoNodes": "지원되는 노드가 없습니다. 공급자 변환이 없는 인라인 노드가 필요합니다.",
+  "@safeHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "safeApplyFailed": "Safe를 적용하지 못했습니다. 선택은 저장되었습니다. 프로필을 확인하고 다시 시도하세요.",
+  "safeNoRoute": "선택 가능한 기본 경로가 없습니다. 글로벌 모드를 선택하거나 규칙을 수정하세요."
 }

@@ -8654,6 +8654,76 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Automatic backup`
+  String get safeAutomatic {
+    return Intl.message(
+      'Automatic backup',
+      name: 'safeAutomatic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap a card to choose. Checks every {seconds} s; returns to the primary when it recovers.`
+  String safeHint(int seconds) {
+    return Intl.message(
+      'Tap a card to choose. Checks every $seconds s; returns to the primary when it recovers.',
+      name: 'safeHint',
+      desc: '',
+      args: [seconds],
+    );
+  }
+
+  /// `Safe selected`
+  String get safeActive {
+    return Intl.message(
+      'Safe selected',
+      name: 'safeActive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap a node to use Safe`
+  String get safeReady {
+    return Intl.message(
+      'Tap a node to use Safe',
+      name: 'safeReady',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No supported nodes in this profile. Inline nodes without provider transformations are required.`
+  String get safeNoNodes {
+    return Intl.message(
+      'No supported nodes in this profile. Inline nodes without provider transformations are required.',
+      name: 'safeNoNodes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Safe could not be applied. Your node choices are saved; retry after checking the profile.`
+  String get safeApplyFailed {
+    return Intl.message(
+      'Safe could not be applied. Your node choices are saved; retry after checking the profile.',
+      name: 'safeApplyFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This profile has no selectable default route. Choose Global mode or correct its routing rules.`
+  String get safeNoRoute {
+    return Intl.message(
+      'This profile has no selectable default route. Choose Global mode or correct its routing rules.',
+      name: 'safeNoRoute',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

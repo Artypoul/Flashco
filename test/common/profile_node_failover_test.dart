@@ -22,6 +22,7 @@ Map<String, dynamic> pairFixture() => {
       'port': 443,
     },
   ],
+  'rules': ['MATCH,My route'],
   'proxy-groups': [
     {
       'name': 'My route',
@@ -42,13 +43,18 @@ Map<String, dynamic> pairFixture() => {
 ProfileNodeFailover pairChoice(Map config) {
   final nodes = profileFailoverNodes(config);
   return ProfileNodeFailover(
-    groupName: 'My route',
+    groupName: 'Safe',
+    routeGroupName: 'My route',
     primaryKey: nodes[0].key,
     backupKey: nodes[1].key,
     primaryName: nodes[0].name,
     backupName: nodes[1].name,
   );
 }
+
+Map safeGroup(Map config) => (config['proxy-groups'] as List)
+    .whereType<Map>()
+    .singleWhere((g) => g['name'] == 'Safe');
 
 void main() {
   test('an explicit GLOBAL group cannot route outside the saved pair', () {
@@ -60,7 +66,7 @@ void main() {
         'type': type,
         'proxies': ['Other country'],
       });
-      applyProfileNodeFailover(
+      applySafeNodeFailover(
         config,
         choice: choice,
         interval: 15,
@@ -70,7 +76,7 @@ void main() {
           .whereType<Map>()
           .singleWhere((group) => group['name'] == 'GLOBAL');
       expect(global['type'], 'select');
-      expect(global['proxies'], ['My route']);
+      expect(global['proxies'], ['Safe', 'Other country']);
     }
   });
 
@@ -112,15 +118,15 @@ void main() {
     config['proxy-providers'] = {
       'source': {'type': 'inline', 'payload': payload},
     };
-    applyProfileNodeFailover(
+    applySafeNodeFailover(
       config,
       choice: choice,
       interval: 15,
       testUrl: 'probe',
     );
-    final members = config['proxy-groups'][0]['proxies'] as List;
+    final members = safeGroup(config)['proxies'] as List;
     expect(members, ['My route (2)', 'DIRECT (2)']);
-    expect(config['proxies'], hasLength(2));
+    expect(config['proxies'], hasLength(3));
   });
 
   test('inline provider transformations are not silently discarded', () {
@@ -136,13 +142,13 @@ void main() {
       },
     };
     expect(profileFailoverNodes(config), isEmpty);
-    applyProfileNodeFailover(
+    applySafeNodeFailover(
       config,
       choice: choice,
       interval: 15,
       testUrl: 'probe',
     );
-    expect(config['proxy-groups'][0]['proxies'], ['REJECT']);
+    expect(safeGroup(config)['proxies'], ['REJECT']);
   });
 
   test(
@@ -181,13 +187,13 @@ void main() {
       final config = pairFixture();
       final original = jsonEncode(config);
       final choice = pairChoice(config);
-      applyProfileNodeFailover(
+      applySafeNodeFailover(
         config,
         choice: choice,
         interval: 19,
         testUrl: 'https://probe.example',
       );
-      final group = config['proxy-groups'][0] as Map;
+      final group = safeGroup(config);
       expect(group['proxies'], ['Node xhttp', 'Node grpc']);
       expect(group['type'], 'fallback');
       expect(group['fallback-mode'], 'ordered');
@@ -199,52 +205,43 @@ void main() {
       expect(group['filter'], isNull);
       expect(config['proxy-groups'][1]['proxies'], ['DIRECT', 'Other country']);
       final disabled = pairFixture();
-      applyProfileNodeFailover(
+      applySafeNodeFailover(
         disabled,
         choice: choice.copyWith(enabled: false),
         interval: 19,
         testUrl: 'unused',
       );
-      expect(jsonEncode(disabled), original);
+      expect(
+        jsonEncode((disabled['proxy-groups'] as List).take(2).toList()),
+        jsonEncode((jsonDecode(original) as Map)['proxy-groups']),
+      );
     },
   );
 
   test(
     'renamed nodes resolve by identity; missing nodes never select another country',
     () {
-      final config = pairFixture();
-      final choice = pairChoice(config);
-      config['proxies'][0]['name'] = 'Renamed primary';
-      applyProfileNodeFailover(
-        config,
-        choice: choice,
-        interval: 15,
-        testUrl: 'probe',
-      );
-      expect(config['proxy-groups'][0]['proxies'], [
-        'Renamed primary',
-        'Node grpc',
-      ]);
-      (config['proxies'] as List).removeAt(0);
-      applyProfileNodeFailover(
-        config,
-        choice: choice,
-        interval: 15,
-        testUrl: 'probe',
-      );
-      expect(config['proxy-groups'][0]['proxies'], ['Node grpc']);
-      (config['proxies'] as List).removeAt(0);
-      applyProfileNodeFailover(
-        config,
-        choice: choice,
-        interval: 15,
-        testUrl: 'probe',
-      );
-      expect(config['proxy-groups'][0]['proxies'], ['REJECT']);
+      final choice = pairChoice(pairFixture());
+      for (var missing = 0; missing <= 2; missing++) {
+        final config = pairFixture();
+        config['proxies'][0]['name'] = 'Renamed primary';
+        (config['proxies'] as List).removeRange(0, missing);
+        applySafeNodeFailover(
+          config,
+          choice: choice,
+          interval: 15,
+          testUrl: 'probe',
+        );
+        expect(safeGroup(config)['proxies'], switch (missing) {
+          0 => ['Renamed primary', 'Node grpc'],
+          1 => ['Node grpc'],
+          _ => ['REJECT'],
+        });
+      }
       final absent = pairFixture();
       absent['proxy-groups'] = [];
       expect(
-        () => applyProfileNodeFailover(
+        () => applySafeNodeFailover(
           absent,
           choice: choice,
           interval: 15,
@@ -264,14 +261,14 @@ void main() {
       config['proxy-providers'] = {
         'remote': {'type': 'inline', 'payload': proxies},
       };
-      applyProfileNodeFailover(
+      applySafeNodeFailover(
         config,
         choice: choice,
         interval: 15,
         testUrl: 'probe',
       );
-      expect(config['proxies'], hasLength(2));
-      expect(config['proxy-groups'][0]['proxies'], ['Node xhttp', 'Node grpc']);
+      expect(config['proxies'], hasLength(3));
+      expect(safeGroup(config)['proxies'], ['Node xhttp', 'Node grpc']);
     },
   );
 
@@ -304,7 +301,7 @@ void main() {
           defaultUA: 'test',
         ),
       );
-      final group = (loadYaml(result.yaml) as Map)['proxy-groups'][0];
+      final group = safeGroup(loadYaml(result.yaml) as Map);
       expect(group['proxies'], ['Node xhttp', 'Node grpc']);
       expect(group['type'], 'fallback');
       expect(group['interval'], 23);

@@ -722,6 +722,7 @@ void main() {
                   autoFailover: false,
                   reconnectInterval: 23,
                   nodeFailover: ProfileNodeFailover(
+                    routeGroupName: 'Actual route',
                     groupName: 'Route',
                     primaryKey: 'a',
                     backupKey: 'b',
@@ -780,6 +781,7 @@ void main() {
           autoUpdateDuration: const Duration(minutes: 23),
           overrides: const ProfileOverrides(
             nodeFailover: ProfileNodeFailover(
+              routeGroupName: 'Actual route',
               groupName: 'Edited route',
               primaryKey: 'new-primary',
               backupKey: 'new-backup',

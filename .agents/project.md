@@ -13,15 +13,17 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
   primary/backup pair. Subscription refresh defaults to ten minutes and uses each profile's saved interval.
   Product behavior and provider limitations are defined in [PRODUCT.md](../PRODUCT.md).
 - Personal workflows: `personal-windows.yaml` produces EXE/ZIP and `personal-android.yaml` produces a universal APK.
-  Both take the required `subscription_url` input without committing its value. Both run 18 Flutter suites and the
+  Both take the required `subscription_url` input without committing its value. The local Safe update runs 19 Flutter suites and the
   ordered pair recovery test in the Go core before packaging.
 - The Windows [41806428363](https://github.com/Artypoul/Flashco/actions/runs/41806428363) and Android
   [41806445081](https://github.com/Artypoul/Flashco/actions/runs/41806445081) runs succeeded for `9338711d`.
   Artifact provenance and validation limits are recorded in [history.md](../history.md); current handoff state is in
   [память.md](../память.md).
 - Known verification limit: the full local suite still reports the pre-existing `test/lint/typography_test.dart`
-  failure against the donor `AppTextStyle` architecture. Targeted profile/state checks and both personal builds passed;
-  do not describe the full suite as green.
+  failure against the donor `AppTextStyle` architecture. The local Safe full run passed 4324 tests, skipped 6 and
+  failed only that known lint test; 216 targeted checks and analyzer passed. The earlier personal builds validate
+  `9338711d` only. Do not describe the full suite as green.
+- Local work over `369f6ebd` moves primary/backup selection into the additional Safe proxy tab, with immediate profile persistence, ordinary-mode restoration and shared Windows/Android configuration. It is not included in the published artifacts above. See [PRODUCT.md](../PRODUCT.md) and current memory for verification status.
 - Maintain these documents using [documentation.md](documentation.md).
 
 ## Version Notes

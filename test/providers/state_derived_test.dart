@@ -22,7 +22,10 @@ void main() {
     navigationPort = navigation;
     addTearDown(() => navigationPort = null);
     container = ProviderContainer(
-      overrides: [profilesProvider.overrideWith(TestProfiles.new)],
+      overrides: [
+        profilesProvider.overrideWith(TestProfiles.new),
+        safeProfileConfigProvider.overrideWith((_) async => {}),
+      ],
     );
   });
 
@@ -357,7 +360,7 @@ void main() {
           .read(viewSizeProvider.notifier)
           .update((_) => const Size(900, 800));
 
-      expect(container.read(filterGroupsStateProvider('')).value, hasLength(2));
+      expect(container.read(filterGroupsStateProvider('')).value, hasLength(3));
       final filtered = container.read(filterGroupsStateProvider('ALP')).value;
       expect(filtered, hasLength(1));
       expect(filtered.single.all.single.name, 'Alpha');
