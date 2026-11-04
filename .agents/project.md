@@ -5,7 +5,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 ## Current Baseline — 2026-11-04
 
 - Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The latest verified application change is
-  [`9338711d`](https://github.com/Artypoul/Flashco/commit/9338711d4a1eb7428c74027361f94d1027424e38).
+  [`04c56386`](https://github.com/Artypoul/Flashco/commit/04c563869e1a594d259a926fd3cb62cb4a8211b3) via [PR #10](https://github.com/Artypoul/Flashco/pull/10).
   Later documentation commits do not change which application revision an artifact contains.
 - Database schema: 22 (`lib/database/database.dart`); application settings migration: 2 (`lib/common/migration.dart`).
   These are separate version counters.
@@ -13,17 +13,17 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
   primary/backup pair. Subscription refresh defaults to ten minutes and uses each profile's saved interval.
   Product behavior and provider limitations are defined in [PRODUCT.md](../PRODUCT.md).
 - Personal workflows: `personal-windows.yaml` produces EXE/ZIP and `personal-android.yaml` produces a universal APK.
-  Both take the required `subscription_url` input without committing its value. The local Safe update runs 19 Flutter suites and the
+  Both take the required `subscription_url` input without committing its value. Both run 19 Flutter suites and the
   ordered pair recovery test in the Go core before packaging.
-- The Windows [41806428363](https://github.com/Artypoul/Flashco/actions/runs/41806428363) and Android
-  [41806445081](https://github.com/Artypoul/Flashco/actions/runs/41806445081) runs succeeded for `9338711d`.
+- The Windows [41848512761](https://github.com/Artypoul/Flashco/actions/runs/41848512761) and Android
+  [41848533942](https://github.com/Artypoul/Flashco/actions/runs/41848533942) runs succeeded for `04c56386` and include Safe.
   Artifact provenance and validation limits are recorded in [history.md](../history.md); current handoff state is in
   [память.md](../память.md).
 - Known verification limit: the full local suite still reports the pre-existing `test/lint/typography_test.dart`
   failure against the donor `AppTextStyle` architecture. The local Safe full run passed 4324 tests, skipped 6 and
-  failed only that known lint test; 216 targeted checks and analyzer passed. The earlier personal builds validate
-  `9338711d` only. Do not describe the full suite as green.
-- Local work over `369f6ebd` moves primary/backup selection into the additional Safe proxy tab, with immediate profile persistence, ordinary-mode restoration and shared Windows/Android configuration. It is not included in the published artifacts above. See [PRODUCT.md](../PRODUCT.md) and current memory for verification status.
+  failed only that known lint test; 216 targeted checks and analyzer passed. Both personal builds validate
+  `04c56386` (Safe). Do not describe the full suite as green.
+- Safe is merged in `04c56386`; the personal Windows/Android builds above succeeded, were downloaded and SHA-256 checked. Later documentation commits do not alter their application source SHA. See current memory for artifact provenance and local storage.
 - Maintain these documents using [documentation.md](documentation.md).
 
 ## Version Notes
