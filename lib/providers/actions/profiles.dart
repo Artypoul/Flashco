@@ -258,24 +258,14 @@ class ProfilesAction extends _$ProfilesAction {
   Future<void> updateProfile(
     Profile profile, {
     bool showLoading = false,
-    bool saveEdits = false,
   }) async {
     final operation = showLoading
         ? ref.read(updatingKeysProvider.notifier).start(profile.updatingKey)
         : null;
     try {
-      if (saveEdits) ref.read(profilesProvider.notifier).put(profile);
-      final current = ref.read(profilesProvider).getProfile(profile.id);
-      if (current == null) return;
-      final downloaded = await current.update(
+      ref.read(profilesProvider.notifier).put(profile);
+      final newProfile = await profile.update(
         validate: (path, key) => _core.validateProfile(path, key),
-      );
-      final latest = ref.read(profilesProvider).getProfile(profile.id);
-      if (latest == null) return;
-      final newProfile = latest.copyWith(
-        label: latest.label == current.label ? downloaded.label : latest.label,
-        lastUpdateDate: downloaded.lastUpdateDate,
-        subscriptionInfo: downloaded.subscriptionInfo,
       );
       ref.read(profilesProvider.notifier).put(newProfile);
       if (profile.id == ref.read(currentProfileIdProvider)) {

@@ -109,7 +109,7 @@ const midDuration = Duration(milliseconds: 200);
 const commonDuration = Duration(milliseconds: 300);
 
 const renderThrottleDuration = Duration(milliseconds: 300);
-const defaultUpdateDuration = Duration(minutes: 10);
+const defaultUpdateDuration = Duration(days: 1);
 const MMDB = 'GEOIP.metadb';
 const ASN = 'ASN.mmdb';
 const GEOIP = 'GEOIP.dat';

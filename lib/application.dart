@@ -3,11 +3,9 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flashco/common/common.dart';
-import 'package:flashco/common/profile_update_scheduler.dart';
 import 'package:flashco/common/window.dart';
 import 'package:flashco/bootstrap.dart';
 import 'package:flashco/common/system_dns.dart';
-import 'package:flashco/enum/enum.dart';
 import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/manager/hotkey_manager.dart';
@@ -76,8 +74,7 @@ Widget _closeButtonIcon(BuildContext context) =>
     const GlyphIcon(AppGlyphs.close);
 
 class ApplicationState extends ConsumerState<Application> {
-  ProfileUpdateScheduler? _profileUpdates;
-  Timer? _resourceUpdatesTimer;
+  Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
   // Windows can only watch SIGINT and SIGHUP.
   final _terminateSignals = system.isDesktop && !system.isWindows
@@ -107,23 +104,7 @@ class ApplicationState extends ConsumerState<Application> {
       } else {
         exit(0);
       }
-      if (!mounted) return;
-      _profileUpdates = ProfileUpdateScheduler(
-        profiles: () => ref.read(profilesProvider),
-        update: (profile) =>
-            ref.read(profilesActionProvider.notifier).updateProfile(profile),
-        onError: (error, _) =>
-            commonPrint.log(compactError(error), logLevel: LogLevel.warning),
-      );
-      ref.listenManual(
-        profilesProvider,
-        (_, _) => _profileUpdates?.reschedule(),
-      );
-      ref.listenManual(appVisibleProvider, (_, visible) {
-        if (visible) _profileUpdates?.reschedule();
-      });
-      _profileUpdates!.reschedule();
-      _autoUpdateResourcesTask();
+      _autoUpdateProfilesTask();
       _initLink();
       if (!safeModeBuild) {
         unawaited(app?.initShortcuts());
@@ -160,13 +141,14 @@ class ApplicationState extends ConsumerState<Application> {
     });
   }
 
-  void _autoUpdateResourcesTask() {
-    _resourceUpdatesTimer = Timer(const Duration(minutes: 20), () async {
+  void _autoUpdateProfilesTask() {
+    _autoUpdateProfilesTaskTimer = Timer(const Duration(minutes: 20), () async {
+      await ref.read(profilesActionProvider.notifier).autoUpdateProfiles();
       await ref.read(resourcesActionProvider.notifier).autoUpdate();
       if (!mounted) {
         return;
       }
-      _autoUpdateResourcesTask();
+      _autoUpdateProfilesTask();
     });
   }
 
@@ -246,8 +228,7 @@ class ApplicationState extends ConsumerState<Application> {
   @override
   void dispose() {
     linkManager.destroy();
-    _profileUpdates?.dispose();
-    _resourceUpdatesTimer?.cancel();
+    _autoUpdateProfilesTaskTimer?.cancel();
     super.dispose();
   }
 }

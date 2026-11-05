@@ -12,7 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
 import 'common.dart';
-import 'safe.dart';
 
 typedef GroupNameProxiesMap = Map<String, List<Proxy>>;
 
@@ -35,9 +34,6 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
   late final ScrollController _controller;
   GroupOffsets _groupOffsets = GroupOffsets.empty;
   double containerHeight = 0;
-  bool _safeBackup = false;
-  double _safeControlsHeight = 0;
-  final _safeControlsKey = GlobalKey();
   String? _enterGroupName;
   Timer? _enterTimer;
 
@@ -96,9 +92,6 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
       if (currentUnfoldSet.contains(group.name)) {
         final rowCount = (group.all.length + columns - 1) ~/ columns;
         currentOffset += rowCount * rowExtent;
-        if (group.name == ref.read(safeTabNameProvider)) {
-          currentOffset += _safeControlsHeight;
-        }
       }
     }
     return GroupOffsets(groups, offsets);
@@ -118,21 +111,14 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
           final (columnIndex, proxy) = entry;
           final card = SizedBox(
             height: getItemHeight(cardType),
-            child: groupName == ref.watch(safeTabNameProvider)
-                ? SafeNodeCard(
-                    group: group,
-                    proxy: proxy,
-                    cardType: cardType,
-                    backup: _safeBackup,
-                  )
-                : ProxyCard(
-                    testUrl: group.testUrl,
-                    type: cardType,
-                    groupType: group.type,
-                    key: ValueKey('$groupName.${proxy.name}'),
-                    proxy: proxy,
-                    groupName: groupName,
-                  ),
+            child: ProxyCard(
+              testUrl: group.testUrl,
+              type: cardType,
+              groupType: group.type,
+              key: ValueKey('$groupName.${proxy.name}'),
+              proxy: proxy,
+              groupName: groupName,
+            ),
           );
           if (!enterAnimated) {
             return Flexible(child: card);
@@ -164,16 +150,6 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
     required int columns,
     required ProxyCardType cardType,
   }) {
-    if (group.name == ref.watch(safeTabNameProvider)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        final box = _safeControlsKey.currentContext?.findRenderObject();
-        final height = box is RenderBox && box.hasSize ? box.size.height : 0.0;
-        if (height != _safeControlsHeight) {
-          setState(() => _safeControlsHeight = height);
-        }
-      });
-    }
     final groupName = group.name;
     final isExpand = currentUnfoldSet.contains(groupName);
     final rows = isExpand
@@ -201,14 +177,6 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
             ),
           ),
         ),
-        if (isExpand && groupName == ref.watch(safeTabNameProvider))
-          SliverToBoxAdapter(
-            child: SafeControls(
-              key: _safeControlsKey,
-              backup: _safeBackup,
-              onChanged: (value) => setState(() => _safeBackup = value),
-            ),
-          ),
         if (isExpand)
           SliverFixedExtentList(
             itemExtent: getRowExtent(cardType),
@@ -304,14 +272,7 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
     if (rowOffset == null) {
       return;
     }
-    animateScrollTo(
-      _controller,
-      _getGroupOffset(groupName) +
-          rowOffset +
-          (groupName == ref.read(safeTabNameProvider)
-              ? _safeControlsHeight
-              : 0),
-    );
+    animateScrollTo(_controller, _getGroupOffset(groupName) + rowOffset);
   }
 
   @override

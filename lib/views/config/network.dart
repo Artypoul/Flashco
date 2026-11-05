@@ -1,4 +1,3 @@
-import 'connection_recovery.dart';
 import 'dart:io';
 
 import 'package:flashco/common/common.dart';
@@ -82,24 +81,6 @@ class TUNItem extends ConsumerWidget {
       selector: patchClashConfigProvider.select((state) => state.tun.enable),
       onChanged: _tunWriter(
         (state, value) => state.copyWith.tun(enable: value),
-      ),
-    );
-  }
-}
-
-class RealityMlkemItem extends ConsumerWidget {
-  const RealityMlkemItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ConfigToggleItem(
-      title: (l) => 'REALITY · ML-KEM',
-      subtitle: (l) => l.realityMlkemDescription,
-      selector: patchClashConfigProvider.select(
-        (state) => state.realityMlkemEnabled,
-      ),
-      onChanged: _tunWriter(
-        (state, value) => state.copyWith(realityMlkemEnabled: value),
       ),
     );
   }
@@ -449,8 +430,6 @@ class TunSection extends ConsumerWidget {
 // (component/keepalive), and only Linux honours a routing mark.
 List<Widget> outboundItems({required bool isDesktop, required bool isLinux}) {
   return [
-    const ConnectionRecoveryItem(),
-    const RealityMlkemItem(),
     if (isDesktop) ...[
       ConfigToggleItem(
         title: (l) => l.disableKeepAlive,

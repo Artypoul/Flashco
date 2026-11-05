@@ -19,10 +19,7 @@ void main() {
 
   test('delegate recognizes only supported locales', () {
     expect(AppLocalizations.delegate.isSupported(const Locale('en')), isTrue);
-    for (final language in ['fr', 'es', 'ko']) {
-      expect(AppLocalizations.delegate.isSupported(Locale(language)), isTrue);
-    }
-    expect(AppLocalizations.delegate.isSupported(const Locale('ar')), isFalse);
+    expect(AppLocalizations.delegate.isSupported(const Locale('fr')), isFalse);
     expect(
       AppLocalizations.delegate.shouldReload(AppLocalizations.delegate),
       isFalse,

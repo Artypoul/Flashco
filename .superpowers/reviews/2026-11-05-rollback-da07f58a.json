@@ -1,0 +1,18 @@
+{
+  "reviewer": "/root/rollback_merge_review",
+  "base": "82929ebe9144d7349287ad64c4d74daa4a9ec6c2",
+  "target": "da07f58a94ea417ff3fe2d77317754dafa377d6f",
+  "reviewed_staged_diff_sha256": "103771956c0ae55668d3349affe9a6d73570c54bc65a3af9bb2fd0bcd3286d07",
+  "scope": "Application, generated sources, Core gitlink, dependencies, workflows, PRODUCT.md and tests restored to target; retained context documents excluded",
+  "verdict": "approve: no actionable P1/P2 findings",
+  "evidence": [
+    "Index matches target outside AGENTS.md, .agents/, history.md and память.md",
+    "Staged diff whitespace check passed",
+    "Inspected schema downgrade, JSON and enum compatibility, saved Safe selection, Core/dependency consistency and removed references"
+  ],
+  "caveats": [
+    "Existing stored subscription intervals are not reversed",
+    "No runtime, device, tests or CI execution by reviewer",
+    "Later context documentation and this receipt are outside the reviewed code scope"
+  ]
+}

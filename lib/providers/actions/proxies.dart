@@ -39,9 +39,6 @@ class ProxiesAction extends _$ProxiesAction {
   Timer? _delayFlushTimer;
 
   final Map<String, String> _pendingSelectedRollback = {};
-  int? _safeSelectionDirty;
-  Object? _safeSelectionRequest;
-  final Map<String, Object> _selectionRequests = {};
 
   @override
   void build() {
@@ -94,10 +91,6 @@ class ProxiesAction extends _$ProxiesAction {
   }
 
   void changeProxyDebounce(String groupName, String proxyName) {
-    _leaveSafe(groupName);
-    final profileId = ref.read(currentProfileIdProvider);
-    final request = Object();
-    _selectionRequests[groupName] = request;
     _pendingSelectedRollback.putIfAbsent(
       groupName,
       () => _currentSelectedName(groupName),
@@ -109,11 +102,6 @@ class ProxiesAction extends _$ProxiesAction {
       String groupName,
       String proxyName,
     ) async {
-      if (!ref.mounted ||
-          ref.read(currentProfileIdProvider) != profileId ||
-          !identical(_selectionRequests[groupName], request)) {
-        return;
-      }
       await changeProxy(groupName: groupName, proxyName: proxyName);
       updateGroupsDebounce();
     }, args: [groupName, proxyName]);
@@ -134,7 +122,9 @@ class ProxiesAction extends _$ProxiesAction {
           final testUrl = ref.read(
             appSettingProvider.select((state) => state.testUrl),
           );
-          final selectedMap = ref.read(selectedMapProvider);
+          final selectedMap = ref.read(
+            currentProfileProvider.select((state) => state?.selectedMap ?? {}),
+          );
           try {
             return await _core.getProxiesGroups(
               selectedMap: selectedMap,
@@ -188,30 +178,6 @@ class ProxiesAction extends _$ProxiesAction {
     required String groupName,
     required String proxyName,
   }) async {
-    final profileId = ref.read(currentProfileIdProvider);
-    final request = Object();
-    _selectionRequests[groupName] = request;
-    bool isCurrent() =>
-        ref.mounted &&
-        ref.read(currentProfileIdProvider) == profileId &&
-        identical(_selectionRequests[groupName], request);
-    if (_safeSelectionDirty != null &&
-        _safeSelectionDirty == ref.read(currentProfileIdProvider)) {
-      _safeSelectionDirty = null;
-      if (!await ref
-          .read(setupActionProvider.notifier)
-          .applyProfile(silence: true, force: true)) {
-        if (isCurrent()) {
-          _safeSelectionDirty = profileId;
-          dialogs.showNotifier(
-            currentAppLocalizations.changeProxyFailedTip,
-            level: MessageLevel.error,
-          );
-        }
-        return;
-      }
-    }
-    if (!isCurrent()) return;
     final profilesAction = ref.read(profilesActionProvider.notifier);
     final rollbackName =
         _pendingSelectedRollback.remove(groupName) ??
@@ -230,7 +196,6 @@ class ProxiesAction extends _$ProxiesAction {
         'changeProxy($groupName -> $proxyName) failed: $error',
         logLevel: coreFailureLogLevel(error),
       );
-      if (!isCurrent()) return;
       profilesAction.updateCurrentSelectedMap(groupName, rollbackName);
       dialogs.showNotifier(
         currentAppLocalizations.changeProxyFailedTip,
@@ -238,7 +203,7 @@ class ProxiesAction extends _$ProxiesAction {
       );
       return;
     }
-    if (!isCurrent() || !result.changed) {
+    if (!result.changed) {
       return;
     }
     try {
@@ -253,81 +218,6 @@ class ProxiesAction extends _$ProxiesAction {
         logLevel: coreFailureLogLevel(error),
       );
     }
-  }
-
-  Future<void> selectSafeNode({String? nodeKey, required bool backup}) async {
-    final id = ref.read(currentProfileIdProvider);
-    final request = Object();
-    _safeSelectionRequest = request;
-    _selectionRequests.clear();
-    for (final group in _pendingSelectedRollback.keys) {
-      debouncer.cancel((FunctionTag.changeProxy, group));
-    }
-    _pendingSelectedRollback.clear();
-    _safeSelectionDirty = null;
-    await globalState.safeRun(() async {
-      final config = await ref.read(safeProfileConfigProvider.future);
-      if (!ref.mounted ||
-          ref.read(currentProfileIdProvider) != id ||
-          !identical(_safeSelectionRequest, request)) {
-        return;
-      }
-      final profile = ref.read(currentProfileProvider);
-      if (profile == null) return;
-      final choice = safeNodeChoice(
-        config,
-        profile.overrides.nodeFailover,
-        nodeKey: nodeKey,
-        backup: backup,
-        global: ref.read(patchClashConfigProvider).mode == Mode.global,
-      );
-      if (choice.routeGroupName?.isEmpty != false) {
-        throw MessageException(currentAppLocalizations.safeNoRoute);
-      }
-      ref
-          .read(profilesProvider.notifier)
-          .put(
-            profile.copyWith(
-              currentGroupName: choice.groupName,
-              overrides: profile.overrides.copyWith(nodeFailover: choice),
-            ),
-          );
-      final applied = await ref
-          .read(setupActionProvider.notifier)
-          .applyProfile(silence: true, force: true);
-      if (!applied && identical(_safeSelectionRequest, request)) {
-        throw MessageException(currentAppLocalizations.safeApplyFailed);
-      }
-    });
-  }
-
-  void _leaveSafe(String groupName) {
-    _safeSelectionRequest = null;
-    final profile = ref.read(currentProfileProvider);
-    final pair = profile?.overrides.nodeFailover;
-    if (profile == null || pair?.enabled != true) return;
-    final selections = {...profile.selectedMap};
-    if (groupName != GroupName.GLOBAL.name) {
-      selections[GroupName.GLOBAL.name] = groupName;
-      final route = pair!.routeGroupName;
-      final root = ref.read(groupsProvider).getGroup(route ?? '');
-      if (route != null &&
-          route != groupName &&
-          root?.all.any((proxy) => proxy.name == groupName) == true) {
-        selections[route] = groupName;
-      }
-    }
-    ref
-        .read(profilesProvider.notifier)
-        .put(
-          profile.copyWith(
-            selectedMap: selections,
-            overrides: profile.overrides.copyWith(
-              nodeFailover: pair!.copyWith(enabled: false),
-            ),
-          ),
-        );
-    _safeSelectionDirty = profile.id;
   }
 
   Future<String> updateProvider(

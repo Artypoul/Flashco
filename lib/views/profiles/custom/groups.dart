@@ -24,12 +24,6 @@ String _emptyFallbackOf(ProxyGroup group) => switch (group.emptyFallback) {
   _ => _defaultEmptyFallback,
 };
 
-String _fallbackModeLabel(AppLocalizations l, FallbackMode mode) =>
-    switch (mode) {
-      FallbackMode.ordered => l.fallbackModeOrdered,
-      FallbackMode.reliable => l.fallbackModeReliable,
-    };
-
 const _inUserHashKey = 'in-user';
 
 /// What a group leaves to the core until it is added, starting from the
@@ -43,7 +37,6 @@ enum _GroupOption {
   lazy,
   expectedStatus,
   tolerance,
-  fallbackMode,
   defaultSelected,
   strategy,
   hashKey,
@@ -59,7 +52,6 @@ enum _GroupOption {
     lazy => l.testWhenUsed,
     expectedStatus => l.expectedStatus,
     tolerance => l.tolerance,
-    fallbackMode => l.fallbackMode,
     defaultSelected => l.defaultSelected,
     strategy => l.strategy,
     hashKey => l.hashByInUser,
@@ -76,7 +68,6 @@ enum _GroupOption {
     expectedStatus ||
     tolerance => l.healthCheck,
     emptyFallback ||
-    fallbackMode ||
     defaultSelected ||
     strategy ||
     hashKey ||
@@ -87,7 +78,6 @@ enum _GroupOption {
   bool appliesTo(GroupType type, LoadBalanceStrategy? strategy) =>
       switch (this) {
         tolerance => type == GroupType.URLTest,
-        fallbackMode => type == GroupType.Fallback,
         defaultSelected => type == GroupType.Selector,
         _GroupOption.strategy => type == GroupType.LoadBalance,
         hashKey =>
@@ -105,7 +95,6 @@ enum _GroupOption {
     lazy => group.lazy != null,
     expectedStatus => group.expectedStatus != null,
     tolerance => group.tolerance != null,
-    fallbackMode => group.fallbackMode != null,
     defaultSelected => group.defaultSelected != null,
     _GroupOption.strategy => group.strategy != null,
     hashKey => group.hashKey != null,
@@ -121,7 +110,6 @@ enum _GroupOption {
     lazy => group.copyWith(lazy: true),
     expectedStatus => group.copyWith(expectedStatus: ''),
     tolerance => group.copyWith(tolerance: 0),
-    fallbackMode => group.copyWith(fallbackMode: FallbackMode.ordered),
     _GroupOption.strategy => group.copyWith(
       strategy: LoadBalanceStrategy.consistentHashing,
     ),
@@ -141,7 +129,6 @@ enum _GroupOption {
     lazy => group.copyWith(lazy: null),
     expectedStatus => group.copyWith(expectedStatus: null),
     tolerance => group.copyWith(tolerance: null),
-    fallbackMode => group.copyWith(fallbackMode: null),
     defaultSelected => group.copyWith(defaultSelected: null),
     _GroupOption.strategy => group.copyWith(strategy: null),
     hashKey => group.copyWith(hashKey: null),
@@ -648,31 +635,6 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
         .update((state) => state.copyWith(strategy: value));
   }
 
-  Future<void> _showFallbackModeOptions() async {
-    final value = await Navigator.of(context).push(
-      PagedSheetRoute(
-        builder: (context) => SelectionSheet<FallbackMode>(
-          title: context.appLocalizations.fallbackMode,
-          sections: const [SelectionSection(items: FallbackMode.values)],
-          labelBuilder: (item) =>
-              _fallbackModeLabel(context.appLocalizations, item),
-          selectedOf: (ref) => ref.watch(
-            proxyGroupProvider.select(
-              (state) => state.fallbackMode ?? FallbackMode.ordered,
-            ),
-          ),
-          onSelected: (item) => Navigator.of(context).pop(item),
-        ),
-      ),
-    );
-    if (value == null) {
-      return;
-    }
-    ref
-        .read(proxyGroupProvider.notifier)
-        .update((state) => state.copyWith(fallbackMode: value));
-  }
-
   Future<void> _showEmptyFallbackOptions() async {
     final res = await Navigator.of(context).push(
       PagedSheetRoute(
@@ -894,18 +856,6 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
       title: context.appLocalizations.strategy,
       value: (strategy ?? LoadBalanceStrategy.consistentHashing).value,
       onPressed: _showStrategyOptions,
-      leading: leading,
-    );
-  }
-
-  Widget _buildFallbackModeItem(FallbackMode? mode, Widget leading) {
-    return _buildPickerItem(
-      title: context.appLocalizations.fallbackMode,
-      value: _fallbackModeLabel(
-        context.appLocalizations,
-        mode ?? FallbackMode.ordered,
-      ),
-      onPressed: _showFallbackModeOptions,
       leading: leading,
     );
   }
@@ -1296,11 +1246,6 @@ class _EditProxyGroupViewState extends ConsumerState<EditProxyGroupView> {
           suffix: 'ms',
           apply: (state, value) => state.copyWith(tolerance: value),
         ),
-      ),
-      _GroupOption.fallbackMode => _optionField(
-        option,
-        (state) => state.fallbackMode,
-        (value) => _buildFallbackModeItem(value, leading),
       ),
       _GroupOption.defaultSelected => _optionField(
         option,

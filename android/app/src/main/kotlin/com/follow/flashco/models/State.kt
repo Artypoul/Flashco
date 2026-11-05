@@ -4,8 +4,6 @@ import com.follow.flashco.service.models.VpnOptions
 import com.google.gson.annotations.SerializedName
 
 data class SharedState(
-    val autoReconnect: Boolean = false,
-    val reconnectInterval: Int = 15,
     val startTip: String = "Starting VPN...",
     val stopTip: String = "Stopping VPN...",
     val localNetworkTip: String =

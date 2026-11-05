@@ -12,8 +12,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -53,9 +51,6 @@ internal class ServiceStateMachine(private val host: ServiceStateHost) {
     @Volatile
     private var sharedState = SharedState()
 
-    private var recovery: Job? = null
-    private var recoveryToken: RunRequest? = null
-
     @Volatile
     private var pendingVpnPreparation: (() -> Unit)? = null
 
@@ -86,34 +81,6 @@ internal class ServiceStateMachine(private val host: ServiceStateHost) {
      * when the loss was observed, so a start that raced ahead of this callback keeps its intent.
      */
     suspend fun handleServiceLost(token: RunRequest) {
-        if (isCurrent(token) && isRunRequested && sharedState.autoReconnect && host.runtime == null) {
-            if (recoveryToken !== token) recovery?.cancel()
-            if (recovery?.isActive != true) {
-                recoveryToken = token
-                recovery = host.scope.launch {
-                    while (isCurrent(token) && isRunRequested && sharedState.autoReconnect && host.runtime == null) {
-                        delay(sharedState.reconnectInterval.coerceIn(1, 3600) * 1000L)
-                        if (!isCurrent(token) || !isRunRequested) return@launch
-                        if (!sharedState.autoReconnect ||
-                            (sharedState.vpnOptions?.enable == true && !host.isVpnPermissionGranted())) break
-                        val restored = try {
-                            startPreparationLock.withLock { runStart(token) }
-                        } catch (error: CancellationException) {
-                            throw error
-                        } catch (error: Exception) {
-                            host.log("Automatic recovery failed: $error")
-                            false
-                        }
-                        if (restored) return@launch
-                    }
-                    if (isCurrent(token) && host.runtime == null && arbiter.resetToStopped(token)) {
-                        publish()
-                        host.notifyStopped()
-                    }
-                }
-            }
-            return
-        }
         val dropped = transitionLock.withLock {
             if (host.runtime != null) {
                 return@withLock false
@@ -163,9 +130,6 @@ internal class ServiceStateMachine(private val host: ServiceStateHost) {
 
     fun requestStop(): Deferred<Boolean> {
         val request = createRequest(running = false)
-        recovery?.cancel()
-        recovery = null
-        recoveryToken = null
         return host.scope.async { stop(request) }
     }
 

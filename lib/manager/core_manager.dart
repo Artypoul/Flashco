@@ -163,9 +163,6 @@ class _CoreContainerState extends ConsumerState<CoreManager>
       return;
     }
     ref.read(coreStatusProvider.notifier).value = CoreStatus.disconnected;
-    if (system.isDesktop) {
-      ref.read(setupActionProvider.notifier).recoverAfterCrash();
-    }
     if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
       context.showNotifier(message, level: MessageLevel.error);
     }

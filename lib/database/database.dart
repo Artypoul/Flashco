@@ -58,7 +58,7 @@ class Database extends _$Database {
   }
 
   @override
-  int get schemaVersion => 22;
+  int get schemaVersion => 21;
 
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
@@ -135,22 +135,6 @@ class Database extends _$Database {
         }
         if (from < 21) {
           await _backfillRussianDirectRules();
-        }
-        if (from < 22) {
-          await (update(profiles)..where(
-                (t) =>
-                    t.type.equalsValue(ProfileType.url) &
-                    t.autoUpdateDurationMillis.equals(
-                      const Duration(days: 1).inMilliseconds,
-                    ),
-              ))
-              .write(
-                ProfilesCompanion(
-                  autoUpdateDurationMillis: Value(
-                    defaultUpdateDuration.inMilliseconds,
-                  ),
-                ),
-              );
         }
       }),
       beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),

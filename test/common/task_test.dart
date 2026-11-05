@@ -400,9 +400,7 @@ void main() {
 
     expect(config['dns']['enable'], true);
     expect(config['dns']['nameserver'], isNot(contains('system://')));
-    expect(config['proxy-groups'], hasLength(2));
-    expect(config['proxy-groups'][1]['name'], 'Safe');
-    expect(config['proxy-groups'][1]['proxies'], ['REJECT']);
+    expect(config['proxy-groups'], hasLength(1));
     expect(config['proxy-groups'][0].keys, ['name', 'type', 'proxies']);
     expect(config['proxy-groups'][0]['type'], 'select');
     expect(config['rules'], ['DOMAIN,custom.example,DIRECT']);

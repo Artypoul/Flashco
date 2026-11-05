@@ -262,6 +262,7 @@ class _FilterDialogState extends State<_FilterDialog> {
               minLines: 1,
               maxLines: 3,
               autocorrect: false,
+              enableSuggestions: false,
               textInputAction: TextInputAction.done,
               inputFormatters: TextInputLimits.limit(TextInputLimits.filter),
               onFieldSubmitted: (_) => _handleSubmit(),

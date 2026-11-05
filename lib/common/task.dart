@@ -319,36 +319,60 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
       };
     }
   }
-  final rules = composeProfileRules(
-    rawConfig,
-    rules: data.rules,
-    addedRules: addedRules,
-    matchTarget: data.matchTarget,
-  );
+  List<String> rules = [];
+  if (data.rules.isEmpty) {
+    if (rawConfig['rules'] != null) {
+      rules = List<String>.from(rawConfig['rules']);
+    }
+    if (addedRules.isNotEmpty) {
+      final hasMatchPlaceholder = addedRules.any(
+        (item) => item.ruleTarget?.toUpperCase() == 'MATCH',
+      );
+      String? replacementTarget = data.matchTarget?.trim();
+      if (replacementTarget?.isEmpty == true) {
+        replacementTarget = null;
+      }
+
+      if (hasMatchPlaceholder && replacementTarget == null) {
+        for (int i = rules.length - 1; i >= 0; i--) {
+          final parsed = Rule.parse(rules[i]);
+          if (parsed.ruleAction == RuleAction.MATCH) {
+            final target = parsed.ruleTarget;
+            if (target != null && target.isNotEmpty) {
+              replacementTarget = target;
+              break;
+            }
+          }
+        }
+      }
+      final List<String> finalAddedRules;
+
+      if (replacementTarget?.isNotEmpty == true) {
+        finalAddedRules = [];
+        for (int i = 0; i < addedRules.length; i++) {
+          final parsed = addedRules[i];
+          if (parsed.ruleTarget?.toUpperCase() == 'MATCH') {
+            finalAddedRules.add(
+              parsed.copyWith(ruleTarget: replacementTarget).rawValue,
+            );
+          } else {
+            finalAddedRules.add(addedRules[i].rawValue);
+          }
+        }
+      } else {
+        finalAddedRules = addedRules.map((e) => e.rawValue).toList();
+      }
+      rules = [...finalAddedRules, ...rules];
+    }
+  } else {
+    rules = data.rules.map((item) => item.rawValue).toList();
+  }
   if (data.proxyGroups.isNotEmpty) {
     rawConfig['proxy-groups'] = data.proxyGroups
         .map((item) => item.definition)
         .toList();
   }
   rawConfig['rules'] = rules;
-  applyAutomaticFailover(
-    rawConfig,
-    enabled: overrides.autoFailover ?? realPatchConfig.autoFailover,
-    interval: overrides.reconnectInterval ?? realPatchConfig.reconnectInterval,
-    testUrl: data.testUrl,
-  );
-  applySafeNodeFailover(
-    rawConfig,
-    choice: overrides.nodeFailover,
-    interval: overrides.reconnectInterval ?? realPatchConfig.reconnectInterval,
-    testUrl: data.testUrl,
-  );
-  applyRealityMlkemOverrides(
-    rawConfig,
-    overrides.realityMlkem,
-    enabledByDefault:
-        overrides.realityMlkemEnabled ?? realPatchConfig.realityMlkemEnabled,
-  );
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
 }
