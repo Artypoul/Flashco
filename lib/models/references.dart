@@ -269,14 +269,6 @@ extension ProfileOverridesReferences on ProfileOverrides {
         key: _renamedPolicyServers(value, names),
     };
     return copyWith(
-      nodeFailover: nodeFailover?.copyWith(
-        groupName: names[nodeFailover!.groupName] ?? nodeFailover!.groupName,
-        routeGroupName:
-            names[nodeFailover!.routeGroupName] ?? nodeFailover!.routeGroupName,
-        primaryName:
-            names[nodeFailover!.primaryName] ?? nodeFailover!.primaryName,
-        backupName: names[nodeFailover!.backupName] ?? nodeFailover!.backupName,
-      ),
       dns: dns.copyWith(
         defaultNameserver: servers(dns.defaultNameserver),
         nameserver: servers(dns.nameserver),

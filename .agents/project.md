@@ -2,28 +2,23 @@
 
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
-## Current Baseline — 2026-11-04
+## Current Baseline — 2026-11-05 rollback
 
-- Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The latest verified application change is
-  [`04c56386`](https://github.com/Artypoul/Flashco/commit/04c563869e1a594d259a926fd3cb62cb4a8211b3) via [PR #10](https://github.com/Artypoul/Flashco/pull/10).
-  Later documentation commits do not change which application revision an artifact contains.
-- Database schema: 22 (`lib/database/database.dart`); application settings migration: 2 (`lib/common/migration.dart`).
+- Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The user selected restoration of application code to
+  `da07f58a94ea417ff3fe2d77317754dafa377d6f` (2026-11-01), before the new fallback, ML-KEM settings, recovery and Safe changes.
+  The rollback PR branch is `codex/revert-to-da07f58a-20261105`; its code and Core match the selected target.
+- Database schema: 21 (`lib/database/database.dart`); application settings migration: 2 (`lib/common/migration.dart`).
   These are separate version counters.
-- Shared settings support editable REALITY ML-KEM defaults, automatic reconnect/failover and a persistent profile-level
-  primary/backup pair. Subscription refresh defaults to ten minutes and uses each profile's saved interval.
-  Product behavior and provider limitations are defined in [PRODUCT.md](../PRODUCT.md).
+- The new fallback, editable ML-KEM overrides, automatic reconnect/failover, Safe and ten-minute subscription defaults are removed.
+  Existing installed data is not rewritten by this source rollback. Product behavior is defined in [PRODUCT.md](../PRODUCT.md).
 - Personal workflows: `personal-windows.yaml` produces EXE/ZIP and `personal-android.yaml` produces a universal APK.
-  Both take the required `subscription_url` input without committing its value. Both run 19 Flutter suites and the
-  ordered pair recovery test in the Go core before packaging.
+  Both take the required `subscription_url` input without committing its value. Each restores its original four Flutter suites.
 - The Windows [41848512761](https://github.com/Artypoul/Flashco/actions/runs/41848512761) and Android
   [41848533942](https://github.com/Artypoul/Flashco/actions/runs/41848533942) runs succeeded for `04c56386` and include Safe.
-  Artifact provenance and validation limits are recorded in [history.md](../history.md); current handoff state is in
+  Those artifacts contain the newer Safe code and do not validate the rollback. Provenance and validation limits are in [history.md](../history.md); current state is in
   [память.md](../память.md).
-- Known verification limit: the full local suite still reports the pre-existing `test/lint/typography_test.dart`
-  failure against the donor `AppTextStyle` architecture. The local Safe full run passed 4324 tests, skipped 6 and
-  failed only that known lint test; 216 targeted checks and analyzer passed. Both personal builds validate
-  `04c56386` (Safe). Do not describe the full suite as green.
-- Safe is merged in `04c56386`; the personal Windows/Android builds above succeeded, were downloaded and SHA-256 checked. Later documentation commits do not alter their application source SHA. See current memory for artifact provenance and local storage.
+- Dependency resolution and analyzer passed for the exact restored application tree. The first test attempt was blocked by a full C: drive;
+  after recovered disk space, all 240 targeted tests passed. Formatting checked 872 files with no changes; comment-density and independent code review passed. Runtime/device testing is unconfirmed.
 - Maintain these documents using [documentation.md](documentation.md).
 
 ## Version Notes
@@ -41,7 +36,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 
 Two `pubspec.yaml` dependencies are pinned by commit SHA to donor-maintained forks under `chen08209`.
 They are separate from the current `Artypoul/Flashco` repository; do not assume write access to them.
-The Core submodule points to `Artypoul/Clash.Meta` (see `.gitmodules`). The upstream fixes needed to remove
+The Core submodule returns to `chen08209/Clash.Meta` at `8380d0e7462f061a964323e9bf3129a236fcc5d5` (see `.gitmodules`). The upstream fixes needed to remove
 the remaining dependency pins are recorded below.
 
 Each entry records what the fork changes and what has to be true before it can go

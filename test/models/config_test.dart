@@ -972,18 +972,6 @@ void main() {
       expect(balanced.containsKey('tolerance'), isFalse);
     });
 
-    test('emits fallback mode only for fallback groups', () {
-      final reliable = group
-          .copyWith(
-            type: GroupType.Fallback,
-            fallbackMode: FallbackMode.reliable,
-          )
-          .definition;
-
-      expect(reliable['fallback-mode'], 'reliable');
-      expect(group.definition.containsKey('fallback-mode'), isFalse);
-    });
-
     test('emits the options mihomo reads for one type only on that type', () {
       final options = group.copyWith(
         defaultSelected: 'A',

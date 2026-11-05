@@ -38,11 +38,6 @@ class ProxyCard extends ConsumerWidget {
   final GroupType groupType;
   final ProxyCardType type;
   final String? testUrl;
-  final VoidCallback? onSelect;
-  final bool? selected;
-  final String? roleLabel;
-  final bool showComputedMark;
-  final bool? computedSelected;
 
   const ProxyCard({
     super.key,
@@ -51,11 +46,6 @@ class ProxyCard extends ConsumerWidget {
     required this.proxy,
     required this.groupType,
     required this.type,
-    this.onSelect,
-    this.selected,
-    this.roleLabel,
-    this.showComputedMark = true,
-    this.computedSelected,
   });
 
   Measure get measure => globalState.measure;
@@ -100,17 +90,15 @@ class ProxyCard extends ConsumerWidget {
               radius: AppCorner.lg,
               enterActionsOnRight: true,
               key: key,
-              onPressed:
-                  onSelect ??
-                  () {
-                    selectGroupProxy(
-                      ref,
-                      groupName: groupName,
-                      groupType: groupType,
-                      proxyName: proxy.name,
-                    );
-                  },
-              isSelected: selected ?? selectedProxyName == proxy.name,
+              onPressed: () {
+                selectGroupProxy(
+                  ref,
+                  groupName: groupName,
+                  groupType: groupType,
+                  proxyName: proxy.name,
+                );
+              },
+              isSelected: selectedProxyName == proxy.name,
               child: child!,
             );
           },
@@ -141,7 +129,7 @@ class ProxyCard extends ConsumerWidget {
                           flex: 1,
                           child: TooltipText(
                             text: Text(
-                              roleLabel ?? proxy.type,
+                              proxy.type,
                               maxLines: 1,
                               style: context.textTheme.bodySmall?.copyWith(
                                 overflow: TextOverflow.ellipsis,
@@ -162,15 +150,11 @@ class ProxyCard extends ConsumerWidget {
             ),
           ),
         ),
-        if (groupType.isComputedSelected && showComputedMark)
+        if (groupType.isComputedSelected)
           Positioned(
             top: 0,
             right: 0,
-            child: _ProxyComputedMark(
-              groupName: groupName,
-              proxy: proxy,
-              selected: computedSelected,
-            ),
+            child: _ProxyComputedMark(groupName: groupName, proxy: proxy),
           ),
       ],
     );
@@ -350,18 +334,12 @@ class _ProxyComputedMark extends ConsumerWidget {
   final String groupName;
   final Proxy proxy;
 
-  final bool? selected;
-
-  const _ProxyComputedMark({
-    required this.groupName,
-    required this.proxy,
-    this.selected,
-  });
+  const _ProxyComputedMark({required this.groupName, required this.proxy});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final proxyName = ref.watch(proxyNameProvider(groupName));
-    if (!(selected ?? proxyName == proxy.name)) {
+    if (proxyName != proxy.name) {
       return const SizedBox();
     }
     return Container(

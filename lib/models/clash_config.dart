@@ -82,7 +82,6 @@ abstract class ProxyGroup with _$ProxyGroup {
     @JsonKey(name: 'exclude-type') String? excludeType,
     @JsonKey(name: 'expected-status') String? expectedStatus,
     int? tolerance,
-    @JsonKey(name: 'fallback-mode') FallbackMode? fallbackMode,
     LoadBalanceStrategy? strategy,
     @JsonKey(name: 'hash-key') String? hashKey,
     @JsonKey(name: 'default-selected') String? defaultSelected,
@@ -109,8 +108,6 @@ extension ProxyGroupExt on ProxyGroup {
   Map<String, dynamic> get definition {
     return {
       'name': name,
-      if (type == GroupType.Fallback && fallbackMode != null)
-        'fallback-mode': fallbackMode!.value,
       'type': type.value,
       if (proxies?.isNotEmpty == true) 'proxies': proxies,
       if (use?.isNotEmpty == true) 'use': use,
@@ -1454,30 +1451,8 @@ extension TunOverrideExt on ProfileTun {
 }
 
 @freezed
-abstract class ProfileNodeFailover with _$ProfileNodeFailover {
-  const factory ProfileNodeFailover({
-    @Default(true) bool enabled,
-    required String groupName,
-    String? routeGroupName,
-    required String primaryKey,
-    required String backupKey,
-    required String primaryName,
-    required String backupName,
-  }) = _ProfileNodeFailover;
-
-  factory ProfileNodeFailover.fromJson(Map<String, Object?> json) =>
-      _$ProfileNodeFailoverFromJson(json);
-}
-
-@freezed
 abstract class ProfileOverrides with _$ProfileOverrides {
   const factory ProfileOverrides({
-    bool? autoReconnect,
-    bool? autoFailover,
-    int? reconnectInterval,
-    ProfileNodeFailover? nodeFailover,
-    @JsonKey(name: 'reality-mlkem-enabled') bool? realityMlkemEnabled,
-    @Default({}) @JsonKey(name: 'reality-mlkem') Map<String, bool> realityMlkem,
     @Default(defaultDns) @JsonKey(fromJson: Dns.safeDnsFromJson) Dns dns,
     @Default({})
     @JsonKey(name: _dnsOverrideKeysJsonKey, fromJson: _dnsOverrideKeysFromJson)
@@ -1922,12 +1897,6 @@ Map<String, String> _geoXUrlToJson(Map<GeoResource, String> value) {
 @freezed
 abstract class PatchClashConfig with _$PatchClashConfig {
   const factory PatchClashConfig({
-    @Default(true) bool autoReconnect,
-    @Default(true) bool autoFailover,
-    @Default(15) int reconnectInterval,
-    @Default(true)
-    @JsonKey(name: 'reality-mlkem-enabled')
-    bool realityMlkemEnabled,
     @Default(defaultMixedPort) @JsonKey(name: 'mixed-port') int mixedPort,
     @Default(0) @JsonKey(name: 'socks-port') int socksPort,
     @Default(0) @JsonKey(name: 'port') int port,

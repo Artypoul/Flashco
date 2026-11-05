@@ -1,4 +1,3 @@
-import 'package:flashco/views/config/connection_recovery.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/providers/app.dart';
@@ -23,12 +22,6 @@ class _ToggleCase {
 }
 
 final _toggleCases = <_ToggleCase>[
-  _ToggleCase(
-    'REALITY ML-KEM',
-    const RealityMlkemItem(),
-    (c) => c.read(patchClashConfigProvider).realityMlkemEnabled,
-    initial: true,
-  ),
   _ToggleCase(
     'VPN',
     const VPNItem(),
@@ -243,15 +236,9 @@ void main() {
     });
 
     test('keep-alive rows stay off Android and the mark is Linux only', () {
-      expect(
-        outboundItems(
-          isDesktop: false,
-          isLinux: false,
-        ).whereType<ConnectionRecoveryItem>(),
-        hasLength(1),
-      );
-      expect(outboundItems(isDesktop: true, isLinux: false), hasLength(5));
-      expect(outboundItems(isDesktop: true, isLinux: true), hasLength(6));
+      expect(outboundItems(isDesktop: false, isLinux: false), isEmpty);
+      expect(outboundItems(isDesktop: true, isLinux: false), hasLength(3));
+      expect(outboundItems(isDesktop: true, isLinux: true), hasLength(4));
     });
   });
 }

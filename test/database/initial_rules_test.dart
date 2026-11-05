@@ -70,7 +70,7 @@ void main() {
       await database.customSelect('PRAGMA foreign_key_check').get(),
       isEmpty,
     );
-    expect(database.schemaVersion, 22);
+    expect(database.schemaVersion, 21);
   });
 
   test('new installations include editable Russian direct rules', () async {
@@ -200,7 +200,7 @@ void main() {
         ),
         russianServiceDirectRules,
       );
-      expect(raw.select('PRAGMA user_version').single['user_version'], 22);
+      expect(raw.select('PRAGMA user_version').single['user_version'], 21);
     },
   );
 

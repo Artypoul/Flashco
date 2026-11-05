@@ -888,14 +888,3 @@ enum ItemPosition {
     return ItemPosition.get(visualIndex, visualLength);
   }
 }
-
-enum FallbackMode {
-  @JsonValue('ordered')
-  ordered('ordered'),
-  @JsonValue('reliable')
-  reliable('reliable');
-
-  final String value;
-
-  const FallbackMode(this.value);
-}

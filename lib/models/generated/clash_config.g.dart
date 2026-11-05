@@ -29,10 +29,6 @@ _ProxyGroup _$ProxyGroupFromJson(Map<String, dynamic> json) => _ProxyGroup(
   excludeType: json['exclude-type'] as String?,
   expectedStatus: json['expected-status'] as String?,
   tolerance: (json['tolerance'] as num?)?.toInt(),
-  fallbackMode: $enumDecodeNullable(
-    _$FallbackModeEnumMap,
-    json['fallback-mode'],
-  ),
   strategy: $enumDecodeNullable(_$LoadBalanceStrategyEnumMap, json['strategy']),
   hashKey: json['hash-key'] as String?,
   defaultSelected: json['default-selected'] as String?,
@@ -68,7 +64,6 @@ Map<String, dynamic> _$ProxyGroupToJson(_ProxyGroup instance) =>
       'exclude-type': instance.excludeType,
       'expected-status': instance.expectedStatus,
       'tolerance': instance.tolerance,
-      'fallback-mode': _$FallbackModeEnumMap[instance.fallbackMode],
       'strategy': _$LoadBalanceStrategyEnumMap[instance.strategy],
       'hash-key': instance.hashKey,
       'default-selected': instance.defaultSelected,
@@ -88,11 +83,6 @@ const _$GroupTypeEnumMap = {
   GroupType.Fallback: 'fallback',
   GroupType.LoadBalance: 'load-balance',
   GroupType.Relay: 'relay',
-};
-
-const _$FallbackModeEnumMap = {
-  FallbackMode.ordered: 'ordered',
-  FallbackMode.reliable: 'reliable',
 };
 
 const _$LoadBalanceStrategyEnumMap = {
@@ -499,45 +489,8 @@ Map<String, dynamic> _$ProfileTunToJson(_ProfileTun instance) =>
       'exclude-interface': instance.excludeInterface,
     };
 
-_ProfileNodeFailover _$ProfileNodeFailoverFromJson(Map<String, dynamic> json) =>
-    _ProfileNodeFailover(
-      enabled: json['enabled'] as bool? ?? true,
-      groupName: json['groupName'] as String,
-      routeGroupName: json['routeGroupName'] as String?,
-      primaryKey: json['primaryKey'] as String,
-      backupKey: json['backupKey'] as String,
-      primaryName: json['primaryName'] as String,
-      backupName: json['backupName'] as String,
-    );
-
-Map<String, dynamic> _$ProfileNodeFailoverToJson(
-  _ProfileNodeFailover instance,
-) => <String, dynamic>{
-  'enabled': instance.enabled,
-  'groupName': instance.groupName,
-  'routeGroupName': instance.routeGroupName,
-  'primaryKey': instance.primaryKey,
-  'backupKey': instance.backupKey,
-  'primaryName': instance.primaryName,
-  'backupName': instance.backupName,
-};
-
 _ProfileOverrides _$ProfileOverridesFromJson(Map<String, dynamic> json) =>
     _ProfileOverrides(
-      autoReconnect: json['autoReconnect'] as bool?,
-      autoFailover: json['autoFailover'] as bool?,
-      reconnectInterval: (json['reconnectInterval'] as num?)?.toInt(),
-      nodeFailover: json['nodeFailover'] == null
-          ? null
-          : ProfileNodeFailover.fromJson(
-              json['nodeFailover'] as Map<String, dynamic>,
-            ),
-      realityMlkemEnabled: json['reality-mlkem-enabled'] as bool?,
-      realityMlkem:
-          (json['reality-mlkem'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, e as bool),
-          ) ??
-          const {},
       dns: json['dns'] == null
           ? defaultDns
           : Dns.safeDnsFromJson(json['dns'] as Map<String, Object?>),
@@ -576,12 +529,6 @@ _ProfileOverrides _$ProfileOverridesFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ProfileOverridesToJson(_ProfileOverrides instance) =>
     <String, dynamic>{
-      'autoReconnect': instance.autoReconnect,
-      'autoFailover': instance.autoFailover,
-      'reconnectInterval': instance.reconnectInterval,
-      'nodeFailover': instance.nodeFailover,
-      'reality-mlkem-enabled': instance.realityMlkemEnabled,
-      'reality-mlkem': instance.realityMlkem,
       'dns': instance.dns,
       'dns-override-keys': instance.dnsOverrideKeys
           .map((e) => _$DnsOverrideKeyEnumMap[e]!)
@@ -844,10 +791,6 @@ Map<String, dynamic> _$ClashConfigToJson(_ClashConfig instance) =>
 
 _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
     _PatchClashConfig(
-      autoReconnect: json['autoReconnect'] as bool? ?? true,
-      autoFailover: json['autoFailover'] as bool? ?? true,
-      reconnectInterval: (json['reconnectInterval'] as num?)?.toInt() ?? 15,
-      realityMlkemEnabled: json['reality-mlkem-enabled'] as bool? ?? true,
       mixedPort: (json['mixed-port'] as num?)?.toInt() ?? defaultMixedPort,
       socksPort: (json['socks-port'] as num?)?.toInt() ?? 0,
       port: (json['port'] as num?)?.toInt() ?? 0,
@@ -916,10 +859,6 @@ _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
     <String, dynamic>{
-      'autoReconnect': instance.autoReconnect,
-      'autoFailover': instance.autoFailover,
-      'reconnectInterval': instance.reconnectInterval,
-      'reality-mlkem-enabled': instance.realityMlkemEnabled,
       'mixed-port': instance.mixedPort,
       'socks-port': instance.socksPort,
       'port': instance.port,

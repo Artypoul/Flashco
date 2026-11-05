@@ -850,26 +850,6 @@ void main() {
       expect(find.text(currentAppLocalizations.strategy), findsNothing);
     });
 
-    testWidgets('offers fallback mode only to a fallback group', (
-      tester,
-    ) async {
-      container = buildContainer(_group());
-
-      await pumpGroupSheet(tester);
-      await _openOptions(tester);
-      expect(find.text(currentAppLocalizations.fallbackMode), findsNothing);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-
-      container
-          .read(proxyGroupProvider.notifier)
-          .update((state) => state.copyWith(type: GroupType.Fallback));
-      await tester.pump();
-      await _openOptions(tester);
-
-      expect(find.text(currentAppLocalizations.fallbackMode), findsOneWidget);
-    });
-
     testWidgets('offers strategy only to a load-balance group', (tester) async {
       container = buildContainer(_group());
 

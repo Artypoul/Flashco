@@ -28,7 +28,7 @@ Set<String> _closureOfCommonBarrel() {
       return 'lib/${uri.substring('package:flashco/'.length)}';
     }
     if (uri.startsWith('dart:') || uri.startsWith('package:')) return uri;
-    return p.normalize(p.join(p.dirname(from), uri)).replaceAll('\\', '/');
+    return p.normalize(p.join(p.dirname(from), uri));
   }
 
   final directive = RegExp(
@@ -61,7 +61,7 @@ Iterable<File> _dartFilesIn(String root) sync* {
   for (final entity in directory.listSync(recursive: true)) {
     if (entity is File &&
         entity.path.endsWith('.dart') &&
-        !entity.path.replaceAll('\\', '/').contains('/generated/')) {
+        !entity.path.replaceAll(r'\', '/').contains('/generated/')) {
       yield entity;
     }
   }
@@ -90,7 +90,7 @@ void main() {
 
     for (final root in ['lib/common', 'lib/enum', 'lib/models']) {
       for (final file in _dartFilesIn(root)) {
-        final relative = p.relative(file.path).replaceAll('\\', '/');
+        final relative = p.relative(file.path).replaceAll(r'\', '/');
         if (_platformModules.contains(relative)) {
           continue;
         }
@@ -148,7 +148,7 @@ void main() {
         "import 'package:flashco/manager/manager.dart';",
       )) {
         offenders.add(
-          '${p.relative(file.path).replaceAll('\\', '/')} — import the one manager it needs, not the '
+          '${p.relative(file.path)} — import the one manager it needs, not the '
           'barrel that reaches every platform manager',
         );
       }
