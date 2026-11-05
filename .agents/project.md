@@ -6,7 +6,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 
 - Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The user selected restoration of application code to
   `da07f58a94ea417ff3fe2d77317754dafa377d6f` (2026-11-01), before the new fallback, ML-KEM settings, recovery and Safe changes.
-  The rollback PR branch is `codex/revert-to-da07f58a-20261105`; its code and Core match the selected target.
+  Rollback [PR #11](https://github.com/Artypoul/Flashco/pull/11) is merged into `main` at `017b10cfc28b49ad7dd64258e7fb37777143fff2`; application code commit `54d4a82bb42dfc0366e3e7d959509736f6598cac` and Core match the selected target.
 - Database schema: 21 (`lib/database/database.dart`); application settings migration: 2 (`lib/common/migration.dart`).
   These are separate version counters.
 - The new fallback, editable ML-KEM overrides, automatic reconnect/failover, Safe and ten-minute subscription defaults are removed.
@@ -19,6 +19,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
   [память.md](../память.md).
 - Dependency resolution and analyzer passed for the exact restored application tree. The first test attempt was blocked by a full C: drive;
   after recovered disk space, all 240 targeted tests passed. Formatting checked 872 files with no changes; comment-density and independent code review passed. Runtime/device testing is unconfirmed.
+- All nine PR validation jobs passed in [build 41974675631](https://github.com/Artypoul/Flashco/actions/runs/41974675631). The separate merge-commit [build 41976324395](https://github.com/Artypoul/Flashco/actions/runs/41976324395) also completed successfully: all nine validation jobs passed, including full Dart tests, coverage, changelog verification and Windows/macOS/Linux debug builds. Packaging/upload were skipped by workflow conditions.
 - Maintain these documents using [documentation.md](documentation.md).
 
 ## Version Notes
