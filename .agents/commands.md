@@ -161,6 +161,14 @@ Native plugin code under `plugins/*/{linux,macos,windows}` is compiled by the CI
 
 Root `flutter test` only discovers the root package's `test/` directory by default. Include bundled plugin Dart tests by passing paths explicitly, or run `flutter test` from that plugin package directory, or run `bash tool/check_plugins.sh` to analyze and test every plugin package the way CI does. Native plugin tests under platform folders are not run by `flutter test`.
 
+On Windows with Inno Setup 6 installed, verify installer version policy and Helper cleanup with:
+
+```powershell
+python tool/test_windows_installer.py --compiler 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+```
+
+The harness compiles production Pascal procedures into fixture installers with fake registry, SCM and process boundaries. It uses a temporary output directory, writes no uninstall registration and never launches Flashco. An explicit `--output-dir` must be empty or marked as owned by this harness. This check also runs in the personal Windows workflow; it does not replace real installation testing or compilation of the complete rendered packaging template.
+
 For the current Core/service architecture, useful focused checks are:
 
 ```bash
