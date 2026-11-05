@@ -59,6 +59,51 @@ class Preferences {
     return store?.getBool('personalDefaults.v1') ?? false;
   }
 
+  Future<void> stageBundledFallback(
+    String url,
+    String config, {
+    required bool isNewInstallation,
+    required bool enabled,
+  }) async {
+    final uri = Uri.tryParse(url.trim());
+    if (!enabled ||
+        !isNewInstallation ||
+        config.trim().isEmpty ||
+        uri == null ||
+        uri.host.isEmpty ||
+        !const ['http', 'https'].contains(uri.scheme)) {
+      return;
+    }
+    final settings = FallbackConfig.fromJson(
+      jsonDecode(config) as Map<String, dynamic>,
+    ).validated();
+    final store = await sharedPreferencesCompleter.future;
+    if (store == null) return;
+    final key = 'bundledFallback.${url.trim().toMd5()}';
+    if (store.getString(key) != null) return;
+    if (!await store.setString(key, jsonEncode(settings.toJson()))) {
+      throw StateError('Failed to save pending fallback defaults');
+    }
+  }
+
+  Future<FallbackConfig?> pendingBundledFallback(String url) async {
+    final store = await sharedPreferencesCompleter.future;
+    final value = store?.getString('bundledFallback.${url.trim().toMd5()}');
+    if (value == null) return null;
+    return FallbackConfig.fromJson(
+      jsonDecode(value) as Map<String, dynamic>,
+    ).validated();
+  }
+
+  Future<void> completeBundledFallback(String url) async {
+    final store = await sharedPreferencesCompleter.future;
+    final key = 'bundledFallback.${url.trim().toMd5()}';
+    if (store?.getString(key) == null) return;
+    if (!await store!.remove(key)) {
+      throw StateError('Failed to complete pending fallback defaults');
+    }
+  }
+
   Future<void> markPersonalDefaultsApplied() async {
     final store = await sharedPreferencesCompleter.future;
     if (await store?.setBool('personalDefaults.v1', true) != true) {

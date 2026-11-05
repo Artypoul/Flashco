@@ -118,6 +118,16 @@ class Bootstrap {
     config = await initializePersonalDefaults(
       config,
       subscriptionUrl: bundledSubscriptionUrl,
+      isNewInstallation: isNewInstallation,
+      enabled:
+          (system.isAndroid || system.isWindows) &&
+          !safeModeBuild &&
+          !_bootDecision.isDegraded,
+    );
+    await preferences.stageBundledFallback(
+      bundledSubscriptionUrl,
+      bundledFallbackConfig,
+      isNewInstallation: isNewInstallation,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&

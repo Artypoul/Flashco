@@ -38,6 +38,7 @@ export 'network.dart';
 export 'network_error.dart';
 export 'num.dart';
 export 'package.dart';
+export 'profile_fallback.dart';
 export 'path.dart';
 export 'picker.dart';
 export 'preferences.dart';

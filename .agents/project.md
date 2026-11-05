@@ -22,6 +22,22 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 - All nine PR validation jobs passed in [build 41974675631](https://github.com/Artypoul/Flashco/actions/runs/41974675631). The separate merge-commit [build 41976324395](https://github.com/Artypoul/Flashco/actions/runs/41976324395) also completed successfully: all nine validation jobs passed, including full Dart tests, coverage, changelog verification and Windows/macOS/Linux debug builds. Packaging/upload were skipped by workflow conditions.
 - Maintain these documents using [documentation.md](documentation.md).
 
+## Personal fallback configuration — 2026-11-05
+
+- Commit `5b52ffcd` embeds `config/personal_fallback.json` through the shared `setup.dart` path used by both personal workflows. The change is published in [PR #13](https://github.com/Artypoul/Flashco/pull/13), targeting `main`. No manual workflow dispatch or new package is implied.
+- A nullable `ProfileOverrides.fallback` is stored in the existing overrides JSON; schema 21 is unchanged. Pending defaults are staged only from the captured fresh-install decision, survive a failed initial download, and attach only to a newly created bundled profile.
+- Standard setup overlays one native ordered fallback group while retaining DB-added rules and later manual selections. Provider-owned checks receive the same test parameters without changing subscription refresh intervals. The source subscription file is not rewritten.
+- This is native ordered fallback with return to priority, not restoration of the removed Safe/custom failover. Core, native platform code, DNS and TUN are unchanged. Results and limits are recorded in history.md and память.md.
+
+## Local settings and installer work — 2026-11-05
+
+- Settings commit `d6a45807` and installer commit `ee85b68d` are published on `codex/preserve-personal-settings-installer` in [PR #13](https://github.com/Artypoul/Flashco/pull/13), based on documentation merge `46bbe44f` (PR #12).
+  Personal defaults now require the fresh-install decision captured before settings migration; existing preferences without the personal marker are preserved.
+- Windows packaging detects the current Flashco AppId across machine registry views and the current user. Same-scope/mode replacement reuses its registered path; downgrade needs confirmation (silent: `/ALLOWDOWNGRADE=1`). Conflicting or unknown registrations stop replacement.
+- Helper cleanup holds a service handle across ownership checks and SCM commands, then closes it before bounded deletion/process polling. It does not require the installed Helper binary.
+- `personal-windows.yaml` runs the compiled Inno behavioral harness from [commands.md](commands.md). The saved pre-rollback installer stash remains intact; selected changes were copied into this work rather than consuming it.
+- Current validation and remaining runtime limits are recorded in [history.md](../history.md) and [память.md](../память.md). No new application package or installation is implied by the local harness.
+
 ## Version Notes
 
 - Build, release and personal CI currently pin Flutter 3.47.6 and Go 1.27.1; Android uses NDK r28c.

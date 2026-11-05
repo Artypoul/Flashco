@@ -18,6 +18,12 @@ const _existing = Config(
     fontFamily: 'Missing Font',
   ),
   appSettingProps: AppSettingProps(locale: 'en', autoRun: false),
+  networkProps: NetworkProps(systemProxy: true, bypassPrivateRoute: false),
+  vpnProps: VpnProps(systemProxy: true, allowBypass: true, ipv6: true),
+  patchClashConfig: PatchClashConfig(
+    mode: Mode.global,
+    tun: Tun(stack: TunStack.system, mtu: 1450),
+  ),
 );
 
 void main() {
@@ -30,12 +36,68 @@ void main() {
   });
 
   test(
-    'personal update persists light and auto-run without replacing data',
+    'an existing installation without a marker keeps its settings',
+    () async {
+      await preferences.saveConfig(_existing);
+      final store = await SharedPreferences.getInstance();
+      final savedKeys = store.getKeys();
+
+      final updated = await initializePersonalDefaults(
+        _existing,
+        subscriptionUrl: _url,
+        enabled: true,
+        isNewInstallation: false,
+      );
+
+      expect(updated, _existing);
+      expect(await preferences.getConfig(), _existing);
+      expect(await preferences.werePersonalDefaultsApplied(), isFalse);
+      expect(store.getKeys(), savedKeys);
+    },
+  );
+
+  test('a fresh-install decision survives migration writes', () async {
+    final isNewInstallation = await preferences.isNewInstallation;
+    await preferences.saveConfig(const Config(themeProps: ThemeProps()));
+    await preferences.setVersion(2);
+    expect(await preferences.isNewInstallation, isFalse);
+
+    final updated = await initializePersonalDefaults(
+      const Config(themeProps: ThemeProps()),
+      subscriptionUrl: _url,
+      enabled: true,
+      isNewInstallation: isNewInstallation,
+    );
+
+    expect(updated.appSettingProps.autoRun, isTrue);
+    expect(updated.patchClashConfig.tun.strictRoute, isTrue);
+    expect(await preferences.werePersonalDefaultsApplied(), isTrue);
+    expect(await preferences.getConfig(), updated);
+  });
+
+  test('an existing store without a saved config is left untouched', () async {
+    await preferences.setVersion(2);
+
+    final updated = await initializePersonalDefaults(
+      _existing,
+      subscriptionUrl: _url,
+      enabled: true,
+      isNewInstallation: await preferences.isNewInstallation,
+    );
+
+    expect(updated, _existing);
+    expect(await preferences.getConfig(), isNull);
+    expect(await preferences.werePersonalDefaultsApplied(), isFalse);
+  });
+
+  test(
+    'fresh personal defaults preserve unrelated initial config fields',
     () async {
       final updated = await initializePersonalDefaults(
         _existing,
         subscriptionUrl: _url,
         enabled: true,
+        isNewInstallation: true,
       );
 
       expect(updated.themeProps.themeMode, ThemeMode.light);
@@ -66,6 +128,7 @@ void main() {
         _existing,
         subscriptionUrl: _url,
         enabled: true,
+        isNewInstallation: true,
       );
       await preferences.saveConfig(_existing);
 
@@ -73,6 +136,7 @@ void main() {
         _existing,
         subscriptionUrl: _url,
         enabled: true,
+        isNewInstallation: true,
       );
 
       expect(reloaded, _existing);
@@ -87,6 +151,7 @@ void main() {
         const Config(themeProps: ThemeProps()),
         subscriptionUrl: _url,
         enabled: true,
+        isNewInstallation: true,
       );
 
       expect(updated.currentProfileId, isNull);
@@ -100,6 +165,7 @@ void main() {
       _existing,
       subscriptionUrl: _url,
       enabled: true,
+      isNewInstallation: true,
     );
     await preferences.saveConfig(_existing);
 
@@ -107,6 +173,7 @@ void main() {
       _existing,
       subscriptionUrl: 'https://example.invalid/other-subscription',
       enabled: true,
+      isNewInstallation: true,
     );
 
     expect(reloaded, _existing);
@@ -121,6 +188,7 @@ void main() {
           _existing,
           subscriptionUrl: _url,
           enabled: false,
+          isNewInstallation: true,
         ),
         _existing,
       );
@@ -129,6 +197,7 @@ void main() {
         _existing,
         subscriptionUrl: _url,
         enabled: true,
+        isNewInstallation: true,
       );
       expect(updated.appSettingProps.autoRun, isTrue);
     },
@@ -141,6 +210,7 @@ void main() {
           _existing,
           subscriptionUrl: url,
           enabled: true,
+          isNewInstallation: true,
         ),
         _existing,
       );
@@ -159,6 +229,7 @@ void main() {
             _existing,
             subscriptionUrl: _url,
             enabled: true,
+            isNewInstallation: true,
           ),
           _existing,
         );
@@ -169,6 +240,7 @@ void main() {
         _existing,
         subscriptionUrl: _url,
         enabled: true,
+        isNewInstallation: true,
       );
       expect(updated.appSettingProps.autoRun, isTrue);
     },

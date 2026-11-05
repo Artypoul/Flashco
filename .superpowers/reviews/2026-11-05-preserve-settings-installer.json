@@ -1,0 +1,36 @@
+{
+  "reviewer": "/root/settings_installer_review",
+  "baseline": "46bbe44fc94895c13c71be6725144bc4fbbbdae0",
+  "revision": "uncommitted frozen working tree",
+  "verdict": "approve",
+  "open_findings": [],
+  "resolved_findings": [
+    {
+      "priority": "P2",
+      "issue": "Service replacement race between WMI validation and sc.exe commands",
+      "resolution": "Retain a service handle across ownership checks and mutation; close before deletion polling. Isolate held cleanup from try/finally exits and test its failure result."
+    }
+  ],
+  "validation": {
+    "flutter": "4263 passed, 6 skipped",
+    "installer": "54 compiled fixture scenarios passed",
+    "analyzer": "No issues",
+    "format": "872 files, 0 changed",
+    "full_template": "Coordinator rendered pinned packager x64 template and ISCC exited 0"
+  },
+  "limitations": [
+    "Real installation and native SCM integration not executed",
+    "Bundled subscription import unchanged",
+    "Documentation updates outside reviewed code scope"
+  ],
+  "sha256": {
+    "lib/bootstrap.dart": "85C7945EE5AF91CC2562F00970DA11C4CF637A7D0975CA8C983C4A485B4EC65C",
+    "lib/common/personal_defaults.dart": "4B709C6B55F1DD60060B3AEE87A7E707A60FF67C1B8C334A88E11AAE91D98CB9",
+    "test/common/personal_defaults_test.dart": "CFAA2080ABD5E05FF6CBD70CDE3AFF451401DFCEA7E08F918D18F7037E6FD7F3",
+    "windows/packaging/exe/inno_setup.iss": "E78E9DFBFE09F8E9E3A1FF9AE9C030819D5EE5E97B1362D87C2CCB90B752E8C6",
+    "test/fixtures/windows_installer_cleanup.iss": "A529AEC5F1AF54321AC9EF94BDCD70CB3FE016497E4C2A4DCA9BE428318BECC0",
+    "test/fixtures/windows_installer_versions.iss": "087D5DB0B5386D20211BA8B1C0CD1FAC5CFF4180D0E15D284300C9968FFBE58E",
+    "tool/test_windows_installer.py": "1E309FBFF2170444BC166257B58C9433E569C4ACCDA97B7F3A3D3DC92506EAC1",
+    ".github/workflows/personal-windows.yaml": "E6BC9EC4A956AFF100BAE2D77CA90A9ED7C829C6B90F0AE1BBD2BA7B886DEDA7"
+  }
+}

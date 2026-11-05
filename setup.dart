@@ -5,6 +5,8 @@ import 'package:args/args.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
+import 'lib/models/fallback_config.dart';
+
 const _allTargets = <String, String>{
   'android': 'apk',
   'linux': 'deb,appimage,rpm',
@@ -161,11 +163,25 @@ String? validateUniversalApkOptions({
 Map<String, String> createBuildEnvironment(
   String env, {
   String? subscriptionUrl,
+  String? rootDir,
 }) {
   final environment = {'APP_ENV': env};
   final url = subscriptionUrl?.trim();
   if (url != null && url.isNotEmpty) {
     environment['BOOTSTRAP_SUBSCRIPTION_URL'] = url;
+    final settings = FallbackConfig.fromJson(
+      jsonDecode(
+            File(
+              p.join(
+                rootDir ?? Directory.current.path,
+                'config',
+                'personal_fallback.json',
+              ),
+            ).readAsStringSync(),
+          )
+          as Map<String, dynamic>,
+    ).validated();
+    environment['BOOTSTRAP_FALLBACK_CONFIG'] = jsonEncode(settings.toJson());
   }
   return environment;
 }
@@ -212,6 +228,7 @@ Future<int> _package(
       createBuildEnvironment(
         env,
         subscriptionUrl: Platform.environment['BOOTSTRAP_SUBSCRIPTION_URL'],
+        rootDir: rootDir,
       ),
     ),
   );

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../setup.dart' as setup;
@@ -47,6 +50,7 @@ void main() {
     });
 
     test('adds a personal subscription only when configured', () {
+      final fallback = File('config/personal_fallback.json').readAsStringSync();
       expect(
         setup.createBuildEnvironment(
           'pre',
@@ -55,6 +59,7 @@ void main() {
         {
           'APP_ENV': 'pre',
           'BOOTSTRAP_SUBSCRIPTION_URL': 'https://example.invalid/subscription',
+          'BOOTSTRAP_FALLBACK_CONFIG': jsonEncode(jsonDecode(fallback)),
         },
       );
       expect(setup.createBuildEnvironment('pre', subscriptionUrl: '  '), {
