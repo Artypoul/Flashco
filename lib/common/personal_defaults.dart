@@ -7,10 +7,12 @@ Future<Config> initializePersonalDefaults(
   Config config, {
   required String subscriptionUrl,
   required bool enabled,
+  required bool isNewInstallation,
 }) async {
   final url = subscriptionUrl.trim();
   final uri = Uri.tryParse(url);
-  if (!enabled ||
+  if (!isNewInstallation ||
+      !enabled ||
       uri == null ||
       uri.host.isEmpty ||
       !const ['https', 'http'].contains(uri.scheme) ||

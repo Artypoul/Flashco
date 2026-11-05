@@ -118,6 +118,7 @@ class Bootstrap {
     config = await initializePersonalDefaults(
       config,
       subscriptionUrl: bundledSubscriptionUrl,
+      isNewInstallation: isNewInstallation,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&
