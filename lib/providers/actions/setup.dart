@@ -438,6 +438,16 @@ class SetupAction extends _$SetupAction {
             ),
           }
         : await _core.getConfig(profileId);
+    final fallback = setupState.overrides.fallback;
+    if (!isCustom &&
+        setupState.extendType == ExtendType.standard &&
+        fallback != null) {
+      final applied = applyProfileFallback(rawConfig, fallback);
+      if (applied.name != fallback.name) {
+        throw const FormatException('Saved fallback group name is now in use');
+      }
+      rawConfig = applied.config;
+    }
     final proxyGroups = isCustom ? setupState.proxyGroups : <ProxyGroup>[];
     final rules = isCustom ? setupState.rules : <Rule>[];
     final scriptContent =

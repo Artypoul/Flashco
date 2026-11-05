@@ -491,6 +491,9 @@ Map<String, dynamic> _$ProfileTunToJson(_ProfileTun instance) =>
 
 _ProfileOverrides _$ProfileOverridesFromJson(Map<String, dynamic> json) =>
     _ProfileOverrides(
+      fallback: json['fallback'] == null
+          ? null
+          : FallbackConfig.fromJson(json['fallback'] as Map<String, dynamic>),
       dns: json['dns'] == null
           ? defaultDns
           : Dns.safeDnsFromJson(json['dns'] as Map<String, Object?>),
@@ -529,6 +532,7 @@ _ProfileOverrides _$ProfileOverridesFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ProfileOverridesToJson(_ProfileOverrides instance) =>
     <String, dynamic>{
+      'fallback': instance.fallback,
       'dns': instance.dns,
       'dns-override-keys': instance.dnsOverrideKeys
           .map((e) => _$DnsOverrideKeyEnumMap[e]!)

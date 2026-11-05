@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -17,6 +18,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../common/profile_fallback_test.dart' show settings, source;
 
 class _Core extends Mock implements CoreHandlerInterface {}
 
@@ -162,6 +165,85 @@ void main() {
   });
 
   ProfilesAction action() => container.read(profilesActionProvider.notifier);
+
+  Future<void> stageFallback() => preferences.stageBundledFallback(
+    url,
+    jsonEncode(settings.toJson()),
+    isNewInstallation: true,
+    enabled: true,
+  );
+
+  test(
+    'new bundled profiles persist fallback while retaining Standard rules',
+    () async {
+      await database.initializeNewInstallationRules([
+        'GEOIP,RU,DIRECT',
+        'DOMAIN-SUFFIX,ru,DIRECT',
+      ]);
+      when(() => core.getConfig(any())).thenAnswer(
+        (_) async => {
+          'proxies': [
+            {'name': 'first', 'type': 'ss'},
+            {'name': 'second', 'type': 'ss'},
+          ],
+          'proxy-groups': [
+            {
+              'name': 'PROXY',
+              'type': 'select',
+              'proxies': ['first', 'second'],
+            },
+          ],
+        },
+      );
+      await stageFallback();
+      await action().importBundledSubscription(url);
+      final profile = (await database.profilesDao.query().get()).single;
+      expect(profile.extendType, ExtendType.standard);
+      expect(profile.scriptId, isNull);
+      expect(profile.overrides.fallback, settings);
+      expect(profile.selectedMap['PROXY'], 'Fallback');
+      expect(profile.selectedMap['GLOBAL'], 'Fallback');
+      expect(await preferences.pendingBundledFallback(url), isNull);
+      final state = await container.read(setupStateProvider(profile.id).future);
+      expect(state.overrides.fallback, settings);
+      expect(
+        state.addedRules.map((rule) => rule.rawValue),
+        containsAll(['GEOIP,RU,DIRECT', 'DOMAIN-SUFFIX,ru,DIRECT']),
+      );
+    },
+  );
+
+  test('pending defaults never modify a matching saved profile', () async {
+    final existing = Profile.normal(
+      url: url,
+    ).copyWith(selectedMap: {'PROXY': 'my-choice'});
+    container.read(profilesProvider.notifier).put(existing);
+    await container.read(profilesProvider.notifier).settledWrites;
+    await stageFallback();
+    await action().importBundledSubscription(url);
+    final profile = (await database.profilesDao.query().get()).single;
+    expect(profile.overrides.fallback, isNull);
+    expect(profile.selectedMap, existing.selectedMap);
+    expect(await preferences.pendingBundledFallback(url), isNull);
+    verifyNever(() => core.getConfig(any()));
+  });
+
+  test(
+    'failed first download retains fallback defaults for a later retry',
+    () async {
+      when(() => core.getConfig(any())).thenAnswer((_) async => source());
+      await stageFallback();
+      status = HttpStatus.serviceUnavailable;
+      await action().importBundledSubscription(url);
+      expect(await database.profilesDao.query().get(), isEmpty);
+      expect(await preferences.pendingBundledFallback(url), settings);
+      status = HttpStatus.ok;
+      await action().importBundledSubscription(url);
+      final profile = (await database.profilesDao.query().get()).single;
+      expect(profile.overrides.fallback, settings);
+      expect(await preferences.pendingBundledFallback(url), isNull);
+    },
+  );
 
   test(
     'first launch saves a normal URL profile, selects it and starts it',

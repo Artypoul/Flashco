@@ -1,0 +1,9 @@
+{
+  "selector": "PROXY",
+  "name": "Fallback",
+  "url": "https://www.gstatic.com/generate_204",
+  "interval": 10,
+  "timeout": 3000,
+  "lazy": false,
+  "expected-status": "204"
+}

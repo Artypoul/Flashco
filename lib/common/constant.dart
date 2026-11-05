@@ -52,6 +52,9 @@ const safeModeBuild = bool.fromEnvironment('SAFE_MODE');
 const bundledSubscriptionUrl = String.fromEnvironment(
   'BOOTSTRAP_SUBSCRIPTION_URL',
 );
+const bundledFallbackConfig = String.fromEnvironment(
+  'BOOTSTRAP_FALLBACK_CONFIG',
+);
 
 const disclaimerVersion = 1;
 

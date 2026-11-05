@@ -1,0 +1,31 @@
+{
+  "reviewer": "/root/personal_fallback_final_review",
+  "base_commit": "46bbe44fc94895c13c71be6725144bc4fbbbdae0",
+  "core_commit": "8380d0e7462f061a964323e9bf3129a236fcc5d5",
+  "verdict": "approved; no open P1/P2",
+  "scope": "Personal Windows/Android build fallback defaults and fresh-only Standard-profile assembly; previous installer work excluded",
+  "findings_resolved": [
+    "P2: reserve names of all raw proxies, including excluded direct/reject types",
+    "Prevent implicit COMPATIBLE/DIRECT empty provider fallback with native empty-fallback REJECT"
+  ],
+  "read_only_reviewer": true,
+  "validation_owner": "parent; final checks recorded in history.md",
+  "files_sha256": {
+    "config/personal_fallback.json": "8fd442d39b85cdcb2d08e93a77d8b6eeff38517309ed2ab7cd3ce19c8842ce63",
+    "setup.dart": "20706b4c941c5f7192fc9f3ab6bf988ec1573c3610721670891474fb35893a26",
+    "lib/models/fallback_config.dart": "922d078b633d42fb17b3234b0b53e888712d6077f36f4426807e7c91d833b79d",
+    "lib/common/profile_fallback.dart": "b0cf8468584b1f041089dd778d9382d66ed03dbdbc049c59b7cb1cf7286f5500",
+    "lib/common/preferences.dart": "93cb3ba6ba03432173e585b14039b617631dcaa126c06005b089451f1b44870b",
+    "lib/common/constant.dart": "841ee0474af41223f44d57510ea001a64c5f13e39aeb8e7ba25dbf0a49667cd8",
+    "lib/bootstrap.dart": "bffb854ca714515395e05c473138d5446e28d6dd62dc3a6b73bdb22d1f749240",
+    "lib/models/clash_config.dart": "dec78dedec9b058af53771a593a79ee0c3731c32d4698c1caab2868daf281ea3",
+    "lib/providers/state/profile.dart": "f1cb20dc91d5b3669278c1499735cf2f3a50906dd35aeab4ce567bc4e130823e",
+    "lib/providers/actions/profiles.dart": "1890d505fef0e719b4cd23babffca25bd1d868b035253e2524fc474a72079078",
+    "lib/providers/actions/setup.dart": "3fa767109ff0ec27c07f28c62da8e41a805a9f1dc9f0757f8ccb50654d805770",
+    "test/setup_test.dart": "8dec927615aab0ce5244a342b0f33b42bad3fc11cbec73daec71f5aa6559f385",
+    "test/common/profile_fallback_test.dart": "91758d83508615b9f3de97ef82222cbf72ea44ada6c0f7629717795d06a5d49e",
+    "test/common/bundled_fallback_test.dart": "4b88ff1a079852f7df63c94e096821bdaaba020260018a5d06a8cfa9c0a4007a",
+    "test/common/final_routing_yaml_test.dart": "94d3b2b39ec7c7f1cf042811fedbff78feef694b5949c169ee9b00e2aec7d862",
+    "test/providers/bundled_subscription_test.dart": "3780ce948869fe2fac78a1f047deb8f1dfd285eef459aad78c9f90ee03881e6b"
+  }
+}

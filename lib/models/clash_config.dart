@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/core.dart';
+import 'package:flashco/models/fallback_config.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:yaml/yaml.dart';
 
@@ -1453,6 +1454,7 @@ extension TunOverrideExt on ProfileTun {
 @freezed
 abstract class ProfileOverrides with _$ProfileOverrides {
   const factory ProfileOverrides({
+    FallbackConfig? fallback,
     @Default(defaultDns) @JsonKey(fromJson: Dns.safeDnsFromJson) Dns dns,
     @Default({})
     @JsonKey(name: _dnsOverrideKeysJsonKey, fromJson: _dnsOverrideKeysFromJson)

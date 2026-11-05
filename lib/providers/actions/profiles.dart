@@ -49,6 +49,7 @@ class ProfilesAction extends _$ProfilesAction {
         .where((profile) => profile.url == url)
         .firstOrNull;
     if (savedProfile != null) {
+      await preferences.completeBundledFallback(url);
       if (ref.read(currentProfileIdProvider) == savedProfile.id) {
         final activated = await _activateImportedProfile(
           savedProfile,
@@ -66,11 +67,26 @@ class ProfilesAction extends _$ProfilesAction {
       }
       return;
     }
+    final fallback = await preferences.pendingBundledFallback(url);
     final profile = await globalState.loadingRun(
-      () => _withAgeSecretKey(
-        Profile.normal(url: url),
-        _download,
-      ).then(_withImportDefaults),
+      () async {
+        final imported = await _withImportDefaults(
+          await _withAgeSecretKey(Profile.normal(url: url), _download),
+        );
+        if (fallback == null) return imported;
+        final rawConfig = await _core.getConfig(imported.id);
+        final applied = applyProfileFallback(rawConfig, fallback);
+        return imported.copyWith(
+          overrides: imported.overrides.copyWith(
+            fallback: fallback.copyWith(name: applied.name),
+          ),
+          selectedMap: {
+            ...imported.selectedMap,
+            fallback.selector: applied.name,
+            'GLOBAL': applied.name,
+          },
+        );
+      },
       tag: LoadingTag.profiles,
       silence: true,
     );
@@ -82,6 +98,7 @@ class ProfilesAction extends _$ProfilesAction {
     )) {
       return;
     }
+    await preferences.completeBundledFallback(url);
     final activated = await _activateImportedProfile(
       profile,
       sequence,

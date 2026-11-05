@@ -124,6 +124,15 @@ class Bootstrap {
           !safeModeBuild &&
           !_bootDecision.isDegraded,
     );
+    await preferences.stageBundledFallback(
+      bundledSubscriptionUrl,
+      bundledFallbackConfig,
+      isNewInstallation: isNewInstallation,
+      enabled:
+          (system.isAndroid || system.isWindows) &&
+          !safeModeBuild &&
+          !_bootDecision.isDegraded,
+    );
     final patchClashConfig = config.patchClashConfig.ensureControllerSecret();
     if (patchClashConfig != config.patchClashConfig) {
       config = config.copyWith(patchClashConfig: patchClashConfig);
