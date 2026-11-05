@@ -62,6 +62,8 @@ jobs:
             $iscc = (Get-Command iscc -ErrorAction Stop).Source
           }
           & $iscc /?
+          python tool/test_windows_installer.py --compiler $iscc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           rustc --version
           cargo --version
 
