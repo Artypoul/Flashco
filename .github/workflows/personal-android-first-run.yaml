@@ -1,9 +1,6 @@
 name: personal Android (first launch + REALITY ML-KEM)
 
 on:
-  push:
-    branches:
-      - codex/android-first-run-subscription
   workflow_dispatch:
 
 permissions:
