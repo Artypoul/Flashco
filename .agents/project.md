@@ -1,5 +1,19 @@
 # Project Context
 
+## Audited baseline and donor update plan — 2026-11-18
+
+Published Flashco `main` is `871a89e4d7da3fe4a484c193b2fbeccc57129c5b` after merged PR #14:
+application 0.9.0, Core `8380d0e7462f061a964323e9bf3129a236fcc5d5`, SQLite 21, preferences version 2.
+The [donor update plan](../docs/upstream/2026-11-18-v0.9.3-update-plan.md) targets stable FlClash v0.9.3
+at `be84736605527034689c95bf27828ff27d912c5e`, Mihomo 1.19.33 at `024245dc72bc92f48237f865119afe0cd53ac9e6`,
+and Prism UI at `63450c0ac0e8e1b2c0f3ed4ad7926dc94e083185`. This documentation change does not update those dependencies.
+Existing Flutter/Go/NDK pins already match this stable target.
+
+An unpublished local implementation checkpoint `60925e7` exists separately; at inspection the remote donor branch
+still pointed to the baseline. Reconcile current refs and concurrent work before resuming it. The plan records
+SQLite version collisions, preferences compatibility, profile-base preservation, module CI coverage and packaging gates.
+Earlier results below are historical and do not validate the donor implementation.
+
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
 ## Optional Android first-run subscription — 2026-11-18
