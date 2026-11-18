@@ -87,7 +87,7 @@ class ProfilesAction extends _$ProfilesAction {
           await _withAgeSecretKey(Profile.normal(url: url), _download),
         );
         if (fallback == null) return imported;
-        final rawConfig = await _core.getConfig(imported.id);
+        final rawConfig = await _core.readConfig(imported.id);
         final applied = applyProfileFallback(rawConfig, fallback);
         return imported.copyWith(
           overrides: imported.overrides.copyWith(

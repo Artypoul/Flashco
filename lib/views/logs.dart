@@ -2,24 +2,19 @@ import 'dart:async';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:super_sliver_list/super_sliver_list.dart';
 
 class LogListController extends ValueNotifier<LogsState> {
   LogListController() : super(const LogsState());
 
   void search(String query) {
     value = value.copyWith(query: query);
-  }
-
-  void updateKeywords(List<String> keywords) {
-    value = value.copyWith(keywords: keywords);
   }
 
   void setLogs(List<Log> logs) {
@@ -52,6 +47,7 @@ class LogsView extends ConsumerStatefulWidget {
 class _LogsViewState extends ConsumerState<LogsView>
     with RouteMotionHoldMixin<LogsView> {
   final _listController = LogListController();
+  final _filters = RecordFilterController<Log>(facets: logFacets);
   late final ScrollController _scrollController;
   late final _physics = FollowEndScrollPhysics(
     isFollowing: () => _listController.value.autoScrollToEnd,
@@ -64,7 +60,7 @@ class _LogsViewState extends ConsumerState<LogsView>
       context,
       initialScrollOffset: double.maxFinite,
     );
-    _listController.setLogs(ref.read(logsProvider).list);
+    _setLogs(ref.read(logsProvider).list);
     ref.listenManual(logsProvider.select((state) => state.revision), (_, _) {
       updateLogsThrottler();
     });
@@ -83,6 +79,7 @@ class _LogsViewState extends ConsumerState<LogsView>
   @override
   void dispose() {
     _listController.dispose();
+    _filters.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -94,11 +91,16 @@ class _LogsViewState extends ConsumerState<LogsView>
     }, title: appLocalizations.exportLogs);
     if (res != true) return;
     unawaited(
-      dialogs.showMessage(
+      dialogs.showAlert(
         title: appLocalizations.tip,
         message: TextSpan(text: appLocalizations.exportSuccess),
       ),
     );
+  }
+
+  void _setLogs(List<Log> logs) {
+    _listController.setLogs(logs);
+    _filters.offer(_listController.value.logs);
   }
 
   void updateLogsThrottler() {
@@ -106,77 +108,92 @@ class _LogsViewState extends ConsumerState<LogsView>
       if (!mounted) {
         return;
       }
-      updateWhenRouteSettled(
-        () => _listController.setLogs(ref.read(logsProvider).list),
-      );
+      updateWhenRouteSettled(() => _setLogs(ref.read(logsProvider).list));
     }, duration: renderThrottleDuration);
   }
 
   @override
   Widget build(BuildContext context) {
+    final body = RecordFilterScope(
+      onFilter: _filters.add,
+      child: _buildBody(context),
+    );
+    return ListenableBuilder(
+      listenable: Listenable.merge([_filters, _filters.options]),
+      child: body,
+      builder: (context, body) {
+        final pinned = !ViewScope.isMobileOf(context);
+        return Scaffold(
+          iconActions: _buildActions(),
+          keywords: _filters.keywordsOf(pinned: pinned),
+          menuItems: _filters.menuItems(context, pinned: pinned),
+          searchState: AppBarSearchState(onSearch: _listController.search),
+          title: context.appLocalizations.logs,
+          body: body!,
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final appLocalizations = context.appLocalizations;
-    return CommonScaffold(
-      iconActions: _buildActions(),
-      onKeywordsUpdate: _listController.updateKeywords,
-      searchState: AppBarSearchState(onSearch: _listController.search),
-      title: appLocalizations.logs,
-      body: ValueListenableBuilder<LogsState>(
-        valueListenable: _listController,
-        builder: (context, state, _) {
-          final logs = state.list;
-          return NullStatusSwitcher(
-            isEmpty: logs.isEmpty,
-            isSearching: state.isSearching,
-            nullStatus: NullStatus(
-              illustration: NullStatusIllustration.logs,
-              label: appLocalizations.nullTip(appLocalizations.logs),
-            ),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: FloatingScrollbar(
-                controller: _scrollController,
-                hintBuilder: (fraction) {
-                  final index = (fraction * (logs.length - 1)).round();
-                  return logs[index].dateTime;
-                },
-                child: ScrollToEndBox(
-                  onCancelToEnd: () {
-                    _listController.setAutoScrollToEnd(false);
-                  },
-                  onResumeToEnd: () {
-                    _listController.resumeAutoScrollToEnd(
-                      ref.read(logsProvider).list,
-                    );
-                  },
-                  controller: _scrollController,
-                  enable: state.autoScrollToEnd,
-                  child: SuperListView.separated(
-                    physics: _physics,
-                    reverse: true,
-                    shrinkWrap: true,
-                    controller: _scrollController,
-                    padding: EdgeInsets.only(
-                      top: context.appBarInset,
-                      bottom: 16 + BottomInsetScope.of(context),
-                    ),
-                    itemCount: logs.length,
-                    extentEstimation: zeroDividerExtentEstimation,
-                    separatorBuilder: (_, _) => const Divider(height: 0),
-                    itemBuilder: (_, index) {
-                      final log = logs[index];
-                      return LogItem(
-                        log: log,
-                        onClick: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          );
+    return ListenableBuilder(
+      listenable: Listenable.merge([_listController, _filters]),
+      builder: (context, _) {
+        final state = _listController.value;
+        final logs = _filters.apply(state.list);
+        return NullStatusSwitcher(
+          isEmpty: logs.isEmpty,
+          isSearching: state.isSearching || _filters.isFiltering,
+          nullStatus: NullStatus(
+            illustration: NullStatusIllustration.logs,
+            label: appLocalizations.nullTip(appLocalizations.logs),
+          ),
+          child: _buildList(context, state, logs),
+        );
+      },
+    );
+  }
+
+  Widget _buildList(BuildContext context, LogsState state, List<Log> logs) {
+    final padding = EdgeInsets.only(
+      top: context.contentTopPadding,
+      bottom: 16 + context.bottomInset,
+    );
+    return Align(
+      alignment: Alignment.topCenter,
+      child: FloatingScrollbar(
+        controller: _scrollController,
+        hintBuilder: (fraction) {
+          final index = (fraction * (logs.length - 1)).round();
+          return logs[index].dateTime;
         },
+        child: ScrollToEndBox(
+          onCancelToEnd: () {
+            _listController.setAutoScrollToEnd(false);
+          },
+          onResumeToEnd: () {
+            _listController.resumeAutoScrollToEnd(ref.read(logsProvider).list);
+            _filters.offer(_listController.value.logs);
+          },
+          controller: _scrollController,
+          enable: state.autoScrollToEnd,
+          child: RecordFeedList<Log>(
+            physics: _physics,
+            reverse: true,
+            shrinkWrap: true,
+            controller: _scrollController,
+            padding: padding,
+            items: logs,
+            keyOf: ObjectKey.new,
+            gap: recordListGap,
+            estimatedItemExtent: recordListEstimatedExtent,
+            itemBuilder: (log, _, _) => MemoBuilder(
+              inputs: [log],
+              builder: (_) => LogItem(log: log),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -184,21 +201,18 @@ class _LogsViewState extends ConsumerState<LogsView>
 
 class LogItem extends StatelessWidget {
   final Log log;
-  final Function(String)? onClick;
 
-  const LogItem({super.key, required this.log, this.onClick});
+  const LogItem({super.key, required this.log});
 
   @override
   Widget build(BuildContext context) {
     final tone = switch (log.logLevel) {
       LogLevel.warning => RecordTone.warning,
       LogLevel.error => RecordTone.error,
-      LogLevel.info => RecordTone.neutral,
-      LogLevel.debug || LogLevel.silent => RecordTone.muted,
+      LogLevel.info || LogLevel.debug || LogLevel.silent => RecordTone.neutral,
     };
-    final payload = LogPayload.parse(log.payload);
+    final payload = log.parsed;
     return RecordListItem(
-      tone: tone,
       onTap: () {},
       header: RecordHeader(
         children: [
@@ -206,7 +220,10 @@ class LogItem extends StatelessWidget {
           RecordLabel(
             label: log.logLevel.name,
             tone: tone,
-            onPressed: () => onClick?.call(log.logLevel.name),
+            onPressed: () => RecordFilterScope.add(
+              context,
+              RecordFilter(RecordFacetKind.level, log.logLevel.name),
+            ),
           ),
         ],
       ),
@@ -235,35 +252,32 @@ class _LogBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SelectableText(payload.message, style: styles.primary),
-          if (payload.tag.isNotEmpty) Text(payload.tag, style: styles.muted),
+          if (payload.tag.isNotEmpty)
+            Text(payload.tag, style: styles.secondary),
         ],
       );
     }
     return SelectableText.rich(
       TextSpan(
         children: [
-          TextSpan(
-            text: route.destination,
-            style: styles.primary?.copyWith(fontWeight: FontWeight.w500),
-          ),
+          TextSpan(text: route.destination, style: styles.title),
           if (route.error.isNotEmpty)
             TextSpan(
               text: '\n${route.error}',
-              style: styles.secondary?.copyWith(color: errorColor),
+              style: styles.secondary.copyWith(color: errorColor),
             ),
           const TextSpan(text: '\n'),
           if (route.rule.isNotEmpty) ...[
             TextSpan(text: route.rule, style: styles.secondary),
-            TextSpan(text: ' \u2192 ', style: styles.muted?.toJetBrainsMono),
+            TextSpan(text: ' \u2192 ', style: styles.secondary.toJetBrainsMono),
           ],
           TextSpan(
             text: route.proxy,
-            style: styles.secondary?.copyWith(
-              color: context.colorScheme.primary,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTextStyle.footnote
+                .of(context, emphasized: true)
+                .copyWith(color: context.colorScheme.primary),
           ),
-          TextSpan(text: '\n$_sourceText', style: styles.muted),
+          TextSpan(text: '\n$_sourceText', style: styles.secondary),
         ],
       ),
     );

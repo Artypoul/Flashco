@@ -1,18 +1,17 @@
 import 'dart:async';
 
 import 'package:flashco/common/common.dart';
-import 'package:flashco/common/theme.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/l10n/l10n.dart';
-import 'package:flashco/manager/status_manager.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/database.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'helpers/test_app.dart';
 import 'helpers/test_profiles.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -38,17 +37,13 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(
+        child: HostApp(
           navigatorKey: globalState.navigatorKey,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: AppLocalizations.delegate.supportedLocales,
           builder: (context, child) {
-            globalState.measure = Measure.of(context, 1);
-            globalState.theme = CommonTheme.of(context, 1);
-            return StatusManager(child: child!);
+            return wrapAppScopes(
+              context,
+              BannerHost(stacked: false, topInset: 0, child: child!),
+            );
           },
           home: const SizedBox(key: Key('child')),
         ),
@@ -233,11 +228,12 @@ void main() {
 
       expect(peak, 2);
       expect(find.byType(AlertDialog), findsNothing);
-      expect(find.text('2 items failed'), findsOneWidget);
+      final failed = find.text(currentAppLocalizations.failedCount(2));
+      expect(failed, findsOneWidget);
 
-      await tester.tap(find.text('View'));
+      await tester.tap(failed);
       await tester.pumpAndSettle();
-      expect(find.text('2 items failed'), findsNothing);
+      expect(failed, findsNothing);
       expect(find.text('Error details'), findsOneWidget);
       expect(find.text('item 1'), findsOneWidget);
       expect(find.text('item 3'), findsOneWidget);

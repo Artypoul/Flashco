@@ -1,10 +1,12 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:material_ui/material_ui.dart' show DynamicSchemeVariant;
 
 import 'models.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 part 'generated/config.freezed.dart';
 part 'generated/config.g.dart';
@@ -104,32 +106,46 @@ final List<HotKeyAction> defaultHotKeyActions = system.isWindows
       ];
 
 const List<DashboardWidget> defaultDashboardWidgets = [
+  DashboardWidget.currentOutbound,
   DashboardWidget.networkSpeed,
-  DashboardWidget.systemProxyButton,
-  DashboardWidget.tunButton,
   DashboardWidget.outboundMode,
-  DashboardWidget.networkDetection,
-  DashboardWidget.trafficUsage,
+  DashboardWidget.networkTakeover,
   DashboardWidget.intranetIp,
 ];
 
-const _legacyOutboundModeV2 = 'outboundModeV2';
+/// A phone starts without the VPN switch and the diagnostic cards, which stay
+/// addable. The field default keeps the shared list because it must be const.
+final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
+    ? const [
+        DashboardWidget.currentOutbound,
+        DashboardWidget.networkSpeed,
+        DashboardWidget.outboundMode,
+        DashboardWidget.profiles,
+        DashboardWidget.proxyGroups,
+      ]
+    : defaultDashboardWidgets;
 
-const _retiredDashboardWidgets = {'overrideDnsButton', 'overrideNtpButton'};
+const _legacyDashboardWidgets = {
+  'networkDetection': DashboardWidget.intranetIp,
+  'outboundModeV2': DashboardWidget.outboundMode,
+  'systemProxyButton': DashboardWidget.networkTakeover,
+  'tunButton': DashboardWidget.networkTakeover,
+  'connections': DashboardWidget.connectionStats,
+  'requests': DashboardWidget.connectionStats,
+  'dnsQueries': DashboardWidget.connectionStats,
+  'trafficUsage': DashboardWidget.networkSpeed,
+};
 
 List<DashboardWidget> dashboardWidgetsFromJson(
   List<dynamic>? dashboardWidgets,
 ) {
+  if (dashboardWidgets == null) return platformDefaultDashboardWidgets;
+  final byName = DashboardWidget.values.asNameMap();
   return dashboardWidgets
-          ?.where((e) => !_retiredDashboardWidgets.contains(e))
-          .map(
-            (e) => e == _legacyOutboundModeV2
-                ? DashboardWidget.outboundMode
-                : $enumDecode(_$DashboardWidgetEnumMap, e),
-          )
-          .toSet()
-          .toList() ??
-      defaultDashboardWidgets;
+      .map((e) => _legacyDashboardWidgets[e] ?? byName[e])
+      .nonNulls
+      .toSet()
+      .toList();
 }
 
 Object? _readSidebarExpanded(Map<dynamic, dynamic> json, String key) {
@@ -140,7 +156,11 @@ Object? _readTabAnimation(Map<dynamic, dynamic> json, String key) {
   if (json.containsKey(key)) {
     return json[key];
   }
-  return json['isAnimateToPage'] == false ? TabAnimation.fade.name : null;
+  return switch (json['isAnimateToPage']) {
+    true => TabAnimation.slide.name,
+    false => TabAnimation.fade.name,
+    _ => null,
+  };
 }
 
 Object? _readUserAgents(Map<dynamic, dynamic> json, String key) {
@@ -181,6 +201,9 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(false) bool openLogs,
     @Default(true) bool closeConnections,
     @Default(defaultTestUrl) String testUrl,
+    String? currentService,
+    @Default(RequestFeed.live) RequestFeed requestFeed,
+    @Default(defaultDelayTestTimeout) int delayTestTimeout,
     @Default(TabAnimation.slide)
     @JsonKey(readValue: _readTabAnimation)
     TabAnimation tabAnimation,
@@ -195,6 +218,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(false) bool developerMode,
     @Default(RestoreStrategy.compatible) RestoreStrategy restoreStrategy,
     @Default(true) bool showTrayTitle,
+    @Default(true) bool monochromeTrayIcon,
     @Default(true) bool checkCertificate,
     @Default(defaultUserAgents)
     @JsonKey(readValue: _readUserAgents)
@@ -205,7 +229,8 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(EditorFontSize.standard) EditorFontSize editorFontSize,
     @Default([]) List<String> serviceOrder,
     @Default([]) List<String> disabledServices,
-    String? currentService,
+    @Default({}) Map<String, Map<String, double>> tableColumnWidths,
+    @Default({}) Map<String, String> recordGroupings,
   }) = _AppSettingProps;
 
   factory AppSettingProps.fromJson(Map<String, Object?> json) =>
@@ -263,10 +288,17 @@ abstract class WindowProps with _$WindowProps {
       json == null ? const WindowProps() : _$WindowPropsFromJson(json);
 }
 
-extension WindowPropsExt on WindowProps {
-  Size get _size => Size(width, height);
+/// Four dashboard columns at full density beside the expanded sidebar, with
+/// room for the Windows and Linux title bar.
+const defaultWindowSize = Size(1280, 880);
 
-  Size get size => _size.isEmpty ? const Size(680, 580) : _size;
+extension WindowPropsExt on WindowProps {
+  Size? get savedSize {
+    final size = Size(width, height);
+    return size.isEmpty ? null : size;
+  }
+
+  Size get size => savedSize ?? defaultWindowSize;
 }
 
 @freezed
@@ -330,16 +362,27 @@ ProxiesIconStyle proxiesIconStyleSafeFromJson(Object? iconStyle) {
   };
 }
 
+ProxyCardType proxyCardTypeSafeFromJson(Object? cardType) {
+  return switch (cardType) {
+    'loose' || 'expand' => ProxyCardType.loose,
+    'standard' || 'shrink' => ProxyCardType.standard,
+    'compact' || 'min' => ProxyCardType.compact,
+    _ => ProxyCardType.standard,
+  };
+}
+
 @freezed
 abstract class ProxiesStyleProps with _$ProxiesStyleProps {
   const factory ProxiesStyleProps({
-    @Default(ProxiesType.tab) ProxiesType type,
+    @Default(ProxiesType.list) ProxiesType type,
     @Default(ProxiesSortType.none) ProxiesSortType sortType,
     @Default(ProxiesLayout.standard) ProxiesLayout layout,
     @Default(ProxiesIconStyle.filled)
     @JsonKey(fromJson: proxiesIconStyleSafeFromJson)
     ProxiesIconStyle iconStyle,
-    @Default(ProxyCardType.shrink) ProxyCardType cardType,
+    @Default(ProxyCardType.standard)
+    @JsonKey(fromJson: proxyCardTypeSafeFromJson)
+    ProxyCardType cardType,
     @Default(false) bool hideTimeoutProxies,
   }) = _ProxiesStyleProps;
 
@@ -359,6 +402,27 @@ abstract class TextScale with _$TextScale {
       _$TextScaleFromJson(json);
 }
 
+// Older configs name one of Material's nine scheme variants instead.
+Object? _readColorStyle(Map<dynamic, dynamic> json, String key) {
+  if (json.containsKey(key)) {
+    return json[key];
+  }
+  return switch (json['schemeVariant']) {
+    'monochrome' => ColorStyle.monochrome.name,
+    'tonalSpot' || 'neutral' => ColorStyle.soft.name,
+    _ => null,
+  };
+}
+
+// Older configs say whether glass is on.
+Object? _readLiquidGlass(Map<dynamic, dynamic> json, String key) {
+  return switch (json[key]) {
+    true => LiquidGlassMode.standard.name,
+    false => LiquidGlassMode.none.name,
+    final value => value,
+  };
+}
+
 @freezed
 abstract class ThemeProps with _$ThemeProps {
   const factory ThemeProps({
@@ -366,8 +430,14 @@ abstract class ThemeProps with _$ThemeProps {
     @Default(defaultPrimaryColors) List<int> primaryColors,
     @Default(ThemeMode.light) ThemeMode themeMode,
     @Default(DynamicSchemeVariant.content) DynamicSchemeVariant schemeVariant,
+    @Default(ColorStyle.vivid)
+    @JsonKey(readValue: _readColorStyle)
+    ColorStyle colorStyle,
     @Default(false) bool pureBlack,
     @Default(true) bool sidebarBlur,
+    @Default(LiquidGlassMode.none)
+    @JsonKey(readValue: _readLiquidGlass)
+    LiquidGlassMode liquidGlass,
     @Default(TextScale()) TextScale textScale,
     // `fontFamily` held the names of a removed enum, which old configs may
     // still carry.
@@ -385,6 +455,9 @@ abstract class ThemeProps with _$ThemeProps {
   }
 }
 
+Object? _readWindowGeometry(Map<dynamic, dynamic> json, String key) =>
+    json.containsKey(key) ? json[key] : json['windowGeometry'];
+
 @freezed
 abstract class Config with _$Config {
   const factory Config({
@@ -398,7 +471,9 @@ abstract class Config with _$Config {
     @Default(defaultVpnProps) VpnProps vpnProps,
     @JsonKey(fromJson: ThemeProps.safeFromJson) required ThemeProps themeProps,
     @Default(defaultProxiesStyleProps) ProxiesStyleProps proxiesStyleProps,
-    @Default(defaultWindowProps) WindowProps windowProps,
+    @Default(defaultWindowProps)
+    @JsonKey(readValue: _readWindowGeometry)
+    WindowProps windowProps,
     @Default(defaultClashConfig) PatchClashConfig patchClashConfig,
     @Default([]) List<String> excludeSSIDs,
   }) = _Config;
@@ -408,7 +483,7 @@ abstract class Config with _$Config {
 
   factory Config.strictFromJson(Map<String, Object?> json) =>
       _withLegacyOverrideDns(
-        _$ConfigFromJson(_withLegacyRouteMode(json)),
+        _$ConfigFromJson(_withLegacyTestUrl(_withLegacyRouteMode(json))),
         json,
       );
 
@@ -417,6 +492,9 @@ abstract class Config with _$Config {
       return Config(
         themeProps: defaultThemeProps,
         hotKeyActions: defaultHotKeyActions,
+        appSettingProps: AppSettingProps(
+          dashboardWidgets: platformDefaultDashboardWidgets,
+        ),
       );
     }
     return Config.fromJson(json);
@@ -436,6 +514,25 @@ Config _withLegacyOverrideDns(Config config, Map<String, Object?> json) {
         )
       : <DnsOverrideKey>{};
   return config.copyWith.patchClashConfig(dnsOverrideKeys: keys);
+}
+
+/// The test URL moved from the app settings into the general overrides.
+Map<String, Object?> _withLegacyTestUrl(Map<String, Object?> json) {
+  final app = json['appSettingProps'];
+  final testUrl = app is Map ? app['testUrl'] : null;
+  final clash = json['patchClashConfig'] ?? const <String, Object?>{};
+  if (testUrl is! String ||
+      clash is! Map ||
+      clash.containsKey(GeneralOverrideKey.testUrl.path)) {
+    return json;
+  }
+  return {
+    ...json,
+    'patchClashConfig': {
+      ...Map<String, Object?>.from(clash),
+      GeneralOverrideKey.testUrl.path: testUrl,
+    },
+  };
 }
 
 Map<String, Object?> _withLegacyRouteMode(Map<String, Object?> json) {

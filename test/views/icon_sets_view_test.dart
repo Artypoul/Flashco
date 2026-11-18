@@ -1,15 +1,17 @@
 import 'package:flashco/common/common.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/config/icon_sets.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/context_menu.dart';
 import '../helpers/test_app.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 class _TestIconSets extends IconSets {
   _TestIconSets(this.initial);
@@ -115,6 +117,11 @@ Future<void> _openMenu(WidgetTester tester, String name) async {
   await tester.pumpAndSettle();
 }
 
+Finder _formField(String title) => find.descendant(
+  of: find.widgetWithText(FormRow, title),
+  matching: find.byType(TextFormField),
+);
+
 void main() {
   testWidgets('lists each set with its size and where it comes from', (
     tester,
@@ -140,10 +147,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Import from URL'));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
-      'https://example.com/set.json',
-    );
+    await tester.enterText(_formField('URL'), 'https://example.com/set.json');
     await tester.tap(find.text('Submit'));
     await tester.pumpAndSettle();
 
@@ -163,10 +167,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Import from URL'));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
-      'https://example.com/page.html',
-    );
+    await tester.enterText(_formField('URL'), 'https://example.com/page.html');
     await tester.tap(find.text('Submit'));
     await tester.pumpAndSettle();
 
@@ -189,7 +190,7 @@ void main() {
     await _openMenu(tester, 'Qure');
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Confirm'));
+    await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
 
     expect(iconSets.deleted, [_remote.id]);
@@ -225,7 +226,7 @@ void main() {
     await tester.tap(find.text('Options'));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(TextFormField, 'URL'), findsNothing);
+    expect(_formField('URL'), findsNothing);
 
     await tester.enterText(find.byType(TextField), 'Flags');
     await tester.tap(find.text('Submit'));
@@ -254,7 +255,7 @@ void main() {
         builder: (context) => TextButton(
           onPressed: () => Navigator.of(
             context,
-          ).push(MaterialPageRoute<void>(builder: (_) => const IconSetsView())),
+          ).push(HostPageRoute<void>(builder: (_) => const IconSetsView())),
           child: const Text('open'),
         ),
       ),

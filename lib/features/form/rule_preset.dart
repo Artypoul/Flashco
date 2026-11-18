@@ -1,11 +1,9 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/clash_config.dart';
-import 'package:flashco/models/common.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 enum RulePreset {
   blockQuic(AppGlyphs.block, [
@@ -87,20 +85,20 @@ class _RulePresetSheetState extends State<RulePresetSheet> {
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     const presets = RulePreset.values;
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.quickActions,
-      iconActions: [
-        if (_selected.isNotEmpty)
-          IconButtonData(
-            glyph: AppGlyphs.check,
-            onPressed: _handleConfirm,
-            tooltip: appLocalizations.confirm,
-          ),
-      ],
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ).copyWith(top: context.contentTopPadding, bottom: 20),
+      confirmationAction: _selected.isEmpty
+          ? null
+          : IconButtonData(
+              glyph: AppGlyphs.check,
+              onPressed: _handleConfirm,
+              tooltip: appLocalizations.confirm,
+            ),
+      body: PrismListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+          top: context.contentTopPadding,
+          bottom: 20 + context.bottomInset,
+        ),
         itemCount: presets.length,
         itemBuilder: (context, index) {
           final preset = presets[index];
@@ -112,7 +110,7 @@ class _RulePresetSheetState extends State<RulePresetSheet> {
               title: Text(preset.label(appLocalizations)),
               subtitle: _PresetSubtitle(preset),
               isSelected: isSelected,
-              trailing: isSelected ? const GlyphIcon(AppGlyphs.check) : null,
+              trailing: isSelected ? const SelectionCheck() : null,
               onPressed: () => _handleToggle(preset),
             ),
           );
@@ -137,9 +135,10 @@ class _PresetSubtitle extends StatelessWidget {
             raw,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: context.textTheme.bodySmall?.toJetBrainsMono.copyWith(
-              color: context.colorScheme.tertiary,
-            ),
+            style: AppTextStyle.footnote
+                .of(context)
+                .toJetBrainsMono
+                .copyWith(color: context.colorScheme.tertiary),
           ),
       ],
     );

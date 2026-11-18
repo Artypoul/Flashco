@@ -1,5 +1,5 @@
 import 'package:flashco/providers/providers.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LocaleManager extends ConsumerStatefulWidget {

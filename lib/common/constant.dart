@@ -27,6 +27,7 @@ const helperPortKey =
     'SYSTEM\\CurrentControlSet\\Services\\$appHelperService\\Runtime';
 const helperPortValue = 'Port';
 const helperSocketPath = '/run/flashco/helper.sock';
+const helperUnitPath = '/etc/systemd/system/flashco-helper.service';
 const helperProtocolVersionHeader = 'x-flashco-helper-protocol';
 final helperProtocolVersion = Platform.isWindows ? '8' : '6';
 const maxTextScale = 1.4;
@@ -51,6 +52,7 @@ const sheetAppBarHeight = 68.0;
 const watchExecution = false;
 
 const safeModeBuild = bool.fromEnvironment('SAFE_MODE');
+bool mitmFeature = const bool.fromEnvironment('FEATURE_MITM');
 
 const disclaimerVersion = 1;
 
@@ -73,12 +75,17 @@ double systemTextScaleOf(BuildContext context) {
 /// worst case - once queueing for a slot, once on the probe itself - so the
 /// guard below has to outlast twice this value.
 const delayTestTimeoutDuration = Duration(seconds: 8);
+const delayTestTimeoutOptions = [500, 1000, 2000, 5000, 8000];
+const defaultDelayTestTimeout = 8000;
 
 const delayTestGuardDuration = Duration(seconds: 30);
 
 const delayTimedOutValue = -1;
 
 const probeTimeoutDuration = Duration(seconds: 10);
+const probeSettleDuration = Duration(milliseconds: 1500);
+const probeThrottleDuration = Duration(seconds: 5);
+const probeMoveSettleDuration = Duration(milliseconds: 300);
 
 const downloadTimeoutDuration = Duration(seconds: 20);
 
@@ -125,6 +132,9 @@ const profilesDirectoryName = 'profiles';
 const providersDirectoryName = 'providers';
 const proxiesProviderDirectoryName = 'proxies';
 const rulesProviderDirectoryName = 'rules';
+const mitmDirectoryName = 'mitm';
+const mitmModulesDirectoryName = 'modules';
+const mitmResourcesDirectoryName = 'resources';
 
 const localhost = '127.0.0.1';
 const clashConfigKey = 'clash_config';
@@ -161,6 +171,7 @@ const stringListEquality = ListEquality<String>();
 const intListEquality = ListEquality<int>();
 const ruleListEquality = ListEquality<Rule>();
 const scriptListEquality = ListEquality<Script>();
+const mitmModuleListEquality = ListEquality<MitmModule>();
 const profileListEquality = ListEquality<Profile>();
 const proxyGroupsEquality = ListEquality<ProxyGroup>();
 const customProxiesEquality = ListEquality<CustomProxy>();

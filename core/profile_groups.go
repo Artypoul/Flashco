@@ -6,7 +6,7 @@ type profileGroupReference = flashco_core.ProfileGroupReference
 type profileGroupReferences = flashco_core.ProfileGroupReferences
 
 func handleGetProfileGroupReferences(path string) ([]profileGroupReferences, error) {
-	raw, err := handleGetConfig(path)
+	raw, err := handleReadConfig(PathParams{Path: path})
 	if err != nil {
 		return nil, err
 	}

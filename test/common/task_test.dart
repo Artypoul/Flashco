@@ -107,15 +107,16 @@ void main() {
       expect(clashConfig.proxyProviders, ['provider']);
       expect(clashConfig.ruleProviders, ['ruleSet']);
       expect(clashConfig.subRules, ['nested']);
-      expect(clashConfig.proxyTypeMap, {
-        'Alpha': 'ss',
-        'Beta': 'vmess',
-        'Auto': 'url-test',
-      });
+      expect(
+        {for (final p in clashConfig.proxies) p.name: p.type},
+        {'Alpha': 'ss', 'Beta': 'vmess'},
+      );
+      expect(clashConfig.proxyGroups.single.name, 'Auto');
+      expect(clashConfig.proxyGroups.single.type.value, 'url-test');
     },
   );
 
-  test('buildClashConfig indexes group types by their clash value', () {
+  test('buildClashConfig parses proxy and group types', () {
     final clashConfig = buildClashConfig(<String, dynamic>{
       'proxies': [
         {'name': 'Alpha', 'type': 'ss'},
@@ -129,7 +130,10 @@ void main() {
       ],
     });
 
-    expect(clashConfig.proxyTypeMap, {'Alpha': 'ss', 'Fallback': 'fallback'});
+    expect(clashConfig.proxies.single.name, 'Alpha');
+    expect(clashConfig.proxies.single.type, 'ss');
+    expect(clashConfig.proxyGroups.single.name, 'Fallback');
+    expect(clashConfig.proxyGroups.single.type.value, 'fallback');
     expect(clashConfig.rules, isEmpty);
   });
 

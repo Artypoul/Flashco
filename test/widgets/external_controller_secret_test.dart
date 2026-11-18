@@ -4,9 +4,10 @@ import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/database.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/config/general.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
@@ -45,7 +46,7 @@ void main() {
   Future<void> tapControllerSwitch(WidgetTester tester) async {
     await tester.tap(
       find.descendant(
-        of: find.widgetWithText(ListTile, 'External controller'),
+        of: find.widgetWithText(ListRow, 'External controller'),
         matching: find.byType(Switch),
       ),
     );

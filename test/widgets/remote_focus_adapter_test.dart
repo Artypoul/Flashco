@@ -1,19 +1,31 @@
 import 'package:flashco/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import '../helpers/host_scaffold.dart';
+import 'package:prism_ui/prism_ui.dart';
+import '../helpers/test_app.dart';
 
-Widget _buildApp({required bool enabled, required Widget home}) {
-  return MaterialApp(
+Widget _buildApp({
+  required bool enabled,
+  required Widget home,
+  ValueListenable<bool>? floatingKeyboard,
+}) {
+  return HostApp(
     builder: (context, child) {
-      return RemoteFocusAdapter(enabled: enabled, child: child!);
+      return RemoteFocusAdapter(
+        enabled: enabled,
+        floatingKeyboard: floatingKeyboard,
+        child: child!,
+      );
     },
     home: home,
   );
 }
 
 Widget _buildForm() {
-  return Scaffold(
+  return HostScaffold(
     body: Column(
       children: [
         const TextField(key: ValueKey('name')),
@@ -61,6 +73,18 @@ bool _onActionRow(WidgetTester tester) {
       _hasFocus(tester, const ValueKey('submit'));
 }
 
+Widget _buildFieldsBelowButton() {
+  return HostScaffold(
+    body: Column(
+      children: [
+        TextButton(onPressed: () {}, child: const Text('top')),
+        const TextField(key: ValueKey('name')),
+        const TextField(key: ValueKey('url')),
+      ],
+    ),
+  );
+}
+
 TextEditingController _controllerOf(WidgetTester tester, Key key) {
   return tester
       .state<EditableTextState>(
@@ -78,7 +102,7 @@ void main() {
     await tester.pumpWidget(
       _buildApp(
         enabled: true,
-        home: Scaffold(
+        home: HostScaffold(
           body: Builder(
             builder: (context) => TextButton(
               key: const ValueKey('open'),
@@ -86,7 +110,7 @@ void main() {
                 showDialog<void>(
                   context: context,
                   builder: (_) => AlertDialog(
-                    title: const Text('title'),
+                    title: 'title',
                     actions: [
                       TextButton(
                         key: const ValueKey('ok'),
@@ -115,7 +139,7 @@ void main() {
     await tester.pumpWidget(
       _buildApp(
         enabled: false,
-        home: Scaffold(
+        home: HostScaffold(
           body: Builder(
             builder: (context) => TextButton(
               key: const ValueKey('open'),
@@ -123,6 +147,7 @@ void main() {
                 showDialog<void>(
                   context: context,
                   builder: (_) => AlertDialog(
+                    title: 'title',
                     actions: [
                       TextButton(
                         key: const ValueKey('ok'),
@@ -192,6 +217,112 @@ void main() {
     expect(_onActionRow(tester), isTrue);
   });
 
+  Widget buildList(ScrollController controller) {
+    return HostScaffold(
+      body: ListView(
+        controller: controller,
+        children: [
+          TextButton(
+            key: const ValueKey('first'),
+            onPressed: () {},
+            child: const Text('first'),
+          ),
+          TextButton(
+            key: const ValueKey('second'),
+            onPressed: () {},
+            child: const Text('second'),
+          ),
+          const SizedBox(height: 2000),
+        ],
+      ),
+    );
+  }
+
+  Future<void> focusText(WidgetTester tester, String text) async {
+    Focus.of(tester.element(find.text(text))).requestFocus();
+    await tester.pump();
+  }
+
+  testWidgets('down with no control below scrolls by half a viewport', (
+    tester,
+  ) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: buildList(controller)),
+    );
+    await focusText(tester, 'second');
+    final second = FocusManager.instance.primaryFocus;
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(FocusManager.instance.primaryFocus, same(second));
+    expect(controller.offset, 300);
+  });
+
+  testWidgets('down that moves focus leaves the list where it is', (
+    tester,
+  ) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: buildList(controller)),
+    );
+    await focusText(tester, 'first');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(_hasFocus(tester, const ValueKey('second')), isTrue);
+    expect(controller.offset, 0);
+  });
+
+  testWidgets('down from a bar below the list scrolls the route list', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildApp(
+        enabled: true,
+        home: HostScaffold(
+          body: Column(
+            children: [
+              Expanded(
+                child: ListView(children: const [SizedBox(height: 2000)]),
+              ),
+              TextButton(onPressed: () {}, child: const Text('bar')),
+            ],
+          ),
+        ),
+      ),
+    );
+    await focusText(tester, 'bar');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    final position = tester
+        .state<ScrollableState>(find.byType(Scrollable))
+        .position;
+    expect(position.pixels, greaterThan(0));
+  });
+
+  testWidgets('down with no control below stays put when disabled', (
+    tester,
+  ) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _buildApp(enabled: false, home: buildList(controller)),
+    );
+    await focusText(tester, 'second');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(controller.offset, 0);
+  });
+
   testWidgets('arrows stay in the field when disabled', (tester) async {
     await tester.pumpWidget(_buildApp(enabled: false, home: _buildForm()));
     await tester.tap(find.byKey(const ValueKey('url')));
@@ -201,5 +332,247 @@ void main() {
     await tester.pump();
 
     expect(_hasFocus(tester, const ValueKey('url')), isTrue);
+  });
+
+  testWidgets('a field the remote moves to opens the keyboard on select', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: _buildFieldsBelowButton()),
+    );
+    await focusText(tester, 'top');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(_hasFocus(tester, const ValueKey('name')), isTrue);
+    expect(tester.testTextInput.hasAnyClients, isFalse);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pump();
+    expect(_hasFocus(tester, const ValueKey('name')), isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
+
+  testWidgets('a dialog the remote opens focuses its field without keyboard', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildApp(
+        enabled: true,
+        home: HostScaffold(
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () {
+                showDialog<void>(
+                  context: context,
+                  builder: (_) => const AlertDialog(
+                    title: 'title',
+                    child: TextField(key: ValueKey('field'), autofocus: true),
+                  ),
+                );
+              },
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await focusText(tester, 'open');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pumpAndSettle();
+
+    expect(_hasFocus(tester, const ValueKey('field')), isTrue);
+    expect(tester.testTextInput.hasAnyClients, isFalse);
+  });
+
+  testWidgets('a field tapped after using the remote opens the keyboard', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: _buildFieldsBelowButton()),
+    );
+    await focusText(tester, 'top');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('url')));
+    await tester.pump();
+
+    expect(_hasFocus(tester, const ValueKey('url')), isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
+
+  testWidgets('the next field keeps a keyboard select opened', (tester) async {
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: _buildFieldsBelowButton()),
+    );
+    await focusText(tester, 'top');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pump();
+
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+
+    expect(_hasFocus(tester, const ValueKey('url')), isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
+
+  testWidgets('a remote key after select leaves the next field closed', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: _buildFieldsBelowButton()),
+    );
+    await focusText(tester, 'top');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.select);
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(_hasFocus(tester, const ValueKey('url')), isTrue);
+    expect(tester.testTextInput.hasAnyClients, isFalse);
+  });
+
+  testWidgets('the next field keeps a keyboard that insets the view', (
+    tester,
+  ) async {
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpWidget(
+      _buildApp(enabled: true, home: _buildFieldsBelowButton()),
+    );
+    await focusText(tester, 'top');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('name')));
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.shiftLeft);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pump();
+
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+
+    expect(_hasFocus(tester, const ValueKey('url')), isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
+
+  testWidgets('the next field keeps a floating keyboard', (tester) async {
+    final floating = ValueNotifier(false);
+    addTearDown(floating.dispose);
+    await tester.pumpWidget(
+      _buildApp(
+        enabled: true,
+        floatingKeyboard: floating,
+        home: _buildFieldsBelowButton(),
+      ),
+    );
+    await focusText(tester, 'top');
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('name')));
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.shiftLeft);
+    floating.value = true;
+    await tester.pump();
+
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+
+    expect(_hasFocus(tester, const ValueKey('url')), isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
+
+  testWidgets('a floating keyboard insets the screen while it is up', (
+    tester,
+  ) async {
+    final floating = ValueNotifier(false);
+    addTearDown(floating.dispose);
+    await tester.pumpWidget(
+      _buildApp(
+        enabled: true,
+        floatingKeyboard: floating,
+        home: const SizedBox(key: ValueKey('page')),
+      ),
+    );
+    double bottomInset() => MediaQuery.viewInsetsOf(
+      tester.element(find.byKey(const ValueKey('page'))),
+    ).bottom;
+
+    floating.value = true;
+    await tester.pump();
+    expect(bottomInset(), 300);
+
+    floating.value = false;
+    await tester.pump();
+    expect(bottomInset(), 0);
+  });
+
+  testWidgets('a dialog field a floating keyboard covers is revealed', (
+    tester,
+  ) async {
+    final floating = ValueNotifier(false);
+    addTearDown(floating.dispose);
+    await tester.pumpWidget(
+      _buildApp(
+        enabled: true,
+        floatingKeyboard: floating,
+        home: HostScaffold(
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () {
+                showDialog<void>(
+                  context: context,
+                  builder: (_) => const AlertDialog(
+                    title: 'title',
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: 360),
+                          TextField(key: ValueKey('field'), autofocus: true),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getRect(find.byKey(const ValueKey('field'))).bottom,
+      greaterThan(300),
+    );
+
+    floating.value = true;
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getRect(find.byKey(const ValueKey('field'))).bottom,
+      lessThanOrEqualTo(300),
+    );
+  });
+
+  testWidgets('the keyboard follows focus when disabled', (tester) async {
+    await tester.pumpWidget(
+      _buildApp(enabled: false, home: _buildFieldsBelowButton()),
+    );
+    await focusText(tester, 'top');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(_hasFocus(tester, const ValueKey('name')), isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
   });
 }

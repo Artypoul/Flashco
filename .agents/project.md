@@ -1,5 +1,9 @@
 # Project Context
 
+## WIP donor v0.9.3 checkpoint — 2026-11-19
+
+The implementation branch `codex/implement-flclash-v0.9.3` contains an incomplete donor import intended for a draft PR. Core is pinned to `024245dc72bc92f48237f865119afe0cd53ac9e6`, Prism to `63450c0ac0e8e1b2c0f3ed4ad7926dc94e083185`; source database schema is 23 and settings remain version 2. Dependencies/generated files/UI/updater are not yet reconciled, so this checkpoint is not build or release ready. See [implementation status](../docs/upstream/2026-11-19-v0.9.3-implementation-status.md); earlier baseline/results below are historical.
+
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
 ## Optional Android first-run subscription — 2026-11-18

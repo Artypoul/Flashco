@@ -1,25 +1,23 @@
 import 'dart:async';
 
+import 'package:flashco/providers/app.dart';
+import 'package:flashco/providers/config.dart';
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 import 'common/common.dart';
 import 'enum/enum.dart';
 import 'models/models.dart';
 
-import 'package:flashco/common/theme.dart';
-import 'package:flashco/providers/app.dart';
-import 'package:flashco/providers/config.dart';
-import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-
 class GlobalState {
   static GlobalState? _instance;
   GlobalKey<NavigatorState> get navigatorKey => rootNavigatorKey;
-  late final String appEnv;
-  late final PackageInfo packageInfo;
-  Function? updateCurrentDelayDebounce;
+  late String appEnv;
+  late PackageInfo packageInfo;
   late Measure measure;
-  late CommonTheme theme;
   late ProviderContainer container;
   bool needInitStatus = true;
 
@@ -33,6 +31,7 @@ class GlobalState {
   }
 
   String? lastConfigMd5;
+  ConfigCounts? lastConfigCounts;
   bool isAttach = false;
 
   GlobalState._internal();
@@ -121,10 +120,10 @@ class GlobalState {
       );
       final message = userFacingErrorMessage(e, currentAppLocalizations);
       if (silence) {
-        dialogs.showNotifier(message, level: MessageLevel.error);
+        dialogs.showBanner(message, level: BannerLevel.error);
       } else {
         unawaited(
-          dialogs.showMessage(
+          dialogs.showAlert(
             title: title ?? currentAppLocalizations.tip,
             message: TextSpan(text: message),
           ),

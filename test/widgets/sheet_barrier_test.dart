@@ -1,12 +1,12 @@
-import 'package:flashco/common/common.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_app.dart';
+import '../helpers/host_scaffold.dart';
 
 Future<void> _pumpStackedSheets(WidgetTester tester, Size size) async {
   tester.view.physicalSize = size;
@@ -22,7 +22,7 @@ Future<void> _pumpStackedSheets(WidgetTester tester, Size size) async {
     UncontrolledProviderScope(
       container: container,
       child: TestApp(
-        child: Scaffold(
+        child: HostScaffold(
           body: Builder(
             builder: (context) => FilledButton(
               onPressed: () {
@@ -66,13 +66,18 @@ void main() {
 
       await tester.tap(find.text('open outer'));
       await tester.pumpAndSettle();
-      final scheme = tester.element(find.text('open inner')).colorScheme;
-      final scrim = scheme.scrim.withValues(alpha: 0.32);
+      final scrim = tester
+          .element(find.text('open inner'))
+          .colorScheme
+          .modalScrim;
       expect(_barrierColorAround(tester, 'open inner'), scrim);
 
       await tester.tap(find.text('open inner'));
       await tester.pumpAndSettle();
-      expect(_barrierColorAround(tester, 'inner'), scrim);
+      expect(
+        _barrierColorAround(tester, 'inner'),
+        kind == 'bottom sheet' ? scrim.withValues(alpha: scrim.a * 0.6) : scrim,
+      );
       expect(find.byType(BackdropFilter), findsNothing);
     });
   }

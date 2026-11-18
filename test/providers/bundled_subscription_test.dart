@@ -137,7 +137,7 @@ void main() {
     });
     core = _Core();
     when(() => core.validateConfig(any())).thenAnswer((_) async => '');
-    when(() => core.clearEffect(any())).thenAnswer((_) async => '');
+    when(() => core.clearEffect(any())).thenAnswer((_) async {});
     when(
       () => core.getProfileGroupReferences(any()),
     ).thenAnswer((_) async => []);
@@ -231,7 +231,7 @@ void main() {
     () async {
       await stageFirstRun();
       await stageFallback();
-      when(() => core.getConfig(any())).thenAnswer((_) async => source());
+      when(() => core.readConfig(any())).thenAnswer((_) async => source());
       status = HttpStatus.serviceUnavailable;
       await action().importBundledSubscription(url, firstRun: true);
 
@@ -258,7 +258,7 @@ void main() {
         'GEOIP,RU,DIRECT',
         'DOMAIN-SUFFIX,ru,DIRECT',
       ]);
-      when(() => core.getConfig(any())).thenAnswer(
+      when(() => core.readConfig(any())).thenAnswer(
         (_) async => {
           'proxies': [
             {'name': 'first', 'type': 'ss'},
@@ -303,13 +303,13 @@ void main() {
     expect(profile.overrides.fallback, isNull);
     expect(profile.selectedMap, existing.selectedMap);
     expect(await preferences.pendingBundledFallback(url), isNull);
-    verifyNever(() => core.getConfig(any()));
+    verifyNever(() => core.readConfig(any()));
   });
 
   test(
     'failed first download retains fallback defaults for a later retry',
     () async {
-      when(() => core.getConfig(any())).thenAnswer((_) async => source());
+      when(() => core.readConfig(any())).thenAnswer((_) async => source());
       await stageFallback();
       status = HttpStatus.serviceUnavailable;
       await action().importBundledSubscription(url);

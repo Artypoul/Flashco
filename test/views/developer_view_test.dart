@@ -3,9 +3,10 @@ import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/developer.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:prism_ui/switch.dart';
 
 import '../helpers/test_app.dart';
 

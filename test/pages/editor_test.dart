@@ -1,21 +1,28 @@
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/pages/editor.dart';
 import 'package:flashco/providers/app.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/glyph_finders.dart';
 import '../helpers/test_app.dart';
+import '../plugins/code_forge/support.dart' show initEditorNative;
+import 'package:prism_ui/prism_ui.dart';
 
 final _viewSizeOverride = viewSizeProvider.overrideWithBuild(
   (_, _) => const Size(1200, 1000),
 );
 
 void main() {
+  setUpAll(initEditorNative);
+
   testWidgets('shows the unavailable state without the native editor library', (
     tester,
   ) async {
+    final ready = editorNativeReady;
+    editorNativeReady = () => false;
+    addTearDown(() => editorNativeReady = ready);
     await tester.pumpWidget(
       TestApp(
         overrides: [_viewSizeOverride],
@@ -80,4 +87,4 @@ void main() {
   });
 }
 
-void _noopSave(BuildContext context, String title, String content) {}
+void _noopSave(BuildContext context, String title, EditorContent content) {}

@@ -1,22 +1,17 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/common/ip_quality.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/ip_quality.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 import 'ip_quality_text.dart';
 import 'labels.dart';
 
 Future<void> showIpQualitySheet(BuildContext context, {required String ip}) {
-  if (isSheetPage(context)) {
-    return Navigator.of(
-      context,
-    ).push(PagedSheetRoute(builder: (_) => _IpQualitySheet(ip: ip)));
-  }
   return showSheet<void>(
     context: context,
     builder: (_) => _IpQualitySheet(ip: ip),
@@ -34,7 +29,7 @@ class _IpQualitySheet extends ConsumerWidget {
     final isLoading = ref.watch(
       ipQualityProvider(ip).select((result) => result.isLoading),
     );
-    return CommonScaffold(
+    return Scaffold(
       title: localizations.outboundIp,
       actions: [
         AppBarActionButton(
@@ -87,20 +82,21 @@ class _IpQualityDetail extends ConsumerWidget {
     final failed = quality == null && !result.isLoading;
     return ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-      ).copyWith(bottom: 20, top: context.contentTopPadding),
+      padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+        bottom: 20 + context.bottomInset,
+        top: context.contentTopPadding,
+      ),
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(_tipInset, 8, _tipInset, 0),
           child: Text(
             localizations.detectionTip,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
-            ),
+            style: AppTextStyle.body
+                .of(context)
+                .copyWith(color: context.colorScheme.onSurfaceVariant),
           ),
         ),
-        generateSectionV3(
+        generateSection(
           title: localizations.basicInfo,
           items: [
             DetailRow(
@@ -121,12 +117,12 @@ class _IpQualityDetail extends ConsumerWidget {
           ],
         ),
         if (!failed)
-          generateSectionV3(
+          generateSection(
             title: localizations.network,
             items: _networkRows(context, quality),
           ),
         if (failed && error is IpQualityLookupException)
-          generateSectionV3(
+          generateSection(
             title: localizations.ipQualitySources,
             items: [
               for (final failure in error.failures)
@@ -136,7 +132,7 @@ class _IpQualityDetail extends ConsumerWidget {
                 ),
             ],
           ),
-        generateSectionV3(
+        generateSection(
           title: localizations.other,
           items: const [_HideIpItem()],
         ),

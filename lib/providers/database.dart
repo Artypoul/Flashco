@@ -5,7 +5,7 @@ import 'package:flashco/common/common.dart';
 import 'package:flashco/database/database.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prism_ui/banner.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'generated/database.g.dart';
@@ -53,9 +53,9 @@ void _reportOptimisticFailure(Object error, StackTrace stackTrace) {
     'Optimistic database write failed: ${compactError(error)}, $stackTrace',
     logLevel: LogLevel.warning,
   );
-  dialogs.showNotifier(
+  dialogs.showBanner(
     currentAppLocalizations.databaseWriteFailedTip,
-    level: MessageLevel.error,
+    level: BannerLevel.error,
   );
 }
 
@@ -133,18 +133,8 @@ Stream<List<Profile>> profilesStream(Ref ref) {
 }
 
 @riverpod
-Stream<List<Rule>> addedRulesStream(Ref ref, int profileId) {
-  return database.rulesDao.queryAddedRules(profileId).watch();
-}
-
-@riverpod
 Stream<Set<String>> customGroupNames(Ref ref) {
   return database.proxyGroupsDao.names().watch().map(Set.of);
-}
-
-@riverpod
-Stream<int> proxyGroupsCount(Ref ref, int profileId) {
-  return database.proxyGroupsDao.count(profileId).watchSingle();
 }
 
 @Riverpod(keepAlive: true)
@@ -222,8 +212,16 @@ class Profiles extends _$Profiles {
   /// A new provider label follows into custom profiles whatever path set it.
   void put(Profile profile) {
     final newProfile = labeled(profile);
-    final previousLabel = state.getProfile(profile.id)?.realLabel;
-    var next = state.copyAndPut(newProfile, (item) => item.id == newProfile.id);
+    final previous = state.getProfile(profile.id);
+    final previousLabel = previous?.realLabel;
+    // A new profile goes where the query sorts it, so the read-back after the
+    // write does not move it.
+    var next = previous == null
+        ? ([...state]..insert(
+            lowerBound(state, newProfile, compare: ProfilesDao.compare),
+            newProfile,
+          ))
+        : state.copyAndPut(newProfile, (item) => item.id == newProfile.id);
     if (newProfile.type == ProfileType.custom ||
         previousLabel == null ||
         previousLabel == newProfile.realLabel) {
@@ -394,6 +392,66 @@ class Scripts extends _$Scripts with AsyncNotifierMixin, OptimisticMixin {
 }
 
 @riverpod
+class MitmModules extends _$MitmModules
+    with AsyncNotifierMixin, OptimisticMixin {
+  @override
+  Stream<List<MitmModule>> build() {
+    final query = database.mitmModulesDao.query();
+    return settled(query.watch(), query.get);
+  }
+
+  @override
+  List<MitmModule> get value => state.value ?? [];
+
+  void put(MitmModule module, {bool first = false}) {
+    final next = List<MitmModule>.from(value);
+    final index = next.indexWhere((item) => item.id == module.id);
+    if (index == -1 && first) {
+      _reorder([module, ...next]);
+      return;
+    }
+    final saved = index == -1 ? module.copyWith(order: next.length) : module;
+    if (index == -1) {
+      next.add(saved);
+    } else {
+      next[index] = saved;
+    }
+    optimistic(next, () => database.mitmModules.put(saved.toCompanion()));
+  }
+
+  void del(int id) {
+    final next = List<MitmModule>.from(value);
+    final index = next.indexWhere((item) => item.id == id);
+    if (index == -1) return;
+    next.removeAt(index);
+    optimistic(next, () => database.mitmModules.remove((t) => t.id.equals(id)));
+  }
+
+  void order(int oldIndex, int newIndex) {
+    _reorder(value.copyAndReorder(oldIndex, newIndex));
+  }
+
+  void _reorder(List<MitmModule> next) {
+    final changed = <MitmModulesCompanion>[];
+    next.forEachIndexed((index, item) {
+      if (item.order != index) {
+        next[index] = item.copyWith(order: index);
+        changed.add(item.toCompanion(index));
+      }
+    });
+    optimistic(next, () => database.mitmModulesDao.putAll(changed));
+  }
+
+  @override
+  bool updateShouldNotify(
+    AsyncValue<List<MitmModule>> previous,
+    AsyncValue<List<MitmModule>> next,
+  ) {
+    return !mitmModuleListEquality.equals(previous.value, next.value);
+  }
+}
+
+@riverpod
 class ClashProviders extends _$ClashProviders
     with AsyncNotifierMixin, OptimisticMixin {
   @override
@@ -526,17 +584,6 @@ class IconSets extends _$IconSets with AsyncNotifierMixin, OptimisticMixin {
   }
 }
 
-@riverpod
-Future<Script?> script(Ref ref, int? scriptId) async {
-  final script = ref.watch(
-    scriptsProvider.future.select((state) async {
-      final scripts = await state;
-      return scripts.get(scriptId);
-    }),
-  );
-  return script;
-}
-
 mixin RuleListMixin on OptimisticMixin<List<Rule>> {
   Future<void> persistRule(Rule rule);
 
@@ -646,6 +693,11 @@ class GlobalRules extends _$GlobalRules
 
   @override
   Future<void> persistRule(Rule rule) => database.rulesDao.putRule(rule);
+}
+
+@riverpod
+Stream<int> profileGroupsCount(Ref ref, int profileId) {
+  return database.proxyGroupsDao.profileGroupsCount(profileId).watchSingle();
 }
 
 /// What the standard extension adds to a profile, or a custom profile's rules.

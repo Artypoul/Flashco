@@ -175,6 +175,26 @@ void main() {
   });
 
   group('applyRestore writes the database', () {
+    test('restores module arguments and resources', () async {
+      final module = MitmModule(
+        id: 42,
+        name: 'From backup',
+        enabled: false,
+        arguments: const {'argument': 'value'},
+        resources: const {'resource': 'hash'},
+        lastUpdateTime: DateTime.utc(2024),
+      );
+      await actionOf(buildContainer()).applyRestore(
+        MigrationData(mitmModules: [module]),
+        RestoreOption.onlyProfiles,
+      );
+      final stored = (await testDatabase.mitmModulesDao.query().get()).single;
+      expect(stored.id, 42);
+      expect(stored.enabled, isFalse);
+      expect(stored.arguments, {'argument': 'value'});
+      expect(stored.resources, {'resource': 'hash'});
+    });
+
     test('inserts the profiles the backup carries', () async {
       final container = buildContainer();
 

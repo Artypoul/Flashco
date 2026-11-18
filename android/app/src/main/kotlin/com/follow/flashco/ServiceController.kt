@@ -11,6 +11,7 @@ import com.follow.flashco.common.GlobalState
 import com.follow.flashco.common.intent
 import com.follow.flashco.core.Core
 import com.follow.flashco.service.ManagedService
+import com.follow.flashco.service.NetworkObserver
 import com.follow.flashco.service.ProxyService
 import com.follow.flashco.service.ServiceConfig
 import com.follow.flashco.service.VpnService
@@ -57,6 +58,7 @@ object ServiceController {
         initParams: String,
         setupParams: String,
     ): Result<String> = runCatching {
+        NetworkObserver.start()
         suspendCancellableCoroutine { continuation ->
             Core.quickSetup(initParams, setupParams) { result ->
                 continuation.resume(result.orEmpty())
@@ -64,7 +66,7 @@ object ServiceController {
         }
     }
 
-    fun setEventListener(callback: ((String?) -> Unit)?): Result<Unit> = runCatching {
+    fun setEventListener(callback: ((ByteArray) -> Unit)?): Result<Unit> = runCatching {
         Core.updateEventListener(callback)
     }
 

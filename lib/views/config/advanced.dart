@@ -1,11 +1,15 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/ui/icons/icons.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flashco/views/config/dns.dart';
+import 'package:flashco/views/config/filters.dart';
+import 'package:flashco/views/config/icon_sets.dart';
+import 'package:flashco/views/config/mitm.dart';
 import 'package:flashco/views/config/network.dart';
+import 'package:flashco/views/config/providers.dart';
 import 'package:flashco/views/config/scripts.dart';
-import 'package:flashco/widgets/list.dart';
-import 'package:flashco/widgets/scaffold.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/views/profiles/custom/custom_proxies.dart';
+import 'package:flutter/widgets.dart';
 
 import 'rules.dart';
 
@@ -39,14 +43,49 @@ class AdvancedConfigView extends StatelessWidget {
         leading: const GlyphIcon(AppGlyphs.code),
         widget: const ScriptsView(),
       ),
+      if (mitmFeature)
+        ListItem.open(
+          title: Text(appLocalizations.mitm),
+          leading: const GlyphIcon(AppGlyphs.lockOpen),
+          widget: MitmView(isAndroid: system.isAndroid),
+        ),
+    ];
+    final customItems = [
+      ListItem.open(
+        title: Text(appLocalizations.proxies),
+        leading: const GlyphIcon(AppGlyphs.proxies),
+        widget: const CustomProxiesView(),
+      ),
+      ListItem.open(
+        title: Text(appLocalizations.ruleProviders),
+        leading: const GlyphIcon(AppGlyphs.resources),
+        widget: const ClashProvidersView(),
+      ),
+      ListItem.open(
+        title: Text(appLocalizations.filters),
+        leading: const GlyphIcon(AppGlyphs.filter),
+        widget: const FiltersView(),
+      ),
+      ListItem.open(
+        title: Text(appLocalizations.iconSets),
+        leading: const GlyphIcon(AppGlyphs.photos),
+        widget: const IconSetsView(),
+      ),
     ];
     return BaseScaffold(
       title: appLocalizations.advancedConfig,
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ).copyWith(top: context.contentTopPadding, bottom: 16),
-        children: [generateSectionV3(items: items)],
+        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+          top: context.sectionsTopPadding,
+          bottom: 16 + context.bottomInset,
+        ),
+        children: [
+          generateSection(items: items),
+          generateSection(
+            title: appLocalizations.customResources,
+            items: customItems,
+          ),
+        ],
       ),
     );
   }

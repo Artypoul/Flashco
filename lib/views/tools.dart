@@ -1,20 +1,19 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/about.dart';
 import 'package:flashco/views/access.dart';
 import 'package:flashco/views/backup_and_restore.dart';
 import 'package:flashco/views/config/general.dart';
 import 'package:flashco/views/hotkey.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/advanced.dart';
-import 'config/custom_resources.dart';
 import 'developer.dart';
 import 'disclaimer.dart';
 import 'theme.dart';
@@ -36,7 +35,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     );
   }
 
-  List<Widget> _getOtherList(bool enableDeveloperMode) {
+  Widget _getOtherList(bool enableDeveloperMode) {
     return generateSection(
       title: context.appLocalizations.other,
       items: [
@@ -47,17 +46,16 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     );
   }
 
-  List<Widget> _getSettingList() {
+  Widget _getSettingList() {
     return generateSection(
       title: context.appLocalizations.settings,
       items: [
         const _LocaleItem(),
         const _ThemeItem(),
-        const _BackupItem(),
         if (system.isDesktop) const _HotkeyItem(),
         if (system.isAndroid) const _AccessItem(),
+        const _BackupItem(),
         const _AdvancedConfigItem(),
-        const _CustomResourcesItem(),
         const _GeneralItem(),
       ],
     );
@@ -65,10 +63,8 @@ class _ToolViewState extends ConsumerState<ToolsView> {
 
   @override
   Widget build(BuildContext context) {
-    final appSetting = ref.watch(
-      appSettingProvider.select(
-        (state) => (locale: state.locale, developerMode: state.developerMode),
-      ),
+    final developerMode = ref.watch(
+      appSettingProvider.select((state) => state.developerMode),
     );
     final items = [
       Consumer(
@@ -77,27 +73,26 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           if (state.navigationItems.isEmpty) {
             return Container();
           }
-          return Column(
-            children: generateSection(
-              title: context.appLocalizations.more,
-              items: state.navigationItems.map(_buildNavigationMenuItem),
-            ),
+          return generateSection(
+            items: state.navigationItems.map(_buildNavigationMenuItem),
           );
         },
       ),
-      ..._getSettingList(),
-      ..._getOtherList(appSetting.developerMode),
+      _getSettingList(),
+      _getOtherList(developerMode),
     ];
-    return CommonScaffold(
+    return Scaffold(
       title: context.appLocalizations.tools,
       body: Builder(
-        builder: (context) => ListView.builder(
+        builder: (context) => PrismListView(
           key: toolsStoreKey,
           itemCount: items.length,
           itemBuilder: (_, index) => items[index],
           padding: EdgeInsets.only(
-            top: context.appBarInset,
-            bottom: 20 + BottomInsetScope.of(context),
+            left: 16,
+            right: 16,
+            top: context.sectionsTopPadding,
+            bottom: 20 + context.bottomInset,
           ),
         ),
       ),
@@ -122,8 +117,6 @@ class _LocaleItem extends ConsumerWidget {
     return ListItem<Locale?>.options(
       leading: const GlyphIcon(AppGlyphs.language),
       title: Text(context.appLocalizations.language),
-      subtitle: Text(_getLocaleString(context, currentLocale)),
-      dialogTitle: context.appLocalizations.language,
       options: [null, ...AppLocalizations.delegate.supportedLocales],
       onChanged: (Locale? locale) {
         ref
@@ -144,7 +137,6 @@ class _ThemeItem extends StatelessWidget {
     return ListItem.open(
       leading: const GlyphIcon(AppGlyphs.paintbrush),
       title: Text(context.appLocalizations.theme),
-      subtitle: Text(context.appLocalizations.themeDesc),
       widget: const ThemeView(),
     );
   }
@@ -158,7 +150,6 @@ class _BackupItem extends StatelessWidget {
     return ListItem.open(
       leading: const GlyphIcon(AppGlyphs.cloudSync),
       title: Text(context.appLocalizations.backupAndRestore),
-      subtitle: Text(context.appLocalizations.backupAndRestoreDesc),
       widget: const BackupAndRestore(),
     );
   }
@@ -185,7 +176,6 @@ class _AccessItem extends StatelessWidget {
     return ListItem.open(
       leading: const GlyphIcon(AppGlyphs.appsList),
       title: Text(context.appLocalizations.accessControl),
-      subtitle: Text(context.appLocalizations.accessControlDesc),
       widget: const AccessView(),
     );
   }
@@ -212,22 +202,7 @@ class _AdvancedConfigItem extends StatelessWidget {
     return ListItem.open(
       leading: const GlyphIcon(AppGlyphs.wrench),
       title: Text(context.appLocalizations.advancedConfig),
-      subtitle: Text(context.appLocalizations.advancedConfigDesc),
       widget: const AdvancedConfigView(),
-    );
-  }
-}
-
-class _CustomResourcesItem extends StatelessWidget {
-  const _CustomResourcesItem();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListItem.open(
-      leading: const GlyphIcon(AppGlyphs.customize),
-      title: Text(context.appLocalizations.customProfileResources),
-      subtitle: Text(context.appLocalizations.customProfileResourcesDesc),
-      widget: const CustomResourcesView(),
     );
   }
 }

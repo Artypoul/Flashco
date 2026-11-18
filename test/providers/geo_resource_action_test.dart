@@ -1,21 +1,21 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/common/theme.dart';
 import 'package:flashco/core/controller.dart';
 import 'package:flashco/core/interface.dart';
+import 'package:flashco/core/method.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
-import 'package:flashco/l10n/l10n.dart';
-import 'package:flashco/manager/status_manager.dart';
 import 'package:flashco/providers/action.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/core.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/icons/icons.dart';
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../helpers/glyph_finders.dart';
+import '../helpers/test_app.dart';
 
 class _MockCoreHandlerInterface extends Mock implements CoreHandlerInterface {}
 
@@ -34,14 +34,11 @@ Future<ProviderContainer> _pumpGeoResourceAction(
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: MaterialApp(
+      child: HostApp(
         navigatorKey: globalState.navigatorKey,
-        localizationsDelegates: const [AppLocalizations.delegate],
-        supportedLocales: AppLocalizations.delegate.supportedLocales,
         builder: (context, child) {
           globalState.measure = Measure.of(context, 1);
-          globalState.theme = CommonTheme.of(context, 1);
-          return StatusManager(child: child!);
+          return BannerHost(stacked: false, topInset: 0, child: child!);
         },
         home: const SizedBox(),
       ),
@@ -79,7 +76,7 @@ void main() {
 
   testWidgets('a manually skipped update is shown as info', (tester) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     final action = container.read(geoResourceActionProvider.notifier);
     final key = GeoResource.MMDB.updatingKey;
@@ -104,9 +101,12 @@ void main() {
 
   testWidgets('a rejected manual request clears progress', (tester) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(
-      () => coreInterface.updateGeoData('MMDB'),
-    ).thenAnswer((_) async => 'unknown geo resource');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer(
+      (_) async => throw const CoreMethodException(
+        code: 'core_error',
+        message: 'unknown geo resource',
+      ),
+    );
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     final action = container.read(geoResourceActionProvider.notifier);
     final key = GeoResource.MMDB.updatingKey;
@@ -114,7 +114,7 @@ void main() {
     await expectLater(
       action.updateGeoResource(GeoResource.MMDB),
       throwsA(
-        isA<MessageException>().having(
+        isA<CoreMethodException>().having(
           (error) => error.message,
           'message',
           'unknown geo resource',
@@ -129,7 +129,7 @@ void main() {
 
   testWidgets('a repeated manual request stays one operation', (tester) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     final action = container.read(geoResourceActionProvider.notifier);
     final key = GeoResource.MMDB.updatingKey;
@@ -153,9 +153,14 @@ void main() {
   ) async {
     final coreInterface = _MockCoreHandlerInterface();
     var requests = 0;
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer(
-      (_) async => requests++ == 0 ? '' : 'geo update already in progress',
-    );
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {
+      if (requests++ > 0) {
+        throw const CoreMethodException(
+          code: 'core_error',
+          message: 'geo update already in progress',
+        );
+      }
+    });
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     final action = container.read(geoResourceActionProvider.notifier);
     final key = GeoResource.MMDB.updatingKey;
@@ -163,7 +168,7 @@ void main() {
     await action.updateGeoResource(GeoResource.MMDB);
     await expectLater(
       action.updateGeoResource(GeoResource.MMDB, announceSuccess: false),
-      throwsA(isA<MessageException>()),
+      throwsA(isA<CoreMethodException>()),
     );
 
     expect(container.read(isUpdatingProvider(key)), isTrue);
@@ -184,7 +189,7 @@ void main() {
     tester,
   ) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     container.read(coreStatusProvider.notifier).value = CoreStatus.connected;
     final action = container.read(geoResourceActionProvider.notifier);
@@ -211,7 +216,7 @@ void main() {
     tester,
   ) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     container.read(updatingActionProvider.notifier);
     final action = container.read(geoResourceActionProvider.notifier);
@@ -237,7 +242,7 @@ void main() {
     tester,
   ) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     final action = container.read(geoResourceActionProvider.notifier);
 
@@ -246,7 +251,16 @@ void main() {
     await tester.pump();
 
     expect(find.text('download failed'), findsOneWidget);
-    expect(find.byGlyph(AppGlyphs.error), findsOneWidget);
+    final banner = find
+        .ancestor(
+          of: find.text('download failed'),
+          matching: find.byType(Surface),
+        )
+        .first;
+    expect(
+      tester.widget<Surface>(banner).color,
+      Theme.of(tester.element(banner)).colorScheme.errorContainer,
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -255,7 +269,7 @@ void main() {
     tester,
   ) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData(any())).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData(any())).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     final action = container.read(geoResourceActionProvider.notifier);
     final key = GeoResource.MMDB.updatingKey;
@@ -280,7 +294,7 @@ void main() {
     tester,
   ) async {
     final coreInterface = _MockCoreHandlerInterface();
-    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async => '');
+    when(() => coreInterface.updateGeoData('MMDB')).thenAnswer((_) async {});
     final container = await _pumpGeoResourceAction(tester, coreInterface);
     container.read(coreStatusProvider.notifier).value = CoreStatus.connected;
     final action = container.read(geoResourceActionProvider.notifier);

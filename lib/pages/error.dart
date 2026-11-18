@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flashco/common/common.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
-import 'package:flashco/widgets/navigation_dock.dart';
+import 'package:flashco/ui/icons/icons.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 
 class InitErrorApp extends StatelessWidget {
@@ -22,24 +25,24 @@ class InitErrorApp extends StatelessWidget {
 
   ThemeData _theme(Brightness brightness) {
     return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
+      colorScheme: seededColorScheme(
         seedColor: const Color(defaultPrimaryColor),
         brightness: brightness,
       ),
-    ).withAppShapes;
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return PrismApp(
       debugShowCheckedModeBanner: false,
       title: appName,
       theme: _theme(Brightness.light),
       darkTheme: _theme(Brightness.dark),
       localizationsDelegates: const [
         AppLocalizations.delegate,
-        ...GlobalMaterialLocalizations.delegates,
+        AppUiLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.delegate.supportedLocales,
       home: InitErrorScreen(
@@ -73,12 +76,23 @@ class InitErrorScreen extends StatefulWidget {
 class _InitErrorScreenState extends State<InitErrorScreen> {
   static const _maxContentWidth = 720.0;
 
+  final _notice = ValueNotifier<({String text, bool visible})?>(null);
+  Timer? _noticeTimer;
   bool _isExiting = false;
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
-    );
+  @override
+  void dispose() {
+    _noticeTimer?.cancel();
+    _notice.dispose();
+    super.dispose();
+  }
+
+  void _showNotice(String text) {
+    _noticeTimer?.cancel();
+    _notice.value = (text: text, visible: true);
+    _noticeTimer = Timer(const Duration(seconds: 4), () {
+      _notice.value = (text: text, visible: false);
+    });
   }
 
   Future<void> _copyDetails() async {
@@ -89,7 +103,7 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
     if (!mounted) {
       return;
     }
-    _showSnackBar(context.appLocalizations.copySuccess);
+    _showNotice(context.appLocalizations.copySuccess);
   }
 
   Future<bool> _confirmClearData() async {
@@ -99,12 +113,7 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
       child: Builder(
         builder: (context) {
           return AlertDialog(
-            title: Text(appLocalizations.clearData),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 300),
-              child: Text(appLocalizations.clearDataAndExitTip),
-            ),
-            actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+            title: appLocalizations.clearData,
             actions: [
               TextButton(
                 onPressed: () {
@@ -119,6 +128,7 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
                 child: Text(appLocalizations.confirm),
               ),
             ],
+            child: Text(appLocalizations.clearDataAndExitTip),
           );
         },
       ),
@@ -143,7 +153,7 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
       setState(() {
         _isExiting = false;
       });
-      _showSnackBar(appLocalizations.clearDataFailed('$error'));
+      _showNotice(appLocalizations.clearDataFailed('$error'));
       return;
     }
     await widget.onExit();
@@ -160,79 +170,98 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     final colorScheme = context.colorScheme;
-    final textTheme = context.textTheme;
-    return Scaffold(
-      body: SafeArea(
+    return Surface(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
         bottom: false,
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: _maxContentWidth,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DecoratedBox(
-                          decoration: ShapeDecoration(
-                            color: colorScheme.errorContainer,
-                            shape: AppShape.full,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: _maxContentWidth,
                           ),
-                          child: SizedBox.square(
-                            dimension: 56,
-                            child: Center(
-                              child: GlyphIcon(
-                                AppGlyphs.warning,
-                                size: 28,
-                                color: colorScheme.onErrorContainer,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DecoratedBox(
+                                decoration: ShapeDecoration(
+                                  color: colorScheme.errorContainer,
+                                  shape: AppShape.full,
+                                ),
+                                child: SizedBox.square(
+                                  dimension: 56,
+                                  child: Center(
+                                    child: GlyphIcon(
+                                      AppGlyphs.warning,
+                                      size: 28,
+                                      color: colorScheme.onErrorContainer,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 20),
+                              Text(
+                                appLocalizations.initFailed,
+                                style: AppTextStyle.title2.of(
+                                  context,
+                                  emphasized: true,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                appLocalizations.initFailedTip,
+                                style: AppTextStyle.subheadline
+                                    .of(context)
+                                    .copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                      height: 1.6,
+                                    ),
+                              ),
+                              const SizedBox(height: 28),
+                              _ErrorSection(
+                                label: appLocalizations.errorDetails,
+                                text: widget.error.toString(),
+                                backgroundColor: colorScheme.errorContainer,
+                                style: AppTextStyle.subheadline
+                                    .of(context, emphasized: true)
+                                    .copyWith(
+                                      color: colorScheme.onErrorContainer,
+                                    ),
+                              ),
+                              const SizedBox(height: 20),
+                              _ErrorSection(
+                                label: appLocalizations.stackTrace,
+                                text: widget.stack.toString(),
+                                backgroundColor: context.raisedSurfaceLevel
+                                    .colorOf(colorScheme),
+                                style: AppTextStyle.footnote
+                                    .of(context)
+                                    .copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                      fontFamily: 'monospace',
+                                      height: 1.5,
+                                    ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Text(
-                          appLocalizations.initFailed,
-                          style: textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          appLocalizations.initFailedTip,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            height: 1.6,
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-                        _ErrorSection(
-                          label: appLocalizations.errorDetails,
-                          text: widget.error.toString(),
-                          backgroundColor: colorScheme.errorContainer,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onErrorContainer,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        _ErrorSection(
-                          label: appLocalizations.stackTrace,
-                          text: widget.stack.toString(),
-                          backgroundColor: colorScheme.surfaceContainerHighest,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            fontFamily: 'monospace',
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                    child: _Notice(notice: _notice),
+                  ),
+                ],
               ),
             ),
             _ErrorActionBar(
@@ -241,9 +270,7 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
                 ElasticButton(
                   child: TextButton.icon(
                     onPressed: _isExiting ? null : _clearData,
-                    style: TextButton.styleFrom(
-                      foregroundColor: colorScheme.error,
-                    ),
+                    style: ButtonStyle.from(foregroundColor: colorScheme.error),
                     icon: const GlyphIcon(AppGlyphs.broom, size: 18),
                     label: Text(appLocalizations.clearData),
                   ),
@@ -270,6 +297,54 @@ class _InitErrorScreenState extends State<InitErrorScreen> {
   }
 }
 
+class _Notice extends StatelessWidget {
+  const _Notice({required this.notice});
+
+  final ValueListenable<({String text, bool visible})?> notice;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return ValueListenableBuilder(
+      valueListenable: notice,
+      builder: (context, value, _) {
+        if (value == null) {
+          return const SizedBox.shrink();
+        }
+        return IgnorePointer(
+          child: AnimatedOpacity(
+            opacity: value.visible ? 1 : 0,
+            duration: const Duration(milliseconds: 200),
+            child: Semantics(
+              liveRegion: value.visible,
+              child: Center(
+                child: DecoratedBox(
+                  decoration: ShapeDecoration(
+                    color: colorScheme.inverseSurface,
+                    shape: AppShape.lg,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Text(
+                      value.text,
+                      style: AppTextStyle.subheadline
+                          .of(context)
+                          .copyWith(color: colorScheme.onInverseSurface),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ErrorSection extends StatelessWidget {
   final String label;
   final String text;
@@ -290,9 +365,7 @@ class _ErrorSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: context.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyle.subheadline.of(context, emphasized: true),
         ),
         const SizedBox(height: 8),
         DecoratedBox(
@@ -318,11 +391,9 @@ class _ErrorActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.colorScheme;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+        color: SurfaceLevel.page.colorOf(context.colorScheme),
       ),
       child: SafeArea(
         top: false,

@@ -1,5 +1,6 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/pages/editor.dart';
 import 'package:flashco/providers/app.dart';
@@ -7,7 +8,7 @@ import 'package:flashco/providers/database.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/config/sniffer.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -193,7 +194,7 @@ void main() {
     final popped = await editor.onPop!(
       context,
       currentAppLocalizations.sniffer,
-      'sniff:\n  http:\n    ports: [80]\n',
+      const EditorContent.text('sniff:\n  http:\n    ports: [80]\n'),
     );
     expect(popped, isTrue);
     expect(config().snifferOverrideKeys, {SnifferOverrideKey.sniffHttp});

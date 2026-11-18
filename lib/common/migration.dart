@@ -52,6 +52,7 @@ class _AppMigrationStore implements MigrationStore {
       data.disabledRules,
       data.proxyGroups,
       clashProviders: data.clashProviders,
+      mitmModules: data.mitmModules,
     );
   }
 

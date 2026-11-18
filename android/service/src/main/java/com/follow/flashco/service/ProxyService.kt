@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import com.follow.flashco.core.Core
 import com.follow.flashco.service.modules.ServiceModules
 
 class ProxyService : Service(), ManagedService {
@@ -20,7 +19,7 @@ class ProxyService : Service(), ManagedService {
     }
 
     override fun onLowMemory() {
-        Core.forceGC()
+        lowCoreMemory()
         super.onLowMemory()
     }
 

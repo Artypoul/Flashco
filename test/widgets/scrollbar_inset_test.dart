@@ -1,11 +1,6 @@
-import 'package:flashco/common/common.dart';
-import 'package:flashco/widgets/inherited.dart';
-import 'package:flashco/widgets/scaffold.dart';
-import 'package:flashco/widgets/scroll.dart';
-import 'package:flashco/widgets/sheet.dart';
-import 'package:flashco/widgets/sheet_header.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/scrollbar.dart';
@@ -24,7 +19,7 @@ Widget _sheet(Widget body) {
     wrapInProviderScope: true,
     child: SheetProvider(
       type: SheetType.bottomSheet,
-      child: CommonScaffold(title: 'title', body: body),
+      child: Scaffold(title: 'title', body: body),
     ),
   );
 }
@@ -51,7 +46,7 @@ void main() {
           data: const MediaQueryData(padding: viewPadding),
           child: Directionality(
             textDirection: TextDirection.ltr,
-            child: CommonScrollBar(
+            child: Scrollbar(
               controller: ScrollController(),
               padding: const EdgeInsets.only(top: sheetAppBarHeight),
               child: Builder(
@@ -87,7 +82,7 @@ void main() {
     ),
     (
       'a bar given its controller',
-      (ScrollController controller) => CommonScrollBar(
+      (ScrollController controller) => Scrollbar(
         controller: controller,
         child: _list(controller: controller),
       ),
@@ -116,9 +111,9 @@ void main() {
       await tester.pumpWidget(
         TestApp(
           wrapInProviderScope: true,
-          child: CommonScaffold(
+          child: Scaffold(
             title: 'title',
-            body: CommonScrollBar(
+            body: Scrollbar(
               controller: controller,
               child: _list(controller: controller),
             ),
@@ -149,7 +144,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(CommonScrollBar), findsOneWidget);
+      expect(find.byType(Scrollbar), findsOneWidget);
       expect(_trackTop(tester), sheetAppBarHeight);
     },
   );
@@ -168,7 +163,7 @@ void main() {
             behavior: const BaseScrollBehavior(
               scrollbarPadding: ambientPadding,
             ),
-            child: CommonScrollBar(
+            child: Scrollbar(
               controller: controller,
               child: ListView(
                 controller: controller,
@@ -183,9 +178,7 @@ void main() {
         ),
       );
 
-      final bars = tester.widgetList<CommonScrollBar>(
-        find.byType(CommonScrollBar),
-      );
+      final bars = tester.widgetList<Scrollbar>(find.byType(Scrollbar));
       expect(bars.where((bar) => bar.controller == controller), hasLength(1));
       final nested = bars.singleWhere((bar) => bar.controller != controller);
       expect(nested.padding, ambientPadding);
@@ -219,7 +212,7 @@ void main() {
       '${type?.name ?? 'a page'} floats its bar over the list under it',
       variant: _everyPlatform,
       (tester) async {
-        final scaffold = CommonScaffold(title: 'title', body: _list());
+        final scaffold = Scaffold(title: 'title', body: _list());
         await tester.pumpWidget(
           TestApp(
             wrapInProviderScope: true,
@@ -230,8 +223,6 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final appBar = tester.widget<AppBar>(find.byType(AppBar));
-        expect(appBar.forceMaterialTransparency, isTrue);
         expect(
           find.ancestor(
             of: find.byType(AppBar),
@@ -256,7 +247,7 @@ void main() {
     await tester.pumpWidget(
       TestApp(
         wrapInProviderScope: true,
-        child: CommonScaffold(titleWidget: const TextField(), body: _list()),
+        child: Scaffold(titleWidget: const TextField(), body: _list()),
       ),
     );
     await tester.pumpAndSettle();
@@ -298,7 +289,7 @@ void main() {
       await tester.pumpWidget(
         TestApp(
           wrapInProviderScope: true,
-          child: CommonScaffold(
+          child: Scaffold(
             title: 'title',
             body: ListView.builder(
               itemCount: 100,

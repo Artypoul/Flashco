@@ -1,9 +1,6 @@
 import 'package:flashco/common/proxy.dart';
-import 'package:flashco/common/print.dart';
-import 'package:flashco/enum/enum.dart';
-import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProxyManager extends ConsumerStatefulWidget {
@@ -16,40 +13,12 @@ class ProxyManager extends ConsumerStatefulWidget {
 }
 
 class _ProxyManagerState extends ConsumerState<ProxyManager> {
-  Future<void> _pendingUpdate = Future.value();
-
-  Future<void> _updateProxy(ProxyState proxyState) async {
-    final isStart = proxyState.isStart;
-    final systemProxy = proxyState.systemProxy;
-    final port = proxyState.port;
-    bool? result;
-    if (isStart && systemProxy) {
-      result = await proxy?.startProxy(port, proxyState.bassDomain);
-    } else {
-      result = await proxy?.stopProxy();
-    }
-    if (result == false) {
-      commonPrint.log('update system proxy failed', logLevel: LogLevel.warning);
-    }
-  }
-
-  void _scheduleUpdateProxy(ProxyState proxyState) {
-    _pendingUpdate = _pendingUpdate
-        .then((_) => _updateProxy(proxyState))
-        .catchError((Object error) {
-          commonPrint.log(
-            'update system proxy failed: $error',
-            logLevel: LogLevel.warning,
-          );
-        });
-  }
-
   @override
   void initState() {
     super.initState();
     ref.listenManual(proxyStateProvider, (prev, next) {
       if (prev != next) {
-        _scheduleUpdateProxy(next);
+        systemProxyQueue?.apply(next);
       }
     }, fireImmediately: true);
   }

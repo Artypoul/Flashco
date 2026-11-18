@@ -1,69 +1,77 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
-
-import 'chip.dart';
-import 'list.dart';
+import 'package:flutter/widgets.dart';
 
 class RecordTextStyles {
-  final TextStyle? primary;
-  final TextStyle? secondary;
-  final TextStyle? muted;
+  final TextStyle title;
+  final TextStyle primary;
+  final TextStyle secondary;
 
-  const RecordTextStyles._({this.primary, this.secondary, this.muted});
+  const RecordTextStyles._({
+    required this.title,
+    required this.primary,
+    required this.secondary,
+  });
 
   factory RecordTextStyles.of(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final textTheme = context.textTheme;
-    final secondary = textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant,
-    );
     return RecordTextStyles._(
-      primary: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-      secondary: secondary,
-      muted: secondary?.copyWith(color: colorScheme.outline),
+      title: AppTextStyle.subheadline
+          .of(context, emphasized: true)
+          .copyWith(color: colorScheme.onSurface),
+      primary: AppTextStyle.subheadline
+          .of(context)
+          .copyWith(color: colorScheme.onSurface),
+      secondary: AppTextStyle.footnote
+          .of(context)
+          .copyWith(color: colorScheme.onSurfaceVariant),
     );
   }
 }
 
+const recordListGap = 8.0;
+
+const recordListEstimatedExtent = 100.0;
+
 class RecordListItem extends StatelessWidget {
   final Widget header;
   final Widget body;
-  final RecordTone tone;
   final VoidCallback? onTap;
 
   const RecordListItem({
     super.key,
     required this.header,
     required this.body,
-    this.tone = RecordTone.neutral,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final item = ListItem(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-      minVerticalPadding: 0,
-      minTileHeight: 0,
-      horizontalTitleGap: 12,
-      tileTitleAlignment: ListTileTitleAlignment.top,
-      color: tone.tintColor(context),
-      onTap: onTap,
-      title: header,
-      subtitle: Padding(padding: const EdgeInsets.only(top: 6), child: body),
-    );
-    final accentColor = tone.accentColor(context);
-    if (accentColor == null) {
-      return item;
-    }
-    return DecoratedBox(
-      position: DecorationPosition.foreground,
-      decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: accentColor, width: 3)),
+    final level = context.raisedSurfaceLevel;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: PressSurface(
+        fill: level.colorOf(context.colorScheme),
+        shape: AppShape.xl,
+        onPressed: onTap,
+        child: SurfaceScope(
+          level: level,
+          child: ListRow(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+            minVerticalPadding: 0,
+            minHeight: 0,
+            horizontalTitleGap: 12,
+            alignment: ListRowAlignment.top,
+            title: header,
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: body,
+            ),
+          ),
+        ),
       ),
-      child: item,
     );
   }
 }
@@ -78,11 +86,10 @@ class RecordHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final trailing = this.trailing;
     return DefaultTextStyle.merge(
-      style: context.textTheme.labelMedium?.copyWith(
-        color: context.colorScheme.onSurfaceVariant,
-        fontWeight: FontWeight.w400,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
+      style: AppTextStyle.caption1
+          .of(context)
+          .toTabular
+          .copyWith(color: context.colorScheme.onSurfaceVariant),
       child: SizedBox(
         width: double.infinity,
         child: Wrap(
@@ -135,20 +142,7 @@ class RecordTimestamp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final split = dateTime.lastIndexOf(' ');
-    return Text.rich(
-      TextSpan(
-        children: [
-          if (split > 0)
-            TextSpan(
-              text: dateTime.substring(0, split + 1),
-              style: TextStyle(color: context.colorScheme.outline),
-            ),
-          TextSpan(text: split > 0 ? dateTime.substring(split + 1) : dateTime),
-        ],
-      ),
-      maxLines: 1,
-    );
+    return Text(dateTime, maxLines: 1);
   }
 }
 
@@ -159,7 +153,7 @@ class RecordArrow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '→',
-      style: RecordTextStyles.of(context).muted?.toJetBrainsMono,
+      style: RecordTextStyles.of(context).secondary.toJetBrainsMono,
     );
   }
 }
@@ -178,7 +172,7 @@ class DetailRow extends StatelessWidget {
   Future<void> _copy(BuildContext context, String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) return;
-    context.showNotifier(context.appLocalizations.copySuccess);
+    dialogs.showBanner(context.appLocalizations.copySuccess);
   }
 
   @override
@@ -199,9 +193,11 @@ class DetailRow extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: DefaultTextStyle.merge(
                       textAlign: TextAlign.end,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
+                      style: AppTextStyle.subheadline
+                          .of(context)
+                          .copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
+                          ),
                       child: value,
                     ),
                   ),

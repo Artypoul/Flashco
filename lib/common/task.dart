@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/common/reality_defaults.dart';
+import 'package:flashco/common/mitm_module.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter/foundation.dart';
@@ -96,29 +97,41 @@ Future<ClashConfig> clashConfigTask(Map<String, dynamic> data) async {
 
 @visibleForTesting
 ClashConfig buildClashConfig(Map<String, dynamic> configMap) {
-  final clashConfig = ClashConfig.fromJson(configMap);
-  final proxyTypeMap = <String, String>{};
-  for (final proxy in clashConfig.proxies) {
-    proxyTypeMap[proxy.name] = proxy.type;
-  }
-  for (final proxyGroup in clashConfig.proxyGroups) {
-    proxyTypeMap[proxyGroup.name] = proxyGroup.type.value;
-  }
-  return clashConfig.copyWith(proxyTypeMap: proxyTypeMap);
+  return ClashConfig.fromJson(configMap);
 }
 
-Future<({String yaml, String md5})> makeRealProfileTask(
-  MakeRealProfileState data,
-) async {
-  return compute<MakeRealProfileState, ({String yaml, String md5})>(
-    _makeRealProfileTask,
-    data,
+typedef ConfigCounts = ({int groups, int proxies, int rules});
+
+typedef RealProfile = ({String yaml, String md5, ConfigCounts counts});
+
+/// Counts what the Core was handed, not what the profile file declares.
+ConfigCounts configCountsOf(Map<Object?, Object?> config) {
+  int lengthOf(Object? value) => value is List ? value.length : 0;
+  return (
+    groups: lengthOf(config['proxy-groups']),
+    proxies: lengthOf(config['proxies']),
+    rules: lengthOf(config['rules']),
   );
 }
 
-Future<({String yaml, String md5})> _makeRealProfileTask(
-  MakeRealProfileState data,
-) async {
+String? lastMatchTarget(List<String> rules) {
+  for (int i = rules.length - 1; i >= 0; i--) {
+    final parsed = Rule.parse(rules[i]);
+    if (parsed.ruleAction == RuleAction.MATCH) {
+      final target = parsed.ruleTarget;
+      if (target != null && target.isNotEmpty) {
+        return target;
+      }
+    }
+  }
+  return null;
+}
+
+Future<RealProfile> makeRealProfileTask(MakeRealProfileState data) async {
+  return compute<MakeRealProfileState, RealProfile>(_makeRealProfileTask, data);
+}
+
+Future<RealProfile> _makeRealProfileTask(MakeRealProfileState data) async {
   final rawConfig = Map.from(data.rawConfig);
   final realPatchConfig = data.realPatchConfig;
   final profilesPath = data.profilesPath;
@@ -191,9 +204,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
       rawConfig['interface-name'] = realPatchConfig.interfaceName;
   }
   rawConfig['external-ui-url'] = '';
-  rawConfig['tcp-concurrent'] = realPatchConfig.tcpConcurrent;
-  rawConfig['unified-delay'] = realPatchConfig.unifiedDelay;
-  rawConfig['ipv6'] = realPatchConfig.ipv6;
+  rawConfig.addAll(realPatchConfig.generalOverrideJson);
   rawConfig['log-level'] = realPatchConfig.logLevel.name;
   rawConfig['port'] = 0;
   rawConfig['socks-port'] = 0;
@@ -213,12 +224,25 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   rawConfig['authentication'] = data.authentication;
   rawConfig['skip-auth-prefixes'] = [];
   rawConfig['mode'] = realPatchConfig.mode.name;
-  rawConfig['tun'] = {
+  // auto-route is always on, so without auto-detect-interface the core sends
+  // its own outbound back into the TUN unless interface-name binds it, and
+  // interface-name wins over the detected interface anyway. A profile's own
+  // dns-hijack may leave queries to other resolvers unhijacked, so only a
+  // picked key replaces any:53.
+  final tun = {
     if (rawConfig['tun'] is Map) ...rawConfig['tun'] as Map,
+    'dns-hijack': defaultDnsHijack,
     ...overrides.tun.overrideJson(overrides.tunOverrideKeys),
-    ...realPatchConfig.tun.toJson(),
+    ...realPatchConfig.tun.coreJson,
+    'auto-detect-interface': true,
   };
-  rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
+  if (data.bypassPrivateRoute) {
+    tun['route-exclude-address'] = [
+      if (tun['route-exclude-address'] case final List routes) ...routes,
+      ...privateRouteAddress,
+    ];
+  }
+  rawConfig['tun'] = tun;
   rawConfig['geo-auto-update'] = realPatchConfig.geoAutoUpdate;
   rawConfig['geo-update-interval'] = realPatchConfig.geoUpdateInterval;
   final snifferOverride = overrides.sniffer.overrideJson(
@@ -240,6 +264,15 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
       }
     }
   }
+  final mitm = mergeMitmModules(realPatchConfig.mitm.hostname, [
+    for (final module in data.mitmModules)
+      parseMitmModule(
+        module.content,
+        values: module.arguments,
+        resources: module.resources,
+      ),
+  ]);
+  rawConfig['mitm'] = realPatchConfig.mitm.coreJson(mitm.mitm);
   if (rawConfig['profile'] == null) {
     rawConfig['profile'] = {};
   }
@@ -335,16 +368,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
       }
 
       if (hasMatchPlaceholder && replacementTarget == null) {
-        for (int i = rules.length - 1; i >= 0; i--) {
-          final parsed = Rule.parse(rules[i]);
-          if (parsed.ruleAction == RuleAction.MATCH) {
-            final target = parsed.ruleTarget;
-            if (target != null && target.isNotEmpty) {
-              replacementTarget = target;
-              break;
-            }
-          }
-        }
+        replacementTarget = lastMatchTarget(rules);
       }
       final List<String> finalAddedRules;
 
@@ -373,11 +397,11 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
         .map((item) => item.definition)
         .toList();
   }
-  rawConfig['rules'] = rules;
+  rawConfig['rules'] = [...mitm.rules, ...rules];
   final yaml = await _encodeYaml(
     applyRealityDefaults(Map<String, dynamic>.from(rawConfig)),
   );
-  return (yaml: yaml, md5: yaml.toMd5());
+  return (yaml: yaml, md5: yaml.toMd5(), counts: configCountsOf(rawConfig));
 }
 
 typedef ShakingStoreArgs = ({

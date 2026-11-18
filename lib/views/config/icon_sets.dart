@@ -3,13 +3,14 @@ import 'dart:convert';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/profiles/custom/icon.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class IconSetsView extends ConsumerStatefulWidget {
@@ -33,7 +34,8 @@ class _IconSetsViewState extends ConsumerState<IconSetsView> {
   }
 
   Future<void> _handleImportFromUrl() async {
-    final res = await dialogs.showNamedUrlInput(
+    final res = await showNamedUrlForm(
+      context,
       title: context.appLocalizations.importUrl,
     );
     if (res == null || !mounted) {
@@ -73,14 +75,15 @@ class _IconSetsViewState extends ConsumerState<IconSetsView> {
               : appLocalizations.emptyTip(appLocalizations.name),
         ),
       );
-      if (name != null) {
+      if (name != null && mounted) {
         ref
             .read(iconSetsProvider.notifier)
             .put(iconSet.copyWith(name: name.trim()));
       }
       return;
     }
-    final res = await dialogs.showNamedUrlInput(
+    final res = await showNamedUrlForm(
+      context,
       title: appLocalizations.options,
       label: iconSet.name,
       url: iconSet.url,
@@ -104,8 +107,10 @@ class _IconSetsViewState extends ConsumerState<IconSetsView> {
     final res = await dialogs.showMessage(
       title: appLocalizations.tip,
       message: TextSpan(text: appLocalizations.deleteTip(iconSet.name)),
+      destructive: true,
+      confirmText: appLocalizations.delete,
     );
-    if (res == true) {
+    if (res == true && mounted) {
       ref.read(iconSetsProvider.notifier).del(iconSet.id);
     }
   }
@@ -114,25 +119,25 @@ class _IconSetsViewState extends ConsumerState<IconSetsView> {
     unawaited(BaseNavigator.push(context, _IconSetPreviewView(iconSet.id)));
   }
 
-  List<CommonPopupMenuItem> _buildMenuItems(IconSet iconSet) {
+  List<PopupMenuItem> _buildMenuItems(IconSet iconSet) {
     final appLocalizations = context.appLocalizations;
     return [
       if (iconSet.isRemote)
-        CommonPopupMenuItem(
+        PopupMenuItem(
           glyph: AppGlyphs.sync,
           label: appLocalizations.sync,
           onPressed: () {
             _run(() => _iconSetsAction.sync(iconSet), title: iconSet.name);
           },
         ),
-      CommonPopupMenuItem(
+      PopupMenuItem(
         glyph: AppGlyphs.settings,
         label: appLocalizations.options,
         onPressed: () {
           _handleEditOptions(iconSet);
         },
       ),
-      CommonPopupMenuItem(
+      PopupMenuItem(
         danger: true,
         glyph: AppGlyphs.delete,
         label: appLocalizations.delete,
@@ -191,11 +196,11 @@ class _IconSetsViewState extends ConsumerState<IconSetsView> {
         label: appLocalizations.nullTip(appLocalizations.iconSets),
         illustration: NullStatusIllustration.icons,
       ),
-      child: ReorderableListView.builder(
-        padding: const EdgeInsets.all(
-          16,
-        ).copyWith(top: context.contentTopPadding),
-        buildDefaultDragHandles: false,
+      child: PrismReorderableListView(
+        padding: const EdgeInsets.all(16).copyWith(
+          top: context.contentTopPadding,
+          bottom: 16 + context.bottomInset,
+        ),
         itemCount: iconSets.length,
         itemBuilder: (_, index) => _buildItem(iconSets, index),
         proxyDecorator: (_, index, animation) {
@@ -215,29 +220,26 @@ class _IconSetsViewState extends ConsumerState<IconSetsView> {
     final appLocalizations = context.appLocalizations;
     final state = ref.watch(iconSetsProvider);
     final iconSets = state.value ?? [];
-    return CommonScaffold(
+    return Scaffold(
       canSort: iconSets.length > 1,
       isLoading: ref.watch(loadingProvider(LoadingTag.iconSets)),
       actions: [
-        CommonPopupBox(
+        PopupAnchor(
           targetBuilder: (open) {
             return IconButton(
               tooltip: appLocalizations.add,
-              onPressed: () {
-                final isMobile = ref.read(isMobileViewProvider);
-                open(offset: Offset(0, isMobile ? 0 : 20));
-              },
+              onPressed: open,
               icon: const GlyphIcon(AppGlyphs.addCircle),
             );
           },
-          popupBuilder: (_) => CommonPopupMenu(
+          popupBuilder: (_) => PopupMenu(
             items: [
-              CommonPopupMenuItem(
+              PopupMenuItem(
                 glyph: AppGlyphs.cloudDownload,
                 label: appLocalizations.importUrl,
                 onPressed: _handleImportFromUrl,
               ),
-              CommonPopupMenuItem(
+              PopupMenuItem(
                 glyph: AppGlyphs.importFile,
                 label: appLocalizations.importFile,
                 onPressed: _handleImportFromFile,
@@ -277,7 +279,7 @@ class _IconSetPreviewViewState extends ConsumerState<_IconSetPreviewView> {
     final icons = (iconSet?.icons ?? const <IconSetIcon>[])
         .whereMatches(_query, (icon) => [icon.label])
         .toList();
-    return CommonScaffold(
+    return Scaffold(
       title: iconSet?.name ?? context.appLocalizations.iconSets,
       searchState: AppBarSearchState(
         onSearch: (query) {
@@ -303,7 +305,7 @@ class _IconSetPreviewViewState extends ConsumerState<_IconSetPreviewView> {
               ),
               SliverIconGrid(icons: icons),
               SliverToBoxAdapter(
-                child: SizedBox(height: 20 + BottomInsetScope.of(context)),
+                child: SizedBox(height: 20 + context.bottomInset),
               ),
             ],
           ),

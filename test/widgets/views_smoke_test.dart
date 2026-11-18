@@ -1,5 +1,5 @@
-import 'package:flashco/features/form/form.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/action.dart';
 import 'package:flashco/providers/app.dart';
@@ -8,46 +8,46 @@ import 'package:flashco/providers/database.dart';
 import 'package:flashco/providers/state.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/config/advanced.dart';
-import 'package:flashco/views/config/custom_resources.dart';
 import 'package:flashco/views/config/dns.dart';
-import 'package:flashco/views/config/ntp.dart';
-import 'package:flashco/views/config/sniffer.dart';
-import 'package:flashco/views/config/tun.dart';
+import 'package:flashco/views/config/filters.dart';
 import 'package:flashco/views/config/general.dart';
 import 'package:flashco/views/config/network.dart';
+import 'package:flashco/views/config/ntp.dart';
 import 'package:flashco/views/config/on_demand.dart';
-import 'package:flashco/views/config/filters.dart';
 import 'package:flashco/views/config/rules.dart';
 import 'package:flashco/views/config/scripts.dart';
+import 'package:flashco/views/config/sniffer.dart';
+import 'package:flashco/views/config/tun.dart';
 import 'package:flashco/views/config/user_agents.dart';
 import 'package:flashco/views/hotkey.dart';
 import 'package:flashco/views/profiles/custom/custom.dart';
 import 'package:flashco/views/profiles/custom/custom_proxies.dart';
 import 'package:flashco/views/profiles/custom/rules.dart';
 import 'package:flashco/views/proxies/list.dart';
-import 'package:flashco/views/proxies/providers.dart';
 import 'package:flashco/views/proxies/tab.dart';
 import 'package:flashco/views/theme.dart';
 import 'package:flashco/views/views.dart';
-import 'package:flashco/widgets/paged_sheet.dart';
-import 'package:flashco/widgets/popup.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_app.dart';
 import '../helpers/test_database_providers.dart';
 import '../helpers/test_profiles.dart';
+import '../helpers/host_scaffold.dart';
+import 'package:prism_ui/prism_ui.dart';
 
-Finder _portField(String label) =>
-    find.ancestor(of: find.text(label), matching: find.byType(TextFormField));
+Finder _portField(String label) => find.descendant(
+  of: find.widgetWithText(FormRow, label),
+  matching: find.byType(TextFormField),
+);
 
 void main() {
   final cases = <String, Widget>{
     'dashboard': const DashboardView(),
     'proxies': const ProxiesView(),
     'profiles': const ProfilesView(),
-    'requests': const RequestsView(),
+    'requests': const RequestsView(initialFeed: RequestFeed.recent),
     'dns queries': const DnsQueriesView(),
     'resources': const ResourcesView(),
     'logs': const LogsView(),
@@ -57,15 +57,13 @@ void main() {
     'ntp config': NtpView(1),
     'sniffer config': SnifferView(1),
     'tun config': TunView(1),
-    'network config': const Scaffold(body: NetworkListView()),
+    'network config': const HostScaffold(body: NetworkListView()),
     'advanced config': const AdvancedConfigView(),
-    'custom profile resources': const CustomResourcesView(),
     'on demand config': const OnDemandView(),
     'theme': const ThemeView(),
     'backup and restore': const BackupAndRestore(),
     'hotkeys': const HotKeyView(),
     'access control': const AccessView(),
-    'proxy providers': const ProvidersView(),
     'added rules': const AddedRulesView(),
     'scripts': const ScriptsView(),
     'user agents': const UserAgentsView(),
@@ -121,7 +119,6 @@ void main() {
     'Backup and restore': BackupAndRestore,
     'General': GeneralView,
     'Advanced configuration': AdvancedConfigView,
-    'Custom profile resources': CustomResourcesView,
   };
 
   for (final entry in toolDestinations.entries) {
@@ -162,6 +159,49 @@ void main() {
     });
   }
 
+  testWidgets('custom resources list directly in advanced config', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final container = ProviderContainer(
+      overrides: [profilesProvider.overrideWith(TestProfiles.new)],
+    );
+    addTearDown(container.dispose);
+    globalState.container = container;
+    container
+        .read(viewSizeProvider.notifier)
+        .update((_) => const Size(1400, 1000));
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const TestApp(child: ToolsView()),
+      ),
+    );
+    await tester.pump();
+
+    final advanced = find.text('Advanced configuration');
+    await tester.scrollUntilVisible(
+      advanced,
+      500,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(advanced);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Custom'), findsOneWidget);
+
+    await tester.tap(find.text('Filters'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FiltersView), findsOneWidget);
+    expect(tester.takeException(), null);
+  });
+
   testWidgets('user agent item opens the page that applies a preset', (
     tester,
   ) async {
@@ -183,7 +223,7 @@ void main() {
       UncontrolledProviderScope(
         container: container,
         child: TestApp(
-          child: Scaffold(body: ListView(children: const [UaItem()])),
+          child: HostScaffold(body: ListView(children: const [UaItem()])),
         ),
       ),
     );
@@ -204,9 +244,7 @@ void main() {
     expect(tester.takeException(), null);
   });
 
-  testWidgets('port dialog validates the fields the expander hides', (
-    tester,
-  ) async {
+  testWidgets('the port form refuses an emptied port', (tester) async {
     tester.view.physicalSize = const Size(1000, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -225,7 +263,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const TestApp(child: Scaffold(body: PortItem())),
+        child: const TestApp(child: HostScaffold(body: PortItem())),
       ),
     );
     await tester.pump();
@@ -233,17 +271,10 @@ void main() {
     await tester.tap(find.text('Port').first);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Expand'));
-    await tester.pumpAndSettle();
-
     await tester.enterText(_portField('SOCKS port'), '');
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Collapse'));
-    await tester.pumpAndSettle();
-    expect(_portField('SOCKS port'), findsNothing);
-
-    await tester.tap(find.text('Submit'));
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), null);
@@ -289,6 +320,10 @@ void main() {
     container
         .read(viewSizeProvider.notifier)
         .update((_) => const Size(1400, 1000));
+    container.listen(proxiesStyleSettingProvider, (_, _) {});
+    container
+        .read(proxiesStyleSettingProvider.notifier)
+        .update((state) => state.copyWith(type: ProxiesType.tab));
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -418,10 +453,10 @@ void main() {
       }
 
       if (view is CustomRulesView) {
-        final list = tester.widget<ReorderableListView>(
-          find.byType(ReorderableListView),
+        final list = tester.widget<PrismReorderableListView>(
+          find.byType(PrismReorderableListView),
         );
-        list.onReorderItem!(0, 1);
+        list.onReorderItem(0, 1);
         await tester.pump();
 
         await tester.tap(find.byType(Checkbox).first);
@@ -439,7 +474,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(
           find.descendant(
-            of: find.byType(CommonPopupMenu),
+            of: find.byType(PopupMenu),
             matching: find.text('Add'),
           ),
         );
@@ -454,8 +489,8 @@ void main() {
 
       if (view is CustomProfileView) {
         await tester.pumpAndSettle();
-        final list = tester.widget<SliverReorderableList>(
-          find.byType(SliverReorderableList),
+        final list = tester.widget<SliverPrismReorderableList>(
+          find.byType(SliverPrismReorderableList),
         );
         list.onReorderItem!(0, 1);
         await tester.pump();

@@ -5,7 +5,7 @@ import 'package:flashco/manager/locale_manager.dart';
 import 'package:flashco/manager/tray_manager.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:tray/tray.dart';
 
 import '../helpers/test_profiles.dart';
+import '../helpers/test_app.dart';
 
 const _trayChannel = MethodChannel('tray');
 const _windowChannel = MethodChannel('window');
@@ -105,7 +106,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(home: TrayManager(child: SizedBox.shrink())),
+        child: const HostApp(home: TrayManager(child: SizedBox.shrink())),
       ),
     );
     await tester.pump();
@@ -118,13 +119,8 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(
+        child: HostApp(
           locale: locale,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: AppLocalizations.delegate.supportedLocales,
           home: const LocaleManager(
             child: TrayManager(child: SizedBox.shrink()),
           ),

@@ -1,13 +1,10 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/features.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/clash_config.dart';
-import 'package:flashco/models/common.dart';
-import 'package:flashco/models/state.dart';
 import 'package:flashco/providers/providers.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AddedRulesView extends ConsumerStatefulWidget {
@@ -35,8 +32,9 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
   }
 
   Future<void> _handleAddOrUpdate([Rule? rule]) async {
-    final res = await dialogs.showCommonDialog<Rule>(
-      child: AddOrEditRuleDialog(rule: rule),
+    final res = await showFormSheet<Rule>(
+      context: context,
+      builder: (_) => RuleForm(rule: rule),
     );
     if (res == null || !mounted) {
       return;
@@ -47,8 +45,9 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
   void _handleQuickActions() {
     showSheet<void>(
       context: context,
-      builder: (_) =>
-          RulePresetSheet(onAdd: ref.read(globalRulesProvider.notifier).putAll),
+      builder: (_) => RulePresetSheet(
+        onAdd: (rules) => ref.read(globalRulesProvider.notifier).putAll(rules),
+      ),
     );
   }
 
@@ -76,6 +75,8 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
       message: TextSpan(
         text: appLocalizations.deleteMultipTip(appLocalizations.rule),
       ),
+      destructive: true,
+      confirmText: appLocalizations.delete,
     );
     if (res != true || !mounted) {
       return;
@@ -110,17 +111,14 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
         tooltip: appLocalizations.selectAll,
       ),
     ];
-    return CommonPopScope(
-      onPop: (_) {
-        if (selectedRules.isNotEmpty) {
-          ref.read(itemsProvider(_key).notifier).value = {};
-          return false;
-        }
-        Navigator.of(context).pop();
-        return false;
-      },
-
-      child: CommonScaffold(
+    return PopGuard(
+      onPop: isSelecting
+          ? (_) {
+              ref.read(itemsProvider(_key).notifier).value = {};
+              return false;
+            }
+          : null,
+      child: Scaffold(
         title: appLocalizations.addedRules,
         searchState: AppBarSearchState(onSearch: _handleSearch),
         actions: [
@@ -134,7 +132,7 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
         iconActions: [
           if (!isSelecting)
             IconButtonData(
-              glyph: AppGlyphs.bolt,
+              glyph: AppGlyphs.rulePresets,
               onPressed: _handleQuickActions,
               tooltip: appLocalizations.quickActions,
             ),
@@ -150,21 +148,20 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
           ),
           child: Builder(
             builder: (context) => isSearching
-                ? ListView.builder(
+                ? PrismListView(
                     padding: _listPadding(context),
                     itemBuilder: (_, index) =>
                         _buildRuleItem(rules, index, selectedRules),
                     itemExtent: ruleItemHeight,
                     itemCount: rules.length,
                   )
-                : ReorderableList(
+                : PrismReorderableListView(
                     padding: _listPadding(context),
-                    itemBuilder: (_, index) =>
-                        ReorderableDelayedDragStartListener(
-                          key: ObjectKey(rules[index]),
-                          index: index,
-                          child: _buildRuleItem(rules, index, selectedRules),
-                        ),
+                    itemBuilder: (_, index) => ReorderDragStartListener(
+                      key: ObjectKey(rules[index]),
+                      index: index,
+                      child: _buildRuleItem(rules, index, selectedRules),
+                    ),
                     proxyDecorator: (child, index, animation) =>
                         commonProxyDecorator(
                           _buildRuleItem(rules, index, selectedRules),
@@ -173,7 +170,9 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
                         ),
                     itemExtent: ruleItemHeight,
                     itemCount: rules.length,
-                    onReorderItem: ref.read(globalRulesProvider.notifier).order,
+                    onReorderItem: (oldIndex, newIndex) => ref
+                        .read(globalRulesProvider.notifier)
+                        .order(oldIndex, newIndex),
                   ),
           ),
         ),
@@ -185,7 +184,7 @@ class _AddedRulesViewState extends ConsumerState<AddedRulesView> {
     16,
     context.contentTopPadding,
     16,
-    16 + BottomInsetScope.of(context),
+    16 + context.bottomInset,
   );
 
   Widget _buildRuleItem(List<Rule> rules, int index, Set<dynamic> selected) {

@@ -196,8 +196,11 @@ extension _RendererCaret on _CodeFieldRenderer {
     final screenY = screenYBase + rowTop;
 
     final baseColor =
-        textStyle?.color ?? editorTheme['root']?.color ?? Colors.white;
-    final bgColor = editorTheme['root']?.backgroundColor ?? Colors.black;
+        textStyle?.color ??
+        editorTheme['root']?.color ??
+        const Color(0xFFFFFFFF);
+    final bgColor =
+        editorTheme['root']?.backgroundColor ?? const Color(0xFF000000);
     final fontSize = textStyle?.fontSize ?? 14.0;
     final fontFamily = textStyle?.fontFamily;
     final overlayParagraphStyle = ui.ParagraphStyle(
@@ -221,6 +224,7 @@ extension _RendererCaret on _CodeFieldRenderer {
         color: baseColor,
         fontSize: fontSize,
         fontFamily: fontFamily,
+        fontFamilyFallback: textStyle?.fontFamilyFallback,
         decoration: TextDecoration.underline,
         decorationColor: baseColor.withAlpha(150),
       ),
@@ -260,6 +264,7 @@ extension _RendererCaret on _CodeFieldRenderer {
           color: baseColor,
           fontSize: fontSize,
           fontFamily: fontFamily,
+          fontFamilyFallback: textStyle?.fontFamilyFallback,
           fontWeight: textStyle?.fontWeight,
         ),
       );

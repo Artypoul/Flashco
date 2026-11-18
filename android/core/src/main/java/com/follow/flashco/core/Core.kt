@@ -8,7 +8,12 @@ import java.net.InetSocketAddress
 import java.net.URI
 
 object Core {
+    /** Loads the Go library and runs its package init, which the first call otherwise pays for. */
+    fun load() = Mobile.touch()
+
     fun forceGC() = Mobile.forceGC()
+
+    fun setMitmPressure(level: Int) = Mobile.setMitmPressure(level)
 
     fun updateDNS(
         dns: String,
@@ -67,10 +72,10 @@ object Core {
     }
 
     fun updateEventListener(
-        callback: ((result: String?) -> Unit)?,
+        callback: ((result: ByteArray) -> Unit)?,
     ) {
         Mobile.setEventListener(
-            callback?.let { ResultHandler { result -> it(result?.decodeToString()) } },
+            callback?.let { ResultHandler { result -> it(result ?: ByteArray(0)) } },
         )
     }
 

@@ -4,13 +4,13 @@ import 'package:flashco/common/common.dart';
 import 'package:flashco/common/system_dns.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
+import 'package:flashco/providers/mitm.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
-import 'package:flashco/widgets/animated_visibility.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flashco/widgets/icon.dart';
-import 'package:flashco/widgets/sidebar.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppStateManager extends ConsumerStatefulWidget {
@@ -90,6 +90,10 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     _updateVisible(state);
     if (state == AppLifecycleState.resumed) {
       unawaited(ref.read(locationPermissionsProvider.notifier).refresh());
+      // A certificate removed meanwhile stops decryption before the next start.
+      if (mitmFeature && ref.read(patchClashConfigProvider).mitm.enable) {
+        unawaited(ref.read(mitmTrustStateProvider.notifier).refresh());
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {
           return;
@@ -190,18 +194,6 @@ class AppSidebarContainer extends ConsumerWidget {
 
   const AppSidebarContainer({super.key, required this.child});
 
-  Widget _buildBackground({
-    required Color color,
-    required Color edge,
-    required Widget child,
-  }) {
-    return Material(
-      color: color,
-      shape: BorderDirectional(end: BorderSide(color: edge)),
-      child: child,
-    );
-  }
-
   void _updateSideBarWidth(WidgetRef ref, double contentWidth) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(sideWidthProvider.notifier).value =
@@ -233,9 +225,9 @@ class AppSidebarContainer extends ConsumerWidget {
     final navigationItems = navigationState.navigationItems;
     final viewMode = navigationState.viewMode;
     final currentIndex = navigationState.currentIndex;
-    final blur = ref.watch(windowBlurProvider);
-    final colorScheme = context.colorScheme;
-    final surfaceContainer = colorScheme.surfaceContainer;
+    final backdropOpacity = ref.watch(windowBlurProvider);
+    final page = SurfaceLevel.page.colorOf(context.colorScheme);
+    final chrome = context.colorScheme.chromeSurface;
     void onSelected(int index) {
       _handleToPage(ref, navigationItems[index].label);
     }
@@ -243,16 +235,16 @@ class AppSidebarContainer extends ConsumerWidget {
     final hasSidebar = viewMode != ViewMode.mobile;
     final isLtr = Directionality.of(context) == TextDirection.ltr;
     return Container(
-      color: blur ? Colors.transparent : surfaceContainer,
+      color: backdropOpacity != null ? Colors.transparent : page,
       child: Row(
         children: [
           AnimatedVisibility.sidebar(
             visible: hasSidebar,
-            child: _buildBackground(
-              color: blur
-                  ? surfaceContainer.withValues(alpha: kSidebarBlurOpacity)
-                  : surfaceContainer,
-              edge: colorScheme.outlineVariant,
+            child: Surface(
+              color: backdropOpacity != null
+                  ? chrome.withValues(alpha: backdropOpacity)
+                  : chrome,
+              shape: BorderDirectional(end: Divider.createBorderSide(context)),
               child: MediaQuery.removePadding(
                 context: context,
                 removeLeft: !isLtr,

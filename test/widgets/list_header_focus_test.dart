@@ -1,18 +1,17 @@
-import 'package:flashco/common/common.dart';
-import 'package:flashco/common/theme.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/proxies/list.dart';
 import 'package:flashco/views/proxies/proxies.dart';
-import 'package:material_ui/material_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+import 'package:prism_ui/prism_ui.dart' hide ListHeader;
 
 void main() {
   Future<ProviderContainer> pumpListLayout(
@@ -62,16 +61,9 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: AppLocalizations.delegate.supportedLocales,
+        child: HostApp(
           builder: (context, child) {
-            globalState.measure = Measure.of(context, 1);
-            globalState.theme = CommonTheme.of(context, 1);
-            return child!;
+            return wrapAppScopes(context, child!);
           },
           home: const ProxiesView(),
         ),
@@ -86,7 +78,7 @@ void main() {
     final ctx = FocusManager.instance.primaryFocus?.context;
     if (ctx == null) return false;
     return ctx.findAncestorWidgetOfExactType<ListHeader>() != null &&
-        ctx.findAncestorWidgetOfExactType<FilledButton>() != null &&
+        ctx.findAncestorWidgetOfExactType<Card>() != null &&
         ctx.findAncestorWidgetOfExactType<IconButton>() == null;
   }
 

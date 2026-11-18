@@ -8,7 +8,7 @@ import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DeveloperView extends ConsumerWidget {
@@ -16,14 +16,14 @@ class DeveloperView extends ConsumerWidget {
 
   Widget _getDeveloperList(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
-    return generateSectionV3(
+    return generateSection(
       title: appLocalizations.options,
       items: [
         ListItem(
           title: Text(appLocalizations.messageTest),
           onTap: () {
-            for (final level in MessageLevel.values) {
-              context.showNotifier(
+            for (final level in BannerLevel.values) {
+              dialogs.showBanner(
                 '${level.name}: ${appLocalizations.messageTestTip}',
                 level: level,
               );
@@ -51,11 +51,22 @@ class DeveloperView extends ConsumerWidget {
               final coreAction = ref.read(coreActionProvider.notifier);
               final res = await dialogs.showMessage(
                 message: TextSpan(text: appLocalizations.confirmForceCrashCore),
+                destructive: true,
               );
               if (res != true) {
                 return;
               }
               unawaited(coreAction.crash());
+            },
+          ),
+        if (selfUpdateSuffix != null)
+          ListItem(
+            title: Text(appLocalizations.updateDownloadTest),
+            onTap: () {
+              if (ref.read(loadingProvider(LoadingTag.checkUpdate))) return;
+              unawaited(
+                ref.read(commonActionProvider.notifier).testUpdateDownload(),
+              );
             },
           ),
         ListItem(
@@ -64,6 +75,8 @@ class DeveloperView extends ConsumerWidget {
             final storeAction = ref.read(storeActionProvider.notifier);
             final res = await dialogs.showMessage(
               message: TextSpan(text: appLocalizations.confirmClearAllData),
+              destructive: true,
+              confirmText: appLocalizations.clearData,
             );
             if (res != true) {
               return;
@@ -90,11 +103,12 @@ class DeveloperView extends ConsumerWidget {
     return BaseScaffold(
       title: appLocalizations.developerMode,
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ).copyWith(top: context.contentTopPadding, bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+          top: context.sectionsTopPadding,
+          bottom: 16 + context.bottomInset,
+        ),
         children: [
-          generateSectionV3(
+          generateSection(
             items: [
               ListItem.toggle(
                 title: Text(appLocalizations.developerMode),

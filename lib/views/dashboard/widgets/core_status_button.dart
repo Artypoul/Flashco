@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 class CoreStatusButton extends ConsumerStatefulWidget {
   const CoreStatusButton({super.key});
@@ -72,13 +73,13 @@ class _CoreStatusButtonState extends ConsumerState<CoreStatusButton> {
         ? context.appLocalizations.forceRestartCoreTip
         : context.appLocalizations.restartCoreTip;
     final res = await dialogs.showMessage(message: TextSpan(text: tip));
-    if (res != true) {
+    if (res != true || !mounted) {
       return;
     }
     try {
       await ref.read(coreActionProvider.notifier).restartCore();
     } catch (error) {
-      dialogs.showNotifier(error.toString(), level: MessageLevel.error);
+      dialogs.showBanner(error.toString(), level: BannerLevel.error);
     }
   }
 
@@ -86,67 +87,67 @@ class _CoreStatusButtonState extends ConsumerState<CoreStatusButton> {
   Widget build(BuildContext context) {
     final coreStatus = _holdTimer != null ? CoreStatus.connecting : _status;
     final appLocalizations = context.appLocalizations;
+    final colorScheme = context.colorScheme;
+    final statusColor = switch (coreStatus) {
+      CoreStatus.connecting => null,
+      CoreStatus.connected => colorScheme.successContainer,
+      CoreStatus.disconnected => colorScheme.errorContainer,
+    };
+    final statusForeground = switch (coreStatus) {
+      CoreStatus.connecting => null,
+      CoreStatus.connected => colorScheme.onSuccessContainer,
+      CoreStatus.disconnected => colorScheme.onErrorContainer,
+    };
+    final pane = TonalButtonTheme.glassOf(context) && statusColor != null
+        ? LiquidGlassStyle.tinted(colorScheme, statusColor)
+        : null;
+    final iconOnly =
+        coreStatus == CoreStatus.connected || ViewScope.isMobileOf(context);
+    final icon = switch (coreStatus) {
+      CoreStatus.connecting => ActivityIndicator(
+        color: iconOnly ? null : colorScheme.onPrimary,
+      ),
+      CoreStatus.connected => const GlyphIcon(AppGlyphs.check, fill: 1),
+      CoreStatus.disconnected => const GlyphIcon(AppGlyphs.refresh, fill: 1),
+    };
     return Tooltip(
       message: appLocalizations.coreStatus,
       child: FadeScaleBox(
         alignment: Alignment.centerRight,
-        child: coreStatus == CoreStatus.connected
+        child: iconOnly
             ? IconButton.filled(
-                style: ElasticPress.buttonStyle.merge(
-                  IconButton.styleFrom(
-                    backgroundColor: context.colorScheme.success,
-                    foregroundColor: switch (Theme.brightnessOf(context)) {
-                      Brightness.light => context.colorScheme.onSurfaceVariant,
-                      Brightness.dark =>
-                        context.colorScheme.onPrimaryFixedVariant,
-                    },
-                  ),
+                key: ValueKey(coreStatus),
+                style: ButtonStyle.from(
+                  backgroundColor: pane == null
+                      ? statusColor
+                      : Colors.transparent,
+                  foregroundColor: statusForeground,
+                  backgroundBuilder: pane == null
+                      ? null
+                      : LiquidGlass.buttonBackground((_) => pane),
+                  pressLook: PressLook.none,
                 ),
                 onPressed: _handleConnection,
-                icon: const GlyphIcon(AppGlyphs.check, fill: 1),
+                icon: icon,
               )
             : FilledButton.icon(
                 key: ValueKey(coreStatus),
                 onPressed: _handleConnection,
-                style: ElasticPress.buttonStyle.merge(
-                  FilledButton.styleFrom(
-                    backgroundColor: switch (coreStatus) {
-                      CoreStatus.connecting => null,
-                      CoreStatus.connected => context.colorScheme.success,
-                      CoreStatus.disconnected => context.colorScheme.error,
-                    },
-                    foregroundColor: switch (coreStatus) {
-                      CoreStatus.connecting => null,
-                      CoreStatus.connected => switch (Theme.brightnessOf(
-                        context,
-                      )) {
-                        Brightness.light =>
-                          context.colorScheme.onSurfaceVariant,
-                        Brightness.dark => null,
-                      },
-                      CoreStatus.disconnected => context.colorScheme.onError,
-                    },
-                  ),
+                style: ButtonStyle.from(
+                  backgroundColor: pane == null
+                      ? statusColor
+                      : Colors.transparent,
+                  foregroundColor: statusForeground,
+                  backgroundBuilder: pane == null
+                      ? null
+                      : LiquidGlass.buttonBackground((_) => pane),
+                  pressLook: PressLook.none,
                 ),
-                icon: SizedBox(
-                  height: globalState.measure.bodyMediumHeight,
-                  width: globalState.measure.bodyMediumHeight,
-                  child: switch (coreStatus) {
-                    CoreStatus.connecting => Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: CommonCircleLoading(
-                        color: context.colorScheme.onPrimary,
-                      ),
-                    ),
-                    CoreStatus.connected => const GlyphIcon(
-                      AppGlyphs.check,
-                      fill: 1,
-                    ),
-                    CoreStatus.disconnected => const GlyphIcon(
-                      AppGlyphs.refresh,
-                      fill: 1,
-                    ),
-                  },
+                icon: SizedBox.square(
+                  dimension: globalState.measure.textHeight(
+                    AppTextStyle.subheadline,
+                  ),
+                  child: icon,
                 ),
                 label: Text(switch (coreStatus) {
                   CoreStatus.connecting => appLocalizations.connecting,

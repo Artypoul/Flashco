@@ -1,9 +1,10 @@
 import 'package:flashco/common/constant.dart';
 import 'package:flashco/providers/providers.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_color_utilities/hct/hct.dart';
+import 'package:prism_ui/hct/hct.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 void main() {
   test(
@@ -31,22 +32,22 @@ void main() {
           accentColor: const Color(defaultPrimaryColor),
         );
 
-    final variant = container.read(themeSettingProvider).schemeVariant;
+    final style = container.read(themeSettingProvider).colorStyle;
 
     expect(
       container.read(genColorSchemeProvider(Brightness.light)),
-      ColorScheme.fromSeed(
+      seededColorScheme(
         seedColor: lightSeed,
         brightness: Brightness.light,
-        dynamicSchemeVariant: variant,
+        style: style,
       ),
     );
     expect(
       container.read(genColorSchemeProvider(Brightness.dark)),
-      ColorScheme.fromSeed(
+      seededColorScheme(
         seedColor: darkSeed,
         brightness: Brightness.dark,
-        dynamicSchemeVariant: variant,
+        style: style,
       ),
     );
   });
@@ -87,12 +88,10 @@ void main() {
 
     expect(
       container.read(genColorSchemeProvider(Brightness.light)),
-      ColorScheme.fromSeed(
+      seededColorScheme(
         seedColor: accent,
         brightness: Brightness.light,
-        dynamicSchemeVariant: container
-            .read(themeSettingProvider)
-            .schemeVariant,
+        style: container.read(themeSettingProvider).colorStyle,
       ),
     );
   });
