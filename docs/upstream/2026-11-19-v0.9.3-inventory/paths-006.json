@@ -1,0 +1,1154 @@
+[
+  {
+    "path": "core/connection.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d746fecfd6f4ceef37159d58dca78f80dcc13ecb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d746fecfd6f4ceef37159d58dca78f80dcc13ecb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a18014b8eeb0f14c8ca18e5f70c4f41145071214"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/connection_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fcf7c040e97b59fd75ec35086965d7f77f73042a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fcf7c040e97b59fd75ec35086965d7f77f73042a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fcf7c040e97b59fd75ec35086965d7f77f73042a"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/delay.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41d69e0adc8b5d5d0bd4e54b93d6110db711d45e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41d69e0adc8b5d5d0bd4e54b93d6110db711d45e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b06883840a9b0a2905a297097cda4a75238c40b7"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/dial_pipe.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba7e16430f84a74e0ffdfade2e54b6b768db7b74"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba7e16430f84a74e0ffdfade2e54b6b768db7b74"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba7e16430f84a74e0ffdfade2e54b6b768db7b74"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/dial_socket.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23a5b33d04f8fe31ade6e44802792792465c5ab5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23a5b33d04f8fe31ade6e44802792792465c5ab5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23a5b33d04f8fe31ade6e44802792792465c5ab5"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/dns_query.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cee60cf46aedefbe3db55f9d7420b0405ad10f5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cee60cf46aedefbe3db55f9d7420b0405ad10f5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cee60cf46aedefbe3db55f9d7420b0405ad10f5"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/dns_query_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4454f605179428deecd5aefb0494ac5c04932af2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4454f605179428deecd5aefb0494ac5c04932af2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4454f605179428deecd5aefb0494ac5c04932af2"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/exit.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e11564016d15418022cbb81c86b7d8f7d7d44af"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e11564016d15418022cbb81c86b7d8f7d7d44af"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e11564016d15418022cbb81c86b7d8f7d7d44af"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/filter.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20b47f1189c5b350e12f89432ef41379bde7e9f9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20b47f1189c5b350e12f89432ef41379bde7e9f9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af670797c019c2f5012b68de1b42b181a25d7902"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/filter_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f871cd2210d3fa88755835ec8dc413ac640e291e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f871cd2210d3fa88755835ec8dc413ac640e291e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0690aa98dc94e11f2055fe5ab587331d527c521"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/geo.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cf6541869c1220bfc998701150b827d74706a02"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cf6541869c1220bfc998701150b827d74706a02"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38bd761a347ee682ea77d07854cf27176e84884d"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/go.mod",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e695c2be23d0983d2db159b6ba9d312b82c9bc9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0aa91e597b417b038a788c5859c39989bb037457"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f783c3f2853cca580822ab5705489c2a5390710"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "core/go.sum",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c8640c6e67c4abf1f1f82dc9228a45762cbfc01"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c8640c6e67c4abf1f1f82dc9228a45762cbfc01"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a780a7d80dc4249396739b50d45875d143ffd95c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/hooks.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1619cb1860b4d5c46e0bb8f6f7437fc96a2db3ef"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1619cb1860b4d5c46e0bb8f6f7437fc96a2db3ef"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6cf3640623e3188decf40667d4b27d43c90454e"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/hub_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95df0269942c28d9c7f5d5015ca251449ac149c5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb6d93427f7794516860558ea3956b00195b2dcd"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e52a9671fc58f2f5bf3e8d2f909f4f0b53ef1ab9"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "core/ipc_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5a89524e114678fe38a95ffc14dc9283806763a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05c4748f450b6ca165f7b862345e26d735a0f32a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6be09015b906cf9199fafd225efdffa1f8ccafff"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "core/lib.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76d4a037b150bb153cdd21a6f61907f4c8d7e217"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76d4a037b150bb153cdd21a6f61907f4c8d7e217"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d181f07c41fb6172abee184314d9ed4974804921"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/lifecycle.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3df7bd03021150ddefae5f6394e8537c4d911c32"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3df7bd03021150ddefae5f6394e8537c4d911c32"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1cbe658bb2521322ac7c1d64710c187d4fe656e"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/log.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8fb7a4049e27c35d5cbb94747f2f82e824276b9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67d82bdf5255d6f526300a995b66cb6d0de1bfdf"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8fb7a4049e27c35d5cbb94747f2f82e824276b9"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "core/message.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af5f38f5ec123e917098252a6609e52070216ede"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af5f38f5ec123e917098252a6609e52070216ede"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af7b4b3a6de02bc7cd798ddb8c8b8a1b8ac0dbe8"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/message_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e72da70b4bf3b67dc0a4a2d70e83d64f3c853a9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e72da70b4bf3b67dc0a4a2d70e83d64f3c853a9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bcf40d0b0d4002060c64f3325d7adeddbb5d4eb4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/method.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f2b836696be3d5798ed930ba6154be8351854d33"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab434ba13324454d947b2128b8448c89469687c2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2bd5b2c0d6478c602fdf8be030c3b1c89e48e877"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "core/mobile/mobile.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f192316b066cce0c4b674c232a18ad3f5b05fb8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f192316b066cce0c4b674c232a18ad3f5b05fb8"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32d1068a3432153904850a6219f10186f1816a32"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/outbound_ip.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "675139fc6d6fcd96a5020ad74f98ea56049a52db"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "675139fc6d6fcd96a5020ad74f98ea56049a52db"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "056223292525b24b685c5d467ddfae4a6a2057c9"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/outbound_ip_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "614c0d421c8947450b3bd918079c50e52b9d2bf2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "614c0d421c8947450b3bd918079c50e52b9d2bf2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1fc797f10c8cbaa03d63ea0761bcf67c17324872"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/ownership_other.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "519b7bc09d274aae31280562794feca10a49eb05"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "519b7bc09d274aae31280562794feca10a49eb05"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ace34db15d57f6ad75c6ec3606a004a3f85dc4de"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/ownership_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c07cf564de555240259465179cd9fc1f84039f08"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c07cf564de555240259465179cd9fc1f84039f08"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c07cf564de555240259465179cd9fc1f84039f08"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/ownership_unix.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b29d8e980a0ef09abc0a11dccc80866f9b7ebab1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b29d8e980a0ef09abc0a11dccc80866f9b7ebab1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b5eaab601ab3b3861f4d68badcc0a9fdec4155f"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/platform/limit.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "817a1697587041a05b900c8babeaeda522704639"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "817a1697587041a05b900c8babeaeda522704639"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "817a1697587041a05b900c8babeaeda522704639"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/platform/procfs.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f1d39408726649e55a5997c2b261b15916f7725"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f1d39408726649e55a5997c2b261b15916f7725"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f1d39408726649e55a5997c2b261b15916f7725"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/probe.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a62a6efbca531abc1bea145a92e938e513bf742b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a62a6efbca531abc1bea145a92e938e513bf742b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16e90d4b7fb4b61f87b3d79b8eca4f26a5596232"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/probe_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c66e4a792449b78940cb01307e4cc0de319093cc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c66e4a792449b78940cb01307e4cc0de319093cc"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "baa2d7907bd7ae108ef9c8f13ca1b8b5e3833ea0"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/profile_base.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "039ce8f82f772282f5a766aeb56a9069789210de"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/profile_base_test.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f9fdfffe0ea69d5273aa2474a1f83a72e2aef8c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/profile_groups.go",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05bfa75ded05ec31b3bf62d681f2ce5b11bcc0b6"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "core/profile_groups_test.go",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a8cf704c514687aa650cb94e97c1363c08b1f3e"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "core/protocol.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6f84af3ac87454418a316b3d4f65ae37de13e38"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6efacd7b7f237453b3e124f466621c2fac58a9d9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7dddd22a6798112a2172eeaca12d919b8fa5514f"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "core/provider.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f61eb53437707456dfb6043deaa409830ee1772"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f61eb53437707456dfb6043deaa409830ee1772"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b391cc37e03c9a7f6b8fca7fd7b9de8b72f359a"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/proxy.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ceff181730f105ae7161fbfe0b3fbf6e72fa3512"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ceff181730f105ae7161fbfe0b3fbf6e72fa3512"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4bef2518c8e628ceae73fa608e05920c13dd390"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/reality_defaults_test.go",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c370540ea27f52b015d3b7ca3d39123d524a8b5d"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "core/region.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69d541e7d296b4cc1aedbf05f9113df360c1bc5e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69d541e7d296b4cc1aedbf05f9113df360c1bc5e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69d541e7d296b4cc1aedbf05f9113df360c1bc5e"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/request_traffic.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0eb6d870f0302c373448c266ecc03180a394e0e"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/request_traffic_test.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77d3f113bd05ddc465d398975890241f09487280"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/route.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "097e61f3ef9cd578c537a81fc4cfa7636c2a8de8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "097e61f3ef9cd578c537a81fc4cfa7636c2a8de8"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "525a1326a56f336bfe7082a13a9483c61359120e"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/route_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44e11f7595e34ec4b9e5faecf0e01acd84119be3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44e11f7595e34ec4b9e5faecf0e01acd84119be3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5d53a1142f9f185d440e83564515ecfc1c79c48"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/rule_set.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4433d72f6ada48773a337ec6546d15242b034680"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4433d72f6ada48773a337ec6546d15242b034680"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4433d72f6ada48773a337ec6546d15242b034680"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/rule_set_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b969ee7dde4c94d1fce7500f6fefc8a64c97e4e5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b969ee7dde4c94d1fce7500f6fefc8a64c97e4e5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f90ca64c09ce41ce1a32379ce8e1505df6e14b6"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/server.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e62658bd8b398032ec217dd79ab44357986f4f7a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e62658bd8b398032ec217dd79ab44357986f4f7a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e62658bd8b398032ec217dd79ab44357986f4f7a"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/service_check.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "35f920ad331140db475e1dc454e0b444984e97aa"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "35f920ad331140db475e1dc454e0b444984e97aa"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ec670a3c61b76aebf0b240c627e9b9bf26fa29c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/service_check_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "121d18a41f654375697479968d4eef8614b37ef5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "121d18a41f654375697479968d4eef8614b37ef5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "121d18a41f654375697479968d4eef8614b37ef5"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/service_rules.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1818ec1aaacdd40d725001a771b1c48bb108c0e9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1818ec1aaacdd40d725001a771b1c48bb108c0e9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1818ec1aaacdd40d725001a771b1c48bb108c0e9"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/service_rules_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5de8e7a9658d840780af4119ed4430e23d2fca5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5de8e7a9658d840780af4119ed4430e23d2fca5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5de8e7a9658d840780af4119ed4430e23d2fca5"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/share_link.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f3861a03392045f7fdf5fc011562f92c525c4f1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f3861a03392045f7fdf5fc011562f92c525c4f1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "676e154d046482c48fb76711a0de6510ba832160"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/share_link_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57d78b4b956f6a4bbb7f0770dde3ab3e491f9e1a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57d78b4b956f6a4bbb7f0770dde3ab3e491f9e1a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59068113bd3b5c14d7bd5ee0f714320b6326364d"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/short_id.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88a5d041926a27bb46745f54c475b99e3ed96b4c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88a5d041926a27bb46745f54c475b99e3ed96b4c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88a5d041926a27bb46745f54c475b99e3ed96b4c"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/short_id_test.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b19f38f08e8834a56f9ca4752013e0b89aad18cd"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b19f38f08e8834a56f9ca4752013e0b89aad18cd"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "efb171fca410805a020e56eae7ffc589c97d74f7"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/slots.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b58b100298c24490dded960da875c5c00271936"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b58b100298c24490dded960da875c5c00271936"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b58b100298c24490dded960da875c5c00271936"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "core/spill.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9f266cfc8e63b2362bbc804f6237fcd2cc548f3"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/spill_test.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e4c96a52071f5c066970c948ae8dfed918dc1a4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/timezone/timezone.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "78c051022e0ca82c14ff61d8f9543e292efe941f"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/timezone/timezone_android.go",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a927211520cd4335e26579e223f6e7fdfd5466bb"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "core/tun/tun.go",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4522a6f28f54f3b71f43432c8f7126fcbce76bcc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54a43ec43a4698a2fd0c175f7dfd3a3c4309930c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4522a6f28f54f3b71f43432c8f7126fcbce76bcc"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  }
+]

@@ -1,0 +1,1098 @@
+[
+  {
+    "path": ".agents/agent-config.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97673b114bfd0b781e59eeeffbf25d41808b3bb3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97673b114bfd0b781e59eeeffbf25d41808b3bb3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97673b114bfd0b781e59eeeffbf25d41808b3bb3"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/architecture.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "969c68c63a80cc80f4019bc53bfd5f2eb869bf90"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "04bb88fd6a14208ea9f0cdb70aa31d079917a4c3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "897b8a21d776abd1b5f08023f5e68a7f84b8e4ab"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/commands.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8acc221866e1d42648cab6b56e81c42ceba355e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91ebcd9f34a040302451226c31209fcd895ec405"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e060ae2dffcf2878a66989fc0d5226eefde4bce"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/documentation.md",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dfa1c5de44d01d75e36a58814fedb13ca11f990"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/flutter-upgrade.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39a5f65436e966b8b534c290b47afc3eea5139e8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1a3e321c4d760512618d46f87c02e09bda8fc01f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f183576aa953bd8ebb2d9be58b3c09087fec7541"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/project.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3e88ca49c5947a791a69d6a8e465fd0032b2155"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe3edc814a827e028a4767b28a998a54cd2ae84e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5f2088432b61d3fd5af85926f2bfe2476d34f02"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/rules.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c05b6a222b3309d4f54983cd2012d501502012f1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77481ae39b97d33720ec5e3742435e0554527a66"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "016c3016d57cd63fbff4fd5e374166a9a7e571e0"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/setting-changes.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0988ba5750f2d9657878948c68669792fa1e77f0"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62cccf54580287f51a55a0b4c512d2d747422d7c"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "359a543c6af2c5b3dae084b0233996eedcbb4ccc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "359a543c6af2c5b3dae084b0233996eedcbb4ccc"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b6d3391f6f20884ef4e9167e4a63ee13c69e3236"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/core-platform/SKILL.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c93c6841e02df14b3d1fd882508da87e331ea0d4"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "826c485139c3615db9f9bdc4c118d136af8bbf65"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c93c6841e02df14b3d1fd882508da87e331ea0d4"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/flashco-upstream-update/SKILL.md",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf6a06de4bf5dab817a881cead655b633a5068f2"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/flashco-upstream-update/references/settings-preservation.md",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0e692bd025e5c50e59671567ee377512b993603"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/flashco-workflow/SKILL.md",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4eec2f6ef10028db26c2f28cbc92b4c84d25a19f"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/localization/SKILL.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0666ec072a0cb26f9b6561dcdcac99456e3b1ad"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2178edd0dff77afe24510fef4b52ed61c2aed3ae"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "835259f83e12ae4b6cd9423438110f822c89ba25"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/pre-commit-quality-review/SKILL.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4ce309d634d983e4da251d53c46ec3cce4ebb0d"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4ce309d634d983e4da251d53c46ec3cce4ebb0d"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4ce309d634d983e4da251d53c46ec3cce4ebb0d"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/ui-performance/SKILL.md",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "955bb6275a430c4ea5ccda7daf198a65d9014a9d"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/skills/ui-work/SKILL.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9fe451be6f02ae316e69c300090de65c0c1bb4bc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "58718d0949a55b3f8ae44d23f9766c396b4f7be4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "746e387c3244663a2cd70cc95761ae3a6810fd19"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/surfaces.md",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad756850c62e01119e38f0f57cbf470c6e6725af"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".agents/worktrees.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7fa8a59a60ca17b8ece92c91b507598f01d8a19"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7fa8a59a60ca17b8ece92c91b507598f01d8a19"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7fa8a59a60ca17b8ece92c91b507598f01d8a19"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".claude/settings.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd55ed39b951d228e12d5525d93f86f483cbaed2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f4df8f2892103ab058a4afa4d160b910589e3e4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd55ed39b951d228e12d5525d93f86f483cbaed2"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".claude/skills/core-platform",
+    "base": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "fc2bb9e33e033d73bed380b0f88ea2c6b66821d0"
+    },
+    "flashco": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "fc2bb9e33e033d73bed380b0f88ea2c6b66821d0"
+    },
+    "donor": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "fc2bb9e33e033d73bed380b0f88ea2c6b66821d0"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".claude/skills/localization",
+    "base": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "a94b23f88addc1f0d9ce28686b182e8628986cd0"
+    },
+    "flashco": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "a94b23f88addc1f0d9ce28686b182e8628986cd0"
+    },
+    "donor": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "a94b23f88addc1f0d9ce28686b182e8628986cd0"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".claude/skills/pre-commit-quality-review",
+    "base": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "287b0786d49521ba43199735eb48d318dff024f4"
+    },
+    "flashco": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "287b0786d49521ba43199735eb48d318dff024f4"
+    },
+    "donor": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "287b0786d49521ba43199735eb48d318dff024f4"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".claude/skills/ui-performance",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "ae9d745fda7a7e7d7297ea9b61a88e135c4202b9"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".claude/skills/ui-work",
+    "base": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "7605df8e2fd78ba895b7c1bc5f9be848c3df19c7"
+    },
+    "flashco": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "7605df8e2fd78ba895b7c1bc5f9be848c3df19c7"
+    },
+    "donor": {
+      "mode": "120000",
+      "type": "blob",
+      "sha": "7605df8e2fd78ba895b7c1bc5f9be848c3df19c7"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".codegraph/.gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d20c0fe4bdba98d3521079d2535222adddb2bf0c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d20c0fe4bdba98d3521079d2535222adddb2bf0c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d20c0fe4bdba98d3521079d2535222adddb2bf0c"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".codex/config.toml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbf6a32d7a457fb59c24aa507d9fcc009624891e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa4327305a5541aebc7c725f03fa32c2c5d7380c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbf6a32d7a457fb59c24aa507d9fcc009624891e"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".gemini/settings.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87ca7dea2b26490a3bd6bd2c18d8e054bb552bf2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87ca7dea2b26490a3bd6bd2c18d8e054bb552bf2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87ca7dea2b26490a3bd6bd2c18d8e054bb552bf2"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".gitattributes",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c54bd99ac5300f4293592c08be2e8f3705191141"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eda65b0fc3582a1e90f9640d1f1209d227548d35"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c54bd99ac5300f4293592c08be2e8f3705191141"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "81789f81645ac31cdf398c688b36bcdfafd52685"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fc6d2dd218e041bd6fdf9ca20fee5d9aed0dada"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "81789f81645ac31cdf398c688b36bcdfafd52685"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/config.yml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4259a168329491b5519dd707bdc64337147f3278"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4259a168329491b5519dd707bdc64337147f3278"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4259a168329491b5519dd707bdc64337147f3278"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/feature_request.yml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "575021d731681d0bc47b78c24bab1be12584e414"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8214c65de45c58b91012f416773f4d119f7c7b9c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "575021d731681d0bc47b78c24bab1be12584e414"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/homebrew_cask_template.rb",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfe4a17f1267626844caa5d9a04e578fffbc88a7"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14806c53d157a2e12ff05e61c0721a07072257fb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfe4a17f1267626844caa5d9a04e578fffbc88a7"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/release_template.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c52b363ddcf304b592b056855c6d082dd4a5ec98"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03397b8ee9cb575dbc801df40433eca6a560abe2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c52b363ddcf304b592b056855c6d082dd4a5ec98"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/workflows/build.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3d6dd6ebbb1d6392162311fe8ce7c436c69084b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5e9b5d26c966c2d8a4ba9955cf16372c8fd49c1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9da1714ad09dc00cf5cb9cad47efcc425ca45b58"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": ".github/workflows/pages.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a9eec44b9dcccd9c898d551256f52a11675d1b0"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a9eec44b9dcccd9c898d551256f52a11675d1b0"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a9eec44b9dcccd9c898d551256f52a11675d1b0"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".github/workflows/personal-android-first-run.yaml",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14251352dbce77bae81b6b428b51c6f393d27bc2"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/workflows/personal-android.yaml",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f808a9c78e25f0089e0cbd6f3059e88b2d4d5b0c"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/workflows/personal-windows.yaml",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f39c766f99a2321bf2ea71b2cfcf933da3cf51d3"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".github/workflows/release.yaml",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "489805d4ed7bf3890fa20b6b9e3ab31f20e32f70"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a455118069d09f997414bf75f4c661ec3511d23c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "172cd0f81ad9467e5a9fce466d9d1a270c428823"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d33b61773ffcad802f783670f720d1da8fc833b"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": ".gitmodules",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f373ba785369f0279e8eb25aa742d2d8c2131c4f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f373ba785369f0279e8eb25aa742d2d8c2131c4f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9bcadc10290bee4358284509332fff9c942fb4c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": ".mcp.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87ca7dea2b26490a3bd6bd2c18d8e054bb552bf2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87ca7dea2b26490a3bd6bd2c18d8e054bb552bf2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87ca7dea2b26490a3bd6bd2c18d8e054bb552bf2"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".metadata",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e80cfec0b309f8f5897022d655a7daa636f7505"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e80cfec0b309f8f5897022d655a7daa636f7505"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e80cfec0b309f8f5897022d655a7daa636f7505"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".pre-commit-config.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e8b7c7c0059eb892e18194f161c7b4a80151ab3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a24249151bfe7255e2114c43eed17020a28c4a5b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e8b7c7c0059eb892e18194f161c7b4a80151ab3"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": ".run/main.dart.run.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a9c9daf3965cdc8db69b87da06efe5bb98b944c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a9c9daf3965cdc8db69b87da06efe5bb98b944c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a9c9daf3965cdc8db69b87da06efe5bb98b944c"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".run/main_safe_mode.run.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26cbd74fe5c8df706c81dae724f5214aa97dd20a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26cbd74fe5c8df706c81dae724f5214aa97dd20a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26cbd74fe5c8df706c81dae724f5214aa97dd20a"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".superpowers/reviews/2026-11-05-personal-fallback-builds.json",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fdd8a0f1667fef3164dd8612e9ac499f0e1913dd"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".superpowers/reviews/2026-11-05-preserve-settings-installer.json",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "392af4e38cb69526e82bcd2aba24c729e9c3c00b"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".superpowers/reviews/2026-11-05-rollback-da07f58a.json",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d0b56f2462a4c1fae4dd85500726e81254808f5"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": ".zed/debug.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4163391088e866d4ae61c7a8af69425dd02c4cfd"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4163391088e866d4ae61c7a8af69425dd02c4cfd"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4163391088e866d4ae61c7a8af69425dd02c4cfd"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".zed/settings.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1bd257a7dc349e76ac0c12574a25a1b0f177bb17"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1bd257a7dc349e76ac0c12574a25a1b0f177bb17"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1bd257a7dc349e76ac0c12574a25a1b0f177bb17"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": ".zed/tasks.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5340b1b824559aa3a24c39dcaa79581d559b6639"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5340b1b824559aa3a24c39dcaa79581d559b6639"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5340b1b824559aa3a24c39dcaa79581d559b6639"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "AGENTS.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "598a2d4506eccd4d55022fc3348fc28f5c84b686"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e78aa438f55c3bb2440ab711be5c63a2b883f7c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c915aef61a3508113097253a835639bd7f0e5d8f"
+    },
+    "disposition": "preserve_flashco_exclude_donor_instructions",
+    "rationale": "Repository-specific agent instructions, skills and hooks are excluded from application import."
+  },
+  {
+    "path": "CHANGELOG.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87f510b8bd844cd82a8571fec69d685962bf1b87"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b600bd66294c7a2a8c0bddc00f0f154c2a8d69f2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fad4bf1ef90d1d825ed9b59378dce1a493ad8a3"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "LICENSE",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "Makefile",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6912ca45c9a21f015d3ba0d492d2aa81ef154f5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6912ca45c9a21f015d3ba0d492d2aa81ef154f5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6912ca45c9a21f015d3ba0d492d2aa81ef154f5"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "PRODUCT.md",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce3b1388d154d580a907f6bf82ee2e855c605040"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "README.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "963879f561a64a3d1c15ceabd198b566df942cf0"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a59421d1d1e036789985f420e83f37b9752d538"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b314844f7afb6507a5833494479f02f43d3e954"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "README_zh_CN.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85beddf0f6d4b2dea7bf0f0e34a3a6b2e115d92c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2afd10acde69782d43b8a9be1e458f563346e61"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b7851f208bb0058ab49fd6e5f8b22097602871e"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "analysis_options.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b72386bf47cc20d338fe0eb8373b73d5c717441b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b72386bf47cc20d338fe0eb8373b73d5c717441b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b72386bf47cc20d338fe0eb8373b73d5c717441b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  }
+]

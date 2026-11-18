@@ -1,0 +1,915 @@
+[
+  {
+    "path": "android/.gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f568019d3c69d4966bb5a0f759980a1472afc1e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f568019d3c69d4966bb5a0f759980a1472afc1e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f568019d3c69d4966bb5a0f759980a1472afc1e"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "android/app/build.gradle.kts",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54f13556077ec42482353dbd5a8cd24ebd3ff769"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36e0f682a163ec24a04f370ee4bcd2c55a7a028b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80cfed830ccf5feb4eac8a2498b785abf2fcd9f8"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "android/app/google-services.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec7efbe187cfb35b38977f8d9eb252d006fd4064"
+    },
+    "flashco": null,
+    "donor": null,
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "android/app/proguard-rules.pro",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7eb34736a7779ee01446ddc1778b7b828db79ae4"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf953b136b58eea12877c51b55b8f70b4807769d"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7eb34736a7779ee01446ddc1778b7b828db79ae4"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "android/app/src/debug/AndroidManifest.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1fb7cc828723a8ccbd72c1c3e7ef4bca92a724fe"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bc88a3678bbe529d410147f6d8b84c7929239750"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1fb7cc828723a8ccbd72c1c3e7ef4bca92a724fe"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "android/app/src/main/AndroidManifest.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8438432567594e0e6f9254eee40ca964802d12de"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a609a170400e2173165ac4a5e4ce76a21e80a6f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33e98efb6948e4225d8044ca39df0d32b26bd983"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/inject.sh",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05ca82671d11422c8a0701bfb74fe9e1de505057"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/module.prop",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8100812e02eed4ffabe5aa8fb8d3027f90c36829"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/post-fs-data.sh",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20da55aedf71e1618e151c1e335d8b33c21092ba"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/root.sh",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "757ed25b330cafa7496189cb8d906598643565ac"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/service.sh",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bca46ad84be084d179b9ee6ab3728c291bc624df"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/update-binary",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a975261f0d680bfea376df18e5acf4297f734bba"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/assets/mitm_ca/updater-script",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "11d5c96e0b07d20bbd25208ae15ff24f1da0b0ab"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/ic_launcher-playstore.png",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76687bbe7d6512fb094f617cd358a2fcdab3d5cb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76687bbe7d6512fb094f617cd358a2fcdab3d5cb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a7f515d48a87dc629845dda9cc13a3e3f9a7744"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/Ext.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44247d1d558438dedd12799da26dbea04388eb5d"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44247d1d558438dedd12799da26dbea04388eb5d"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/Ext.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/FlClashApplication.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b904458e0cea18c24ea96db07467c9d1c0431a7"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b904458e0cea18c24ea96db07467c9d1c0431a7"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/FlashcoApplication.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/MainActivity.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac28b8c17786bfcbf83d852f9c9f8d1284b3915c"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac28b8c17786bfcbf83d852f9c9f8d1284b3915c"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/MainActivity.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/QuickActionActivity.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0180ebfb2dc64824fc57f219195189bb19dfe738"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0180ebfb2dc64824fc57f219195189bb19dfe738"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/QuickActionActivity.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/ServiceBroadcastReceiver.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a3c8f8d6d2dac609073e0dc791c8933a83bd21f"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a3c8f8d6d2dac609073e0dc791c8933a83bd21f"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceBroadcastReceiver.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/ServiceController.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f308d5c32ee36a50a8b6f536553dd9ab4ca92122"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69e1560535052c0a435e3b243533e0893d1c22de"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceController.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/ServiceState.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28c4560daedc019859246a93333f41a470eb3c4f"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28c4560daedc019859246a93333f41a470eb3c4f"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceState.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/ServiceStateHost.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "11c7288e8556667f651f9c9f633bd66cb25dad7f"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7239248b773186d83e86361c3c330583482d8a70"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateHost.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/ServiceStateMachine.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3ce5c9dbdfc7d55562c4c5ee66516b3e4392bae"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "840a394389210a5df17de2159750da04ec8e95ce"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateMachine.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/SystemCaStore.kt",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eeda5b845c54d8774208c5d52693728dc93c8641"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/TileService.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0e90c3f60123e851ed74c0d6157a27a3665d7fc"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0e90c3f60123e851ed74c0d6157a27a3665d7fc"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/TileService.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/models/InstalledPackage.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5018332cfcd5795b37853ccb93e139a724d01f4"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5018332cfcd5795b37853ccb93e139a724d01f4"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/models/InstalledPackage.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/models/State.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cae2b392d258498908a2b1c0d61685fb94bfaa07"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0f016512b54cd39473236c9d2b3b1693c80866e"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/models/State.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/packages/ChinaPackageMatcher.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d48c74976aa2571923b22126dd43539f001a5d6"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d48c74976aa2571923b22126dd43539f001a5d6"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/packages/ChinaPackageMatcher.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/packages/PackageResolver.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3aa22c99b58fccdf3253c89518576378b26f9e0f"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3aa22c99b58fccdf3253c89518576378b26f9e0f"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/packages/PackageResolver.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/plugins/AppPlugin.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d714e2cf3204db5a8dfb65f4d2e65144801d000d"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d30952d1cf953b4a1d8a5aed8ed86377d0afc54"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/AppPlugin.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/plugins/BatteryPlugin.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "22f88cde4d6e326b829cc5124afe9794c4f087a6"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "22f88cde4d6e326b829cc5124afe9794c4f087a6"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/BatteryPlugin.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/plugins/MainThreadResult.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2393946da055411b4e8a20a422a75024b8446db"
+    },
+    "flashco": null,
+    "donor": null,
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/MainThreadResult.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/plugins/ServicePlugin.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1b826320eb67600b2127ae7205c90b1092564f9"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef7c6396682027d156b9778e26acd3ece934c51d"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/ServicePlugin.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/clash/plugins/TilePlugin.kt",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1f71d3ac5cc791a83dae0ca2d71e70af52c9f51"
+    },
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1f71d3ac5cc791a83dae0ca2d71e70af52c9f51"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "flashco_renamed_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/TilePlugin.kt",
+    "rename_method": "Git similarity detection; path mapping requires semantic verification"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/Ext.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3594e11422b4c11f439d1390634b184f16d4b153"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/Ext.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/FlashcoApplication.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cd9aafb2fd0007a51c6472f2571f4e7be6182a6"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/FlClashApplication.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/MainActivity.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0aab474233c055a8ddd3b038c1ef8554797a04ac"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/MainActivity.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/QuickActionActivity.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69ef60c300671673dfacd9cab49b6b4770320286"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/QuickActionActivity.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/ServiceBroadcastReceiver.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcd918f343c1c1ac4a8151f73b02266f185aa2a5"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/ServiceBroadcastReceiver.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/ServiceController.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "92b5487d43ea3dc4c2448a14af746cf23a86ea6f"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/ServiceController.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/ServiceState.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a23a51641a8de72c6ea254ce0c6a55914701f6c"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/ServiceState.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateHost.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "31b95cbdc823dd9ce3fe3c47537c467cd0746140"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/ServiceStateHost.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateMachine.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1dfb25a3954389f314bb4141beba1b47e444b643"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/ServiceStateMachine.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/TileService.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0e9e9daf7c5506b90f106062f93718e80d6149a"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/TileService.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/models/InstalledPackage.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4277efade34018fd19df1cfe83fc5bf784eb3be0"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/models/InstalledPackage.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/models/State.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ff6e5c49bc6b23d8197f1c1b9c7a9c4137e50cf"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/models/State.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/packages/ChinaPackageMatcher.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "248b57c8636b6bf98b8df2f7161ed06b6def23a9"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/packages/ChinaPackageMatcher.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/packages/PackageResolver.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "462ebc2271650f9e4e2d2da8ff661e88194d0efe"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/packages/PackageResolver.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/plugins/AppPlugin.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29c03aa1138ace94c5f2e51e79d4dbf49bbc3610"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/plugins/AppPlugin.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/plugins/BatteryPlugin.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "935ad5e94be72c880082c9fa4e72f85f79d3b5ed"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/plugins/BatteryPlugin.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/plugins/MainThreadResult.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37d39462496dce1f7f123a21e857a6568ce37c4c"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/plugins/MainThreadResult.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/plugins/ServicePlugin.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f86c655f8ad0e53069bcc01b474cc8fd924fc5f2"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/plugins/ServicePlugin.kt"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/follow/flashco/plugins/TilePlugin.kt",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4437625004cdae0c091de5ccc766b806294bc8ba"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions.",
+    "base_renamed_from": "android/app/src/main/kotlin/com/follow/clash/plugins/TilePlugin.kt"
+  },
+  {
+    "path": "android/app/src/main/res/drawable/ic_launcher_foreground.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc3928285b595220fa3340cd07eff5eba87315c3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc3928285b595220fa3340cd07eff5eba87315c3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f77d673ab1a5108b30fbe29c2cea1e5129930d9"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/res/drawable/ic_launcher_foreground_tv.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cde6eb7fb35d37618fbcf89771d96cfa10f587b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cde6eb7fb35d37618fbcf89771d96cfa10f587b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4897b64a667f35f96ec7ff803434990cdde4ed18"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "android/app/src/main/res/drawable/ic_shortcut_start.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0e9153dd5574b90fb8a85182d1fb396135320e0"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0e9153dd5574b90fb8a85182d1fb396135320e0"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0e9153dd5574b90fb8a85182d1fb396135320e0"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "android/app/src/main/res/drawable/ic_shortcut_stop.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e92bebe096ce79364040f1377775ecb59836098"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e92bebe096ce79364040f1377775ecb59836098"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e92bebe096ce79364040f1377775ecb59836098"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "android/app/src/main/res/drawable/ic_shortcut_toggle.xml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10a50b93ff3959cad583c594340e07a2cef35a66"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10a50b93ff3959cad583c594340e07a2cef35a66"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10a50b93ff3959cad583c594340e07a2cef35a66"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  }
+]
