@@ -8,14 +8,16 @@ Future<Config> initializePersonalDefaults(
   required String subscriptionUrl,
   required bool enabled,
   required bool isNewInstallation,
+  bool subscriptionOnFirstRun = false,
 }) async {
   final url = subscriptionUrl.trim();
   final uri = Uri.tryParse(url);
   if (!isNewInstallation ||
       !enabled ||
-      uri == null ||
-      uri.host.isEmpty ||
-      !const ['https', 'http'].contains(uri.scheme) ||
+      (!subscriptionOnFirstRun &&
+          (uri == null ||
+              uri.host.isEmpty ||
+              !const ['https', 'http'].contains(uri.scheme))) ||
       !await preferences.isInit ||
       await preferences.werePersonalDefaultsApplied()) {
     return config;

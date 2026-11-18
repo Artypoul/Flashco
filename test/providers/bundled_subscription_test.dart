@@ -31,6 +31,8 @@ class _Setup extends SetupAction {
   final started = <int?>[];
   final events = <String>[];
   AuthorizeCode authorizeResult = AuthorizeCode.none;
+  Completer<void>? holdListener;
+  final listenerRequested = Completer<void>();
   Object? _token;
   var _hasRunningState = false;
   @override
@@ -64,6 +66,8 @@ class _Setup extends SetupAction {
   @override
   Future<bool> setCoreRunning(bool running) async {
     if (running) {
+      if (!listenerRequested.isCompleted) listenerRequested.complete();
+      await holdListener?.future;
       events.add('listener started');
       started.add(ref.read(currentProfileIdProvider));
     }
@@ -171,6 +175,80 @@ void main() {
     jsonEncode(settings.toJson()),
     isNewInstallation: true,
     enabled: true,
+  );
+
+  Future<void> stageFirstRun() async {
+    await preferences.initializeSubscriptionOnboarding(
+      enabled: true,
+      isNewInstallation: true,
+    );
+    await preferences.finishSubscriptionOnboardingInitialization();
+  }
+
+  test(
+    'first-run import preserves a custom profile added during download',
+    () async {
+      await stageFirstRun();
+      held = Completer<void>();
+      final importing = action().importBundledSubscription(url, firstRun: true);
+      await downloadStarted.future;
+      final manualId = action().addCustomProfile('Manual');
+      await container.read(profilesProvider.notifier).settledWrites;
+      held!.complete();
+      await importing;
+
+      expect((await database.profilesDao.query().get()).single.id, manualId);
+      expect(container.read(currentProfileIdProvider), manualId);
+      expect(setup.started, isEmpty);
+      expect(await preferences.isSubscriptionOnboardingPending, isFalse);
+    },
+  );
+
+  test(
+    'first-run completion survives deletion while activation is pending',
+    () async {
+      await stageFirstRun();
+      setup.holdListener = Completer<void>();
+      final importing = action().importBundledSubscription(url, firstRun: true);
+      await setup.listenerRequested.future;
+      final profile = (await database.profilesDao.query().get()).single;
+      expect(await preferences.isSubscriptionOnboardingPending, isFalse);
+
+      await action().deleteProfile(profile.id);
+      await container.read(profilesProvider.notifier).settledWrites;
+      setup.holdListener!.complete();
+      await importing;
+      await action().importBundledSubscription(url, firstRun: true);
+
+      expect(requests, 1);
+      expect(await database.profilesDao.query().get(), isEmpty);
+      expect(await preferences.isSubscriptionOnboardingPending, isFalse);
+    },
+  );
+
+  test(
+    'first-run download failure retains pending input and fallback for retry',
+    () async {
+      await stageFirstRun();
+      await stageFallback();
+      when(() => core.getConfig(any())).thenAnswer((_) async => source());
+      status = HttpStatus.serviceUnavailable;
+      await action().importBundledSubscription(url, firstRun: true);
+
+      expect(await preferences.isSubscriptionOnboardingPending, isTrue);
+      expect(await preferences.pendingBundledFallback(url), settings);
+      expect(await database.profilesDao.query().get(), isEmpty);
+
+      status = HttpStatus.ok;
+      await action().importBundledSubscription(url, firstRun: true);
+
+      expect(requests, 2);
+      expect(await preferences.isSubscriptionOnboardingPending, isFalse);
+      expect(
+        (await database.profilesDao.query().get()).single.overrides.fallback,
+        settings,
+      );
+    },
   );
 
   test(

@@ -59,6 +59,45 @@ class Preferences {
     return store?.getBool('personalDefaults.v1') ?? false;
   }
 
+  Future<void> initializeSubscriptionOnboarding({
+    required bool enabled,
+    required bool isNewInstallation,
+  }) async {
+    if (!enabled || !isNewInstallation) return;
+    final store = await sharedPreferencesCompleter.future;
+    if (store == null || store.containsKey('subscriptionOnboarding')) {
+      return;
+    }
+    if (!await store.setString('subscriptionOnboarding', 'initializing')) {
+      throw StateError('Failed to save pending subscription setup');
+    }
+  }
+
+  Future<bool> get isSubscriptionOnboardingInitializing async {
+    final store = await sharedPreferencesCompleter.future;
+    return store?.getString('subscriptionOnboarding') == 'initializing';
+  }
+
+  Future<void> finishSubscriptionOnboardingInitialization() async {
+    if (!await isSubscriptionOnboardingInitializing) return;
+    final store = await sharedPreferencesCompleter.future;
+    if (await store?.setString('subscriptionOnboarding', 'pending') != true) {
+      throw StateError('Failed to prepare subscription input');
+    }
+  }
+
+  Future<bool> get isSubscriptionOnboardingPending async {
+    final store = await sharedPreferencesCompleter.future;
+    return store?.getString('subscriptionOnboarding') == 'pending';
+  }
+
+  Future<void> completeSubscriptionOnboarding() async {
+    final store = await sharedPreferencesCompleter.future;
+    if (await store?.setString('subscriptionOnboarding', 'complete') != true) {
+      throw StateError('Failed to complete subscription setup');
+    }
+  }
+
   Future<void> stageBundledFallback(
     String url,
     String config, {

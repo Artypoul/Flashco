@@ -163,12 +163,21 @@ String? validateUniversalApkOptions({
 Map<String, String> createBuildEnvironment(
   String env, {
   String? subscriptionUrl,
+  bool subscriptionOnFirstRun = false,
   String? rootDir,
 }) {
   final environment = {'APP_ENV': env};
   final url = subscriptionUrl?.trim();
+  if (subscriptionOnFirstRun && url != null && url.isNotEmpty) {
+    throw ArgumentError('Choose a bundled subscription or first-run input.');
+  }
   if (url != null && url.isNotEmpty) {
     environment['BOOTSTRAP_SUBSCRIPTION_URL'] = url;
+  }
+  if (subscriptionOnFirstRun) {
+    environment['BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN'] = 'true';
+  }
+  if (subscriptionOnFirstRun || (url != null && url.isNotEmpty)) {
     final settings = FallbackConfig.fromJson(
       jsonDecode(
             File(
@@ -228,6 +237,9 @@ Future<int> _package(
       createBuildEnvironment(
         env,
         subscriptionUrl: Platform.environment['BOOTSTRAP_SUBSCRIPTION_URL'],
+        subscriptionOnFirstRun:
+            Platform.environment['BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN'] ==
+            'true',
         rootDir: rootDir,
       ),
     ),

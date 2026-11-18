@@ -91,6 +91,59 @@ Future<void> _pumpStatusManagerHost(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('subscription input validates HTTP(S) before submission', (
+    tester,
+  ) async {
+    await _pumpHost(tester);
+    final result = dialogs.showSubscriptionUrlInput();
+    await tester.pumpAndSettle();
+
+    for (final value in [
+      '',
+      'ftp://example.invalid/subscription',
+      'https://example.invalid/a b',
+    ]) {
+      await tester.enterText(find.byType(TextFormField), value);
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TextFormField), findsOneWidget);
+      final localizations = currentAppLocalizations;
+      expect(
+        find.text(
+          value.isEmpty
+              ? localizations.emptyTip(localizations.value)
+              : localizations.urlTip(localizations.value),
+        ),
+        findsOneWidget,
+      );
+    }
+
+    const url = '  https://example.invalid/subscription  ';
+    await tester.enterText(find.byType(TextFormField), url);
+    await tester.tap(find.text('Submit'));
+    await tester.pumpAndSettle();
+
+    expect(await result, url);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('subscription retry retains the URL and can be cancelled', (
+    tester,
+  ) async {
+    await _pumpHost(tester);
+    const url = 'https://example.invalid/subscription';
+    final result = dialogs.showSubscriptionUrlInput(value: url);
+    await tester.pumpAndSettle();
+
+    expect(find.text(url), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(await result, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('showMessage resolves true when confirmed', (tester) async {
     await _pumpHost(tester);
 

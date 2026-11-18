@@ -2,6 +2,14 @@
 
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
+## Optional Android first-run subscription — 2026-11-18
+
+- Based on `main` at `cd0bb943016b1fb717eb50742ba1947551bb01f0` (merged PR #13). The additional `personal-android-first-run.yaml` builds the same universal APK with `BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN=true` and no embedded URL; original personal workflows and SDK pins are unchanged.
+- `setup.dart` includes the existing fallback configuration in this mode. Fresh Android installations retain existing personal defaults; existing installations, desktop builds, safe mode and degraded starts do not enter the new prompt.
+- The `subscriptionOnboarding` preference progresses from `initializing` to `pending` to `complete`. An interrupted fresh initialization resumes rules/defaults; a cancelled or failed import remains pending. Completion follows durable profile persistence, before VPN activation. The opt-in importer preserves a profile created or selected during download.
+- Database schema and migration versions are unchanged. Use the existing generated provider definitions; regenerate after changing the provider source, never edit generated output manually.
+- Validation evidence and remaining limitations are recorded in [history.md](../history.md) and [память.md](../память.md).
+
 ## Current Baseline — 2026-11-05 rollback
 
 - Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The user selected restoration of application code to
