@@ -2,6 +2,21 @@
 
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
+## Optional Android first-run subscription — 2026-11-18
+
+- Based on `main` at `cd0bb943016b1fb717eb50742ba1947551bb01f0` (merged PR #13). The additional `personal-android-first-run.yaml` builds the same universal APK with `BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN=true` and no embedded URL; original personal workflows and SDK pins are unchanged.
+- `setup.dart` includes the existing fallback configuration in this mode. Fresh Android installations retain existing personal defaults; existing installations, desktop builds, safe mode and degraded starts do not enter the new prompt.
+- The `subscriptionOnboarding` preference progresses from `initializing` to `pending` to `complete`. An interrupted fresh initialization resumes rules/defaults; a cancelled or failed import remains pending. Completion follows durable profile persistence, before VPN activation. The opt-in importer preserves a profile created or selected during download.
+- Database schema and migration versions are unchanged. Use the existing generated provider definitions; regenerate after changing the provider source, never edit generated output manually.
+- Validation evidence and remaining limitations are recorded in [history.md](../history.md) and [память.md](../память.md).
+
+### REALITY ML-KEM default for this build
+
+- `personal-android-first-run.yaml` enables `REALITY_SUPPORT_X25519MLKEM768=true` by default. `setup.dart` forwards the opt-in define through `env.json`; other workflows and builds remain unchanged.
+- Final YAML generation applies `lib/common/reality_defaults.dart` after scripts and custom provider injection. Root REALITY nodes receive absent ML-KEM/fingerprint defaults; provider defaults use the pinned Core's ordered `override-expr` support, including provider refreshes. Explicit values and source payloads are preserved. The Core gitlink, database schema and models are unchanged.
+- The workflow tests both disabled and enabled Dart defines, then checks the actually emitted provider expressions with `TestRealityMlkemProviderDefaults`. That Go contract test uses `REALITY_MLKEM_FIXTURE_PATH` and skips outside the workflow when no Flutter-generated fixture is supplied. The enabled build artifact is named `flashco-personal-android-first-run-mlkem-<run_number>`.
+- Independent XHTTP download REALITY settings and preserved classical fingerprints are outside this default. See [PRODUCT.md](../PRODUCT.md) for behavior and [history.md](../history.md) for verified results.
+
 ## Current Baseline — 2026-11-05 rollback
 
 - Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The user selected restoration of application code to

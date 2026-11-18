@@ -9,9 +9,12 @@ class ProfilesAction extends _$ProfilesAction {
   @override
   void build() {}
 
-  Future<void> importBundledSubscription(String url) async {
+  Future<void> importBundledSubscription(
+    String url, {
+    bool firstRun = false,
+  }) async {
     if (_bundledSubscriptionTask case final pending?) return pending;
-    final task = _importBundledSubscription(url.trim());
+    final task = _importBundledSubscription(url.trim(), firstRun: firstRun);
     _bundledSubscriptionTask = task;
     try {
       await task;
@@ -20,7 +23,10 @@ class ProfilesAction extends _$ProfilesAction {
     }
   }
 
-  Future<void> _importBundledSubscription(String url) async {
+  Future<void> _importBundledSubscription(
+    String url, {
+    required bool firstRun,
+  }) async {
     final uri = Uri.tryParse(url);
     if (uri == null ||
         uri.host.isEmpty ||
@@ -34,7 +40,8 @@ class ProfilesAction extends _$ProfilesAction {
     final runRequestToken = setup.runRequestToken;
     final previousSequence = _importSequence;
     if (!await preferences.isInit ||
-        await preferences.wasBundledSubscriptionImported(url)) {
+        await preferences.wasBundledSubscriptionImported(url) ||
+        (firstRun && !await preferences.isSubscriptionOnboardingPending)) {
       return;
     }
     final profiles = ref.read(profilesProvider.notifier);
@@ -45,7 +52,13 @@ class ProfilesAction extends _$ProfilesAction {
       return;
     }
     final sequence = ++_importSequence;
-    final savedProfile = (await database.profilesDao.query().get())
+    final savedProfiles = await database.profilesDao.query().get();
+    if (firstRun && savedProfiles.isNotEmpty) {
+      await preferences.completeSubscriptionOnboarding();
+      await preferences.completeBundledFallback(url);
+      return;
+    }
+    final savedProfile = savedProfiles
         .where((profile) => profile.url == url)
         .firstOrNull;
     if (savedProfile != null) {
@@ -91,6 +104,14 @@ class ProfilesAction extends _$ProfilesAction {
       silence: true,
     );
     if (profile == null || !ref.mounted) return;
+    if (firstRun) {
+      await profiles.settledWrites;
+      if ((await database.profilesDao.query().get()).isNotEmpty) {
+        await preferences.completeSubscriptionOnboarding();
+        await preferences.completeBundledFallback(url);
+        return;
+      }
+    }
     ref.read(profilesProvider.notifier).put(profile);
     await profiles.settledWrites;
     if (!(await database.profilesDao.query().get()).any(
@@ -98,12 +119,16 @@ class ProfilesAction extends _$ProfilesAction {
     )) {
       return;
     }
+    if (firstRun) {
+      await preferences.completeSubscriptionOnboarding();
+    }
     await preferences.completeBundledFallback(url);
     final activated = await _activateImportedProfile(
       profile,
       sequence,
       runRequestToken,
       initialize: true,
+      preserveSelection: firstRun,
     );
     if (activated) {
       await globalState.safeRun(
@@ -185,6 +210,7 @@ class ProfilesAction extends _$ProfilesAction {
     int sequence,
     Object? runRequestToken, {
     bool? initialize,
+    bool preserveSelection = false,
   }) async {
     if (!await ref
         .read(profilesProvider.notifier)
@@ -193,6 +219,12 @@ class ProfilesAction extends _$ProfilesAction {
     }
     if (!ref.mounted || sequence != _importSequence) return false;
     if (ref.read(profilesProvider).getProfile(profile.id) == null) return false;
+    final currentProfileId = ref.read(currentProfileIdProvider);
+    if (preserveSelection &&
+        currentProfileId != null &&
+        currentProfileId != profile.id) {
+      return false;
+    }
     final setup = ref.read(setupActionProvider.notifier);
     if (!identical(setup.runRequestToken, runRequestToken)) return false;
     ref.read(currentProfileIdProvider.notifier).value = profile.id;

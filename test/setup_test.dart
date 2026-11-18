@@ -67,6 +67,29 @@ void main() {
       });
     });
 
+    test('REALITY ML-KEM is an independent opt-in build define', () {
+      expect(
+        setup.createBuildEnvironment('pre', realitySupportX25519Mlkem768: true),
+        {'APP_ENV': 'pre', 'REALITY_SUPPORT_X25519MLKEM768': 'true'},
+      );
+      expect(
+        setup.createBuildEnvironment(
+          'pre',
+          realitySupportX25519Mlkem768: false,
+        ),
+        {'APP_ENV': 'pre'},
+      );
+      final environment = setup.createBuildEnvironment(
+        'pre',
+        subscriptionOnFirstRun: true,
+        realitySupportX25519Mlkem768: true,
+      );
+      expect(environment['REALITY_SUPPORT_X25519MLKEM768'], 'true');
+      expect(environment['BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN'], 'true');
+      expect(environment, isNot(contains('BOOTSTRAP_SUBSCRIPTION_URL')));
+      expect(environment['BOOTSTRAP_FALLBACK_CONFIG'], isNotEmpty);
+    });
+
     test('omits verbose from flutter build args by default', () {
       final args = setup.createFlutterBuildArgs(
         platform: 'android',
@@ -74,6 +97,30 @@ void main() {
       );
 
       expect(args, ['dart-define-from-file=env.json', 'split-per-abi']);
+    });
+
+    test('first-run subscription keeps fallback without bundling a URL', () {
+      final fallback = File('config/personal_fallback.json').readAsStringSync();
+
+      expect(
+        setup.createBuildEnvironment('pre', subscriptionOnFirstRun: true),
+        {
+          'APP_ENV': 'pre',
+          'BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN': 'true',
+          'BOOTSTRAP_FALLBACK_CONFIG': jsonEncode(jsonDecode(fallback)),
+        },
+      );
+    });
+
+    test('rejects conflicting bundled and first-run subscription modes', () {
+      expect(
+        () => setup.createBuildEnvironment(
+          'pre',
+          subscriptionUrl: 'https://example.invalid/subscription',
+          subscriptionOnFirstRun: true,
+        ),
+        throwsArgumentError,
+      );
     });
 
     test('adds verbose to flutter build args with -v', () {

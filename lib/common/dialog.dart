@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:animations/animations.dart';
 import 'package:flashco/common/common.dart';
+import 'package:flashco/common/subscription_onboarding.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/widgets/widgets.dart';
@@ -116,6 +117,27 @@ class Dialogs {
         value: '',
         labelText: currentAppLocalizations.password,
         obscureText: true,
+      ),
+    );
+  }
+
+  Future<String?> showSubscriptionUrlInput({String value = ''}) {
+    final appLocalizations = currentAppLocalizations;
+    return showCommonDialog<String>(
+      child: InputDialog(
+        title: appLocalizations.importFromLink,
+        value: value,
+        labelText: appLocalizations.url,
+        inputFormatters: TextInputLimits.limit(TextInputLimits.url),
+        validator: (value) {
+          if (value == null || value.trim().isEmpty) {
+            return appLocalizations.emptyTip(appLocalizations.value);
+          }
+          if (!isSubscriptionUrl(value)) {
+            return appLocalizations.urlTip(appLocalizations.value);
+          }
+          return null;
+        },
       ),
     );
   }

@@ -219,6 +219,51 @@ void main() {
   });
 
   test(
+    'first-run input applies the same defaults without a bundled URL',
+    () async {
+      final bundled = await initializePersonalDefaults(
+        _existing,
+        subscriptionUrl: _url,
+        enabled: true,
+        isNewInstallation: true,
+      );
+      final store = await SharedPreferences.getInstance();
+      await store.clear();
+
+      final prompted = await initializePersonalDefaults(
+        _existing,
+        subscriptionUrl: '',
+        enabled: true,
+        isNewInstallation: true,
+        subscriptionOnFirstRun: true,
+      );
+
+      expect(prompted, bundled);
+      expect(await preferences.getConfig(), bundled);
+      expect(await preferences.werePersonalDefaultsApplied(), isTrue);
+    },
+  );
+
+  test(
+    'first-run input preserves existing installations and disabled defaults',
+    () async {
+      for (final (enabled, isNew) in [(true, false), (false, true)]) {
+        final updated = await initializePersonalDefaults(
+          _existing,
+          subscriptionUrl: '',
+          enabled: enabled,
+          isNewInstallation: isNew,
+          subscriptionOnFirstRun: true,
+        );
+
+        expect(updated, _existing);
+        expect(await preferences.getConfig(), isNull);
+        expect(await preferences.werePersonalDefaultsApplied(), isFalse);
+      }
+    },
+  );
+
+  test(
     'unavailable preferences cannot mark the defaults as complete',
     () async {
       final previous = preferences.sharedPreferencesCompleter;

@@ -9,6 +9,7 @@ import 'package:flashco/common/default_rules.dart';
 import 'package:flashco/common/launch.dart';
 import 'package:flashco/common/migration.dart';
 import 'package:flashco/common/personal_defaults.dart';
+import 'package:flashco/common/subscription_onboarding.dart';
 import 'package:flashco/common/tray.dart';
 import 'package:flashco/common/window.dart';
 import 'package:flashco/database/database.dart';
@@ -36,6 +37,13 @@ class Bootstrap {
   }
 
   BootDecision _bootDecision = const BootDecision();
+
+  bool get _subscriptionOnboardingEnabled =>
+      subscriptionOnFirstRun &&
+      system.isAndroid &&
+      !safeModeBuild &&
+      !_bootDecision.isDegraded &&
+      bundledSubscriptionUrl.trim().isEmpty;
 
   Future<ProviderContainer> init(int version) async {
     globalState.appEnv = const String.fromEnvironment(
@@ -103,7 +111,14 @@ class Bootstrap {
   ) async {
     await _claimDataDirectory();
     globalState.packageInfo = await PackageInfo.fromPlatform();
-    final isNewInstallation = await preferences.isNewInstallation;
+    final isNewInstallation =
+        await preferences.isNewInstallation ||
+        (_subscriptionOnboardingEnabled &&
+            await preferences.isSubscriptionOnboardingInitializing);
+    await preferences.initializeSubscriptionOnboarding(
+      enabled: _subscriptionOnboardingEnabled,
+      isNewInstallation: isNewInstallation,
+    );
     if (isNewInstallation) {
       await database.initializeNewInstallationRules(russianServiceDirectRules);
     }
@@ -119,6 +134,7 @@ class Bootstrap {
       config,
       subscriptionUrl: bundledSubscriptionUrl,
       isNewInstallation: isNewInstallation,
+      subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&
@@ -137,6 +153,9 @@ class Bootstrap {
     if (patchClashConfig != config.patchClashConfig) {
       config = config.copyWith(patchClashConfig: patchClashConfig);
       await preferences.saveConfig(config);
+    }
+    if (_subscriptionOnboardingEnabled) {
+      await preferences.finishSubscriptionOnboardingInitialization();
     }
     final appState = AppState(
       brightness: WidgetsBinding.instance.platformDispatcher.platformBrightness,
@@ -207,8 +226,11 @@ class Bootstrap {
     final hasBundledSubscription =
         (system.isAndroid || system.isWindows) &&
         bundledSubscriptionUrl.trim().isNotEmpty;
+    final hasPendingSubscription =
+        _subscriptionOnboardingEnabled &&
+        await preferences.isSubscriptionOnboardingPending;
     if (!_bootDecision.isDegraded &&
-        (!hasBundledSubscription ||
+        ((!hasBundledSubscription && !hasPendingSubscription) ||
             _container.read(profilesProvider).isNotEmpty)) {
       await _container.read(setupActionProvider.notifier).initStatus();
     }
@@ -221,6 +243,28 @@ class Bootstrap {
         () => _container
             .read(profilesActionProvider.notifier)
             .importBundledSubscription(bundledSubscriptionUrl),
+      );
+    }
+    if (hasPendingSubscription) {
+      await globalState.safeRun(
+        () => requestFirstRunSubscription(
+          requestUrl: (value) => dialogs.showSubscriptionUrlInput(value: value),
+          hasProfiles: () async {
+            await _container.read(profilesProvider.notifier).settledWrites;
+            return (await database.profilesDao.query().get()).isNotEmpty;
+          },
+          importSubscription: (url) async {
+            await preferences.stageBundledFallback(
+              url,
+              bundledFallbackConfig,
+              isNewInstallation: true,
+              enabled: true,
+            );
+            await _container
+                .read(profilesActionProvider.notifier)
+                .importBundledSubscription(url, firstRun: true);
+          },
+        ),
       );
     }
   }

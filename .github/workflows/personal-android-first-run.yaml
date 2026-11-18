@@ -1,0 +1,106 @@
+name: personal Android (first launch + REALITY ML-KEM)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: personal-android-first-run
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.47.6'
+  GO_VERSION: '1.27.1'
+  NDK_VERSION: r28c
+
+jobs:
+  build:
+    name: build first-run subscription APK
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Verify first-run subscription, personal defaults, TUN, and routing
+        run: >-
+          flutter test test/common/personal_defaults_test.dart
+          test/models/tun_test.dart
+          test/database/initial_rules_test.dart
+          test/common/final_routing_yaml_test.dart
+          test/setup_test.dart
+          test/common/subscription_onboarding_test.dart
+          test/common/dialog_test.dart
+          test/common/bundled_fallback_test.dart
+          test/providers/bundled_subscription_test.dart
+          test/common/reality_defaults_test.dart
+          test/common/task_test.dart
+
+      - name: Verify enabled REALITY defaults against Core
+        env:
+          REALITY_MLKEM_FIXTURE_PATH: ${{ runner.temp }}/flashco-reality-overrides.json
+        run: |
+          flutter test --dart-define=REALITY_SUPPORT_X25519MLKEM768=true test/common/reality_defaults_test.dart
+          CGO_ENABLED=0 go -C core test . -run '^TestRealityMlkemProviderDefaults$' -count=1
+
+      - name: Build universal APK
+        env:
+          ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
+          BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN: 'true'
+          REALITY_SUPPORT_X25519MLKEM768: 'true'
+        run: |
+          dart setup.dart android --env pre --targets apk --universal-apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: flashco-personal-android-first-run-mlkem-${{ github.run_number }}
+          path: dist/*android*.apk
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Remove generated build inputs
+        if: always()
+        run: rm -f env.json android/local.properties android/app/keystore.jks
