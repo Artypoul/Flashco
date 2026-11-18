@@ -14,6 +14,14 @@ still pointed to the baseline. Reconcile current refs and concurrent work before
 SQLite version collisions, preferences compatibility, profile-base preservation, module CI coverage and packaging gates.
 Earlier results below are historical and do not validate the donor implementation.
 
+The second review of [PR #15](https://github.com/Artypoul/Flashco/pull/15) adds explicit preservation rules for
+donor UI upgrades, alteration of existing MITM tables, full app-state backup/restore, and the actual `getProfile`
+route/REALITY test matrix. Reuse the existing signed `.github/workflows/release.yaml`; adapt its metadata checkout
+for Prism and native-hook jobs for the verified CA bundle. Personal Android builds without release signing use
+`com.follow.flashco.dev`, so they do not prove official in-place upgrades. Freeze generated files and final workflows
+before producing test packages. Code-PR readiness and post-merge signed client-release readiness are separate gates.
+The local implementation checkpoint remains optional and unverified; its referenced integration note is not tracked.
+
 Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
 
 ## Optional Android first-run subscription — 2026-11-18
