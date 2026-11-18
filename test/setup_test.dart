@@ -67,6 +67,29 @@ void main() {
       });
     });
 
+    test('REALITY ML-KEM is an independent opt-in build define', () {
+      expect(
+        setup.createBuildEnvironment('pre', realitySupportX25519Mlkem768: true),
+        {'APP_ENV': 'pre', 'REALITY_SUPPORT_X25519MLKEM768': 'true'},
+      );
+      expect(
+        setup.createBuildEnvironment(
+          'pre',
+          realitySupportX25519Mlkem768: false,
+        ),
+        {'APP_ENV': 'pre'},
+      );
+      final environment = setup.createBuildEnvironment(
+        'pre',
+        subscriptionOnFirstRun: true,
+        realitySupportX25519Mlkem768: true,
+      );
+      expect(environment['REALITY_SUPPORT_X25519MLKEM768'], 'true');
+      expect(environment['BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN'], 'true');
+      expect(environment, isNot(contains('BOOTSTRAP_SUBSCRIPTION_URL')));
+      expect(environment['BOOTSTRAP_FALLBACK_CONFIG'], isNotEmpty);
+    });
+
     test('omits verbose from flutter build args by default', () {
       final args = setup.createFlutterBuildArgs(
         platform: 'android',

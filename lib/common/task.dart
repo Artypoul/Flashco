@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flashco/common/common.dart';
+import 'package:flashco/common/reality_defaults.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter/foundation.dart';
@@ -373,7 +374,9 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
         .toList();
   }
   rawConfig['rules'] = rules;
-  final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
+  final yaml = await _encodeYaml(
+    applyRealityDefaults(Map<String, dynamic>.from(rawConfig)),
+  );
   return (yaml: yaml, md5: yaml.toMd5());
 }
 

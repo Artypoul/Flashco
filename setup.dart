@@ -164,6 +164,7 @@ Map<String, String> createBuildEnvironment(
   String env, {
   String? subscriptionUrl,
   bool subscriptionOnFirstRun = false,
+  bool realitySupportX25519Mlkem768 = false,
   String? rootDir,
 }) {
   final environment = {'APP_ENV': env};
@@ -176,6 +177,9 @@ Map<String, String> createBuildEnvironment(
   }
   if (subscriptionOnFirstRun) {
     environment['BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN'] = 'true';
+  }
+  if (realitySupportX25519Mlkem768) {
+    environment['REALITY_SUPPORT_X25519MLKEM768'] = 'true';
   }
   if (subscriptionOnFirstRun || (url != null && url.isNotEmpty)) {
     final settings = FallbackConfig.fromJson(
@@ -240,6 +244,8 @@ Future<int> _package(
         subscriptionOnFirstRun:
             Platform.environment['BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN'] ==
             'true',
+        realitySupportX25519Mlkem768:
+            Platform.environment['REALITY_SUPPORT_X25519MLKEM768'] == 'true',
         rootDir: rootDir,
       ),
     ),
