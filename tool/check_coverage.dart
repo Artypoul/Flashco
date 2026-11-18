@@ -25,6 +25,7 @@ const _groupFloors = <String, double>{
   'models': 67.0,
   'providers': 73.0,
   'common': 74.0,
+  'flashco': 95.0,
   'manager': 68.0,
   'views': 66.0,
   'enum': 86.0,

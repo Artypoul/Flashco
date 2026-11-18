@@ -6,7 +6,10 @@ toolchain go1.27.1
 
 replace github.com/metacubex/mihomo => ./Clash.Meta
 
+replace github.com/Artypoul/Flashco/modules/flashco_core => ../modules/flashco_core
+
 require (
+	github.com/Artypoul/Flashco/modules/flashco_core v0.0.0
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/dlclark/regexp2 v1.12.0
 	github.com/metacubex/http v0.1.8

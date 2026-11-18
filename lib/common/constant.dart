@@ -9,6 +9,8 @@ import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:material_ui/material_ui.dart';
 
+export 'package:flashco/flashco/build_defines.dart';
+
 const appName = 'Flashco';
 const appInstallationName = 'Flashco';
 const defaultTunDeviceName = 'Flashco';
@@ -49,18 +51,6 @@ const sheetAppBarHeight = 68.0;
 const watchExecution = false;
 
 const safeModeBuild = bool.fromEnvironment('SAFE_MODE');
-const bundledSubscriptionUrl = String.fromEnvironment(
-  'BOOTSTRAP_SUBSCRIPTION_URL',
-);
-const subscriptionOnFirstRun = bool.fromEnvironment(
-  'BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN',
-);
-const realitySupportX25519Mlkem768 = bool.fromEnvironment(
-  'REALITY_SUPPORT_X25519MLKEM768',
-);
-const bundledFallbackConfig = String.fromEnvironment(
-  'BOOTSTRAP_FALLBACK_CONFIG',
-);
 
 const disclaimerVersion = 1;
 

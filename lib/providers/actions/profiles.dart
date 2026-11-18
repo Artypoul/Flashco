@@ -195,12 +195,7 @@ class ProfilesAction extends _$ProfilesAction {
   Future<Profile> _withImportDefaults(Profile profile) async {
     final selectedMap = await globalState.safeRun(() async {
       final groups = await _core.getProfileGroupReferences(profile.id);
-      return {
-        for (final mode in [Mode.rule, Mode.global])
-          if (fastestChoice(groups, mode) case final choice?)
-            choice.selector.name: choice.automatic.name,
-        ...profile.selectedMap,
-      };
+      return importDefaultSelections(groups, profile.selectedMap);
     });
     return profile.copyWith(selectedMap: selectedMap ?? profile.selectedMap);
   }
