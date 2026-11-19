@@ -40,20 +40,23 @@ void main() {
     expect(Tun.fromJson({'mtu': 1500}).mtu, 1500);
   });
 
-  test('the desktop TUN takes only its switch, device and stack, routed', () {
-    const tun = Tun(
-      enable: true,
-      stack: TunStack.gvisor,
-      mtu: 1400,
-      routeAddress: ['1.0.0.0/8'],
-    );
+  test('desktop TUN preserves the selected auto-route value', () {
+    for (final autoRoute in [false, true]) {
+      final tun = Tun(
+        enable: true,
+        autoRoute: autoRoute,
+        stack: TunStack.gvisor,
+        mtu: 1400,
+        routeAddress: const ['1.0.0.0/8'],
+      );
 
-    expect(tun.coreJson, {
-      'enable': true,
-      'device': tun.device,
-      'stack': 'gvisor',
-      'auto-route': true,
-    });
+      expect(tun.coreJson, {
+        'enable': true,
+        'device': tun.device,
+        'stack': 'gvisor',
+        'auto-route': autoRoute,
+      });
+    }
   });
 
   test('a config update patches every key the desktop TUN takes', () {

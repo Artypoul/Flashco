@@ -2,6 +2,7 @@ package com.follow.flashco.plugins
 
 import com.follow.flashco.ServiceController
 import com.follow.flashco.ServiceState
+import com.follow.flashco.isCoreSetupCall
 import com.follow.flashco.common.Components
 import com.follow.flashco.common.GlobalState
 import com.follow.flashco.core.Core
@@ -91,10 +92,22 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             result.error("INVALID_ARGUMENT", "Method call payload must be a string", null)
             return
         }
-        ServiceController.invokeMethod(data) { response ->
-            result.success(response)
-        }.onFailure { error ->
-            result.error("CORE_ERROR", error.message, null)
+        if (isCoreSetupCall(data)) {
+            scope.launch {
+                runCatching {
+                    ServiceState.withCoreSetup { ServiceController.invokeSetup(data) }
+                }.onSuccess { response ->
+                    result.success(response)
+                }.onFailure { error ->
+                    result.error("CORE_ERROR", error.message, null)
+                }
+            }
+        } else {
+            ServiceController.invokeMethod(data) { response ->
+                result.success(response)
+            }.onFailure { error ->
+                result.error("CORE_ERROR", error.message, null)
+            }
         }
     }
 

@@ -15,8 +15,11 @@ Future<Config> initializePersonalDefaults(
         isNewInstallation: isNewInstallation,
         subscriptionOnFirstRun: subscriptionOnFirstRun,
       ) ||
-      !await preferences.isInit ||
-      await preferences.werePersonalDefaultsApplied()) {
+      !await preferences.isInit) {
+    return config;
+  }
+  if (await preferences.werePersonalDefaultsApplied()) {
+    await preferences.finishPersonalDefaultsInitialization();
     return config;
   }
   final updated = applyPersonalDefaults(config);
@@ -24,5 +27,6 @@ Future<Config> initializePersonalDefaults(
     throw StateError('Failed to save personal startup defaults');
   }
   await preferences.markPersonalDefaultsApplied();
+  await preferences.finishPersonalDefaultsInitialization();
   return updated;
 }

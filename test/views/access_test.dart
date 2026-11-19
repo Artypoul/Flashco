@@ -95,6 +95,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late ProviderContainer container;
+  late ProviderSubscription<VpnProps> vpnSubscription;
   late _TestSystemAction systemAction;
 
   setUp(() {
@@ -106,10 +107,14 @@ void main() {
       ],
     );
     globalState.container = container;
+    vpnSubscription = container.listen(vpnSettingProvider, (_, _) {});
     container.read(packagesProvider.notifier).value = _packages;
   });
 
-  tearDown(() => container.dispose());
+  tearDown(() {
+    vpnSubscription.close();
+    container.dispose();
+  });
 
   void seedAccessControl(AccessControlProps props) {
     container.read(vpnSettingProvider.notifier).value = const VpnProps()
@@ -658,6 +663,30 @@ void main() {
 
       await teardownView(tester);
     });
+
+    testWidgets(
+      'leaving without saving restores the saved selection on reentry',
+      (tester) async {
+        const saved = AccessControlProps(
+          enable: true,
+          rejectList: ['com.example.browser'],
+        );
+        seedAccessControl(saved);
+        await pumpAccessView(tester);
+        await tester.tap(find.text('Chat'));
+        await tester.pump();
+        expect(container.read(accessControlStateProvider).rejectList, [
+          'com.example.browser',
+          'com.example.chat',
+        ]);
+
+        await teardownView(tester);
+        expect(container.read(vpnSettingProvider).accessControlProps, saved);
+        await pumpAccessView(tester);
+        expect(container.read(accessControlStateProvider), saved);
+        await teardownView(tester);
+      },
+    );
 
     testWidgets('keeps hidden packages and sorts what it persists', (
       tester,

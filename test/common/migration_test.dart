@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:flashco/common/constant.dart';
 import 'package:flashco/common/migration.dart';
-import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:prism_ui/prism_ui.dart';
@@ -295,155 +293,41 @@ void main() {
       ]);
     });
 
-    group('upgrade', () {
-      Map<String, Object?> customized() =>
-          _createConfigMap()
-            ..['themeProps'] = {
-              'primaryColor': 0xFF123456,
-              'primaryColors': [0xFF795548, 0xFF123456],
-              'schemeVariant': 'tonalSpot',
-              'themeMode': 'dark',
-              'pureBlack': true,
-              'liquidGlass': true,
-              'systemFontFamily': 'Beta Serif',
-            };
-
-      test('starts theme colors over once and keeps the rest', () async {
-        final store = _FakeMigrationStore(
-          configMap: customized(),
-          version: Migration.currentVersion,
-          upgradeVersion: 0,
-        );
-
-        final config = await Migration(store: store).run();
-
-        final theme = config.themeProps;
-        expect(theme.primaryColor, defaultPrimaryColor);
-        expect(theme.primaryColors, defaultPrimaryColors);
-        expect(theme.colorStyle, ColorStyle.vivid);
-        expect(theme.themeMode, ThemeMode.dark);
-        expect(theme.pureBlack, isTrue);
-        expect(theme.liquidGlass, LiquidGlassMode.ultra);
-        expect(theme.fontFamily, 'Beta Serif');
-        expect(store.savedConfig, config);
-        expect(store.version, Migration.currentVersion);
-        expect(store.upgradeVersion, Migration.upgradeVersion);
-        expect(store.events, [
-          'getConfigMap',
-          'getVersion',
-          'saveConfig',
-          'setUpgradeVersion',
-        ]);
-
-        final later = _FakeMigrationStore(
-          configMap: jsonDecode(
-            jsonEncode(config.copyWith.themeProps(primaryColor: 0xFF123456)),
-          ),
-          version: store.version,
-          upgradeVersion: store.upgradeVersion,
-        );
-        final kept = await Migration(store: later).run();
-
-        expect(kept.themeProps.primaryColor, 0xFF123456);
-        expect(later.events, ['getConfigMap', 'getVersion']);
-      });
-
-      test('keeps standard glass on the ultra tier it became, once', () async {
-        Future<LiquidGlassMode> upgrade(String mode, int from) async {
-          final configMap = _createConfigMap();
-          (configMap['themeProps']! as Map<String, Object?>)['liquidGlass'] =
-              mode;
-          final store = _FakeMigrationStore(
-            configMap: configMap,
-            version: Migration.currentVersion,
-            upgradeVersion: from,
-          );
-          return (await Migration(store: store).run()).themeProps.liquidGlass;
-        }
-
-        expect(await upgrade('standard', 1), LiquidGlassMode.ultra);
-        expect(await upgrade('none', 1), LiquidGlassMode.none);
-        expect(await upgrade('standard', 2), LiquidGlassMode.standard);
-      });
-
-      test('moves presets picked before to the current system colors, '
-          'once', () async {
-        Future<ThemeProps> upgrade(int from) async {
+    group('Flashco theme upgrade policy', () {
+      for (final marker in [0, 1, 4, 99]) {
+        test('preserves saved choices with donor marker $marker', () async {
           final configMap = _createConfigMap();
           (configMap['themeProps']! as Map<String, Object?>)
-            ..['primaryColor'] = 0xFFFF9500
-            ..['primaryColors'] = [
-              0xFF007AFF,
-              0xFFAF52DE,
-              0xFFCB30E0,
-              0xFFFF9500,
-              0xFF123456,
-            ];
+            ..['primaryColor'] = 0xFF123456
+            ..['primaryColors'] = [0xFF795548, 0xFF123456]
+            ..['themeMode'] = 'dark'
+            ..['sidebarBlur'] = true;
           final store = _FakeMigrationStore(
             configMap: configMap,
             version: Migration.currentVersion,
-            upgradeVersion: from,
+            upgradeVersion: marker,
           );
-          return (await Migration(store: store).run()).themeProps;
-        }
+          final config = await Migration(store: store).run();
+          expect(config.themeProps.primaryColor, 0xFF123456);
+          expect(config.themeProps.primaryColors, [0xFF795548, 0xFF123456]);
+          expect(config.themeProps.themeMode, ThemeMode.dark);
+          expect(config.themeProps.sidebarBlur, isTrue);
+          expect(store.upgradeVersion, marker);
+          expect(store.events, ['getConfigMap', 'getVersion']);
+        });
+      }
 
-        final moved = await upgrade(2);
-        expect(moved.primaryColor, 0xFFFF8D28);
-        expect(moved.primaryColors, [
-          0xFF007AFF,
-          0xFFCB30E0,
-          0xFFFF8D28,
-          0xFF123456,
-        ]);
-        expect((await upgrade(3)).primaryColor, 0xFFFF9500);
-      });
-
-      test('turns off the sidebar blur releases stored unseen, once', () async {
-        Future<bool> upgrade(int from) async {
-          final configMap = _createConfigMap();
-          (configMap['themeProps']! as Map<String, Object?>)['sidebarBlur'] =
-              true;
-          final store = _FakeMigrationStore(
-            configMap: configMap,
-            version: Migration.currentVersion,
-            upgradeVersion: from,
-          );
-          return (await Migration(store: store).run()).themeProps.sidebarBlur;
-        }
-
-        expect(await upgrade(3), isFalse);
-        expect(await upgrade(4), isTrue);
-      });
-
-      test('a new install only records it', () async {
+      test('preserves an explicitly disabled sidebar blur', () async {
+        final configMap = _createConfigMap();
+        (configMap['themeProps']! as Map<String, Object?>)['sidebarBlur'] =
+            false;
         final store = _FakeMigrationStore(
-          configMap: null,
-          version: 0,
-          upgradeVersion: 0,
-        );
-
-        final config = await Migration(store: store).run();
-
-        expect(config.themeProps, defaultThemeProps);
-        expect(store.upgradeVersion, Migration.upgradeVersion);
-        expect(
-          store.events.where((event) => event == 'saveConfig'),
-          hasLength(1),
-        );
-      });
-
-      test('waits for the next launch when saving fails', () async {
-        final store = _FakeMigrationStore(
-          configMap: customized(),
+          configMap: configMap,
           version: Migration.currentVersion,
-          upgradeVersion: 0,
-          configSaveResult: false,
         );
-
         final config = await Migration(store: store).run();
-
-        expect(config.themeProps.primaryColor, 0xFF123456);
-        expect(store.upgradeVersion, 0);
+        expect(config.themeProps.sidebarBlur, isFalse);
+        expect(store.events, ['getConfigMap', 'getVersion']);
       });
     });
 
@@ -514,7 +398,7 @@ class _FakeMigrationStore implements MigrationStore {
   _FakeMigrationStore({
     required this.configMap,
     required this.version,
-    this.upgradeVersion = Migration.upgradeVersion,
+    this.upgradeVersion = 0,
     this.clashConfigMap,
     this.configSaveResult = true,
     this.available = true,
@@ -567,14 +451,5 @@ class _FakeMigrationStore implements MigrationStore {
   Future<void> setVersion(int version) async {
     events.add('setVersion');
     this.version = version;
-  }
-
-  @override
-  Future<int> getUpgradeVersion() async => upgradeVersion;
-
-  @override
-  Future<void> setUpgradeVersion(int version) async {
-    events.add('setUpgradeVersion');
-    upgradeVersion = version;
   }
 }

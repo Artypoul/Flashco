@@ -285,7 +285,7 @@ void main() {
       }
     }
     expect(handler.calls[CoreMethod.coreInit], {
-      'home-dir': '/tmp/flclash',
+      'home-dir': '/tmp/flashco',
       'version': 35,
     });
     expect(json.decode(json.encode(handler.calls[CoreMethod.configSetup])), {

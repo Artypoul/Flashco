@@ -136,8 +136,13 @@ void main() {
       await request.response.close();
     });
     core = _Core();
-    when(() => core.validateConfig(any())).thenAnswer((_) async => '');
+    when(() => core.validateConfig(any())).thenAnswer((_) async => null);
     when(() => core.clearEffect(any())).thenAnswer((_) async {});
+    when(() => core.resetTraffic()).thenAnswer((_) async {});
+    when(() => core.getTraffic(any())).thenAnswer((_) async => const Traffic());
+    when(
+      () => core.getTotalTraffic(any()),
+    ).thenAnswer((_) async => const Traffic());
     when(
       () => core.getProfileGroupReferences(any()),
     ).thenAnswer((_) async => []);
@@ -162,10 +167,13 @@ void main() {
     await pumpEventQueue();
   });
   tearDown(() async {
-    await setup.setRunning(false);
-    container.dispose();
-    await server.close(force: true);
-    await database.close();
+    try {
+      await setup.setRunning(false);
+    } finally {
+      container.dispose();
+      await server.close(force: true);
+      await database.close();
+    }
   });
 
   ProfilesAction action() => container.read(profilesActionProvider.notifier);

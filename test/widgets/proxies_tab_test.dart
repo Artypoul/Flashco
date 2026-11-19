@@ -160,6 +160,65 @@ void main() {
     expect(current.right, lessThan(more.left));
   });
 
+  testWidgets('horizontal group drags do not move a partially open sheet', (
+    tester,
+  ) async {
+    const size = Size(400, 900);
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: globalContainer,
+        child: TestApp(
+          child: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showSnapSheet<void>(
+                context,
+                builder: (_, _) => Scaffold(
+                  title: 'Groups',
+                  body: Builder(
+                    builder: (context) => Padding(
+                      padding: EdgeInsets.only(top: context.contentTopPadding),
+                      child: const Align(
+                        alignment: Alignment.topCenter,
+                        child: _SheetGroupTabs(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    globalContainer.read(viewSizeProvider.notifier).value = size;
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final handle = find.byType(SheetDragHandle);
+    final beforeTop = tester.getTopLeft(handle).dy;
+    expect(beforeTop, closeTo(size.height * (1 - snapSheetDetents.first), 1));
+    final scrollable = find.descendant(
+      of: find.byType(GroupTabs),
+      matching: find.byType(Scrollable),
+    );
+    final position = tester.state<ScrollableState>(scrollable).position;
+    expect(position.maxScrollExtent, greaterThan(0));
+    final beforeOffset = position.pixels;
+    await tester.drag(scrollable, const Offset(-180, 0));
+    await tester.pumpAndSettle();
+
+    expect(position.pixels, greaterThan(beforeOffset));
+    expect(tester.getTopLeft(handle).dy, closeTo(beforeTop, 1));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('the last tab scrolls clear of the more button', (tester) async {
     globalContainer
         .read(_tabStateProvider.notifier)
@@ -503,6 +562,29 @@ void main() {
     expect(isTabSelected(tester, 'B'), isTrue);
     expect(tester.takeException(), isNull);
   });
+}
+
+class _SheetGroupTabs extends StatefulWidget {
+  const _SheetGroupTabs();
+
+  @override
+  State<_SheetGroupTabs> createState() => _SheetGroupTabsState();
+}
+
+class _SheetGroupTabsState extends State<_SheetGroupTabs>
+    with SingleTickerProviderStateMixin {
+  late final _groups = [for (var i = 0; i < 12; i++) _group('Group $i')];
+  late final _controller = TabController(length: _groups.length, vsync: this);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      GroupTabs(controller: _controller, groups: _groups);
 }
 
 Finder tabOf(String name) =>

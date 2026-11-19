@@ -6,8 +6,9 @@ import 'dart:isolate';
 import 'package:crypto/crypto.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/state.dart';
 import 'package:flashco/plugins/app.dart';
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:path/path.dart';
 
@@ -35,21 +36,57 @@ final class UpdateReady extends UpdateDownload {
 }
 
 @visibleForTesting
-String? Function() resolveSelfUpdateSuffix = () => selfUpdateAssetSuffix(
-  Abi.current(),
-  windowsInstalled: system.isWindows && isInstalledWindowsBuild,
+bool Function() resolveStableUpdateEligibility = () => stableUpdateEligible(
+  debug: kDebugMode,
+  environment: const String.fromEnvironment('APP_ENV', defaultValue: 'pre'),
+  android: system.isAndroid,
+  packageName: globalState.packageInfo.packageName,
+  bundledSubscription: bundledSubscriptionUrl,
+  bundledFallback: bundledFallbackConfig,
+  firstRun: subscriptionOnFirstRun,
+  reality: realitySupportX25519Mlkem768,
+  mitm: mitmFeature,
 );
+
+bool get isStableUpdateBuild => resolveStableUpdateEligibility();
+
+@visibleForTesting
+String? Function() resolveSelfUpdateSuffix = () {
+  if (!isStableUpdateBuild) return null;
+  return selfUpdateAssetSuffix(
+    Abi.current(),
+    windowsInstalled: system.isWindows && isInstalledWindowsBuild,
+  );
+};
+
+bool stableUpdateEligible({
+  required bool debug,
+  required String environment,
+  required bool android,
+  required String packageName,
+  required String bundledSubscription,
+  required String bundledFallback,
+  required bool firstRun,
+  required bool reality,
+  required bool mitm,
+}) =>
+    !debug &&
+    environment == 'stable' &&
+    (!android || packageName == 'com.follow.flashco') &&
+    !packageName.endsWith('.dev') &&
+    bundledSubscription.isEmpty &&
+    bundledFallback.isEmpty &&
+    !firstRun &&
+    !reality &&
+    !mitm;
 
 String? get selfUpdateSuffix => resolveSelfUpdateSuffix();
 
 // The names follow the release matrix in .github/workflows/build.yaml.
 String? selfUpdateAssetSuffix(Abi abi, {required bool windowsInstalled}) {
   return switch (abi) {
-    Abi.androidArm64 => 'android-arm64-v8a.apk',
-    Abi.androidArm => 'android-armeabi-v7a.apk',
-    Abi.androidX64 => 'android-x86_64.apk',
+    Abi.androidArm64 || Abi.androidArm || Abi.androidX64 => 'android.apk',
     Abi.windowsX64 when windowsInstalled => 'windows-amd64-setup.exe',
-    Abi.windowsArm64 when windowsInstalled => 'windows-arm64-setup.exe',
     _ => null,
   };
 }
@@ -66,13 +103,15 @@ Uri releaseAssetUri(String tag, String name) {
 final _checksumLine = RegExp(r'^([0-9a-fA-F]{64}) [ *](?:\./)?(.+)$');
 
 String? releaseChecksum(String sums, String name) {
+  String? found;
   for (final line in const LineSplitter().convert(sums)) {
     final match = _checksumLine.firstMatch(line.trim());
     if (match != null && match[2] == name) {
-      return match[1]!.toLowerCase();
+      if (found != null) return null;
+      found = match[1]!.toLowerCase();
     }
   }
-  return null;
+  return found;
 }
 
 Future<String> fileSha256(String path) {

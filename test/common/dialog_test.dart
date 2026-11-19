@@ -1,18 +1,18 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/common/theme.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
-import 'package:flashco/manager/status_manager.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/disclaimer.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/glyph_finders.dart';
 import '../helpers/test_app.dart';
+import '../helpers/host_scaffold.dart';
 
 Future<ProviderContainer> _pumpHost(
   WidgetTester tester, {
@@ -34,7 +34,7 @@ Future<ProviderContainer> _pumpHost(
       container: container,
       child: TestApp(
         homeBuilder: homeBuilder ?? (child) => child,
-        child: const Scaffold(body: SizedBox.shrink()),
+        child: const HostScaffold(body: SizedBox.shrink()),
       ),
     ),
   );
@@ -56,9 +56,9 @@ Future<void> _agree(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// The real manager stack mounts [StatusManager] above the app navigator, so
-/// [Dialogs.showNotifier] can reach it from `navigatorKey.currentContext`.
-Future<void> _pumpStatusManagerHost(WidgetTester tester) async {
+/// [PrismApp] mounts the [BannerHost] above its navigator, so
+/// [Dialogs.showBanner] can reach it from `navigatorKey.currentContext`.
+Future<void> _pumpBannerHost(WidgetTester tester) async {
   tester.view.physicalSize = const Size(1000, 800);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -74,16 +74,14 @@ Future<void> _pumpStatusManagerHost(WidgetTester tester) async {
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: MaterialApp(
+      child: PrismApp(
         navigatorKey: globalState.navigatorKey,
-        localizationsDelegates: const [AppLocalizations.delegate],
         supportedLocales: AppLocalizations.delegate.supportedLocales,
         builder: (context, child) {
-          globalState.measure = Measure.of(context, 1);
-          globalState.theme = CommonTheme.of(context, 1);
-          return StatusManager(child: child!);
+          globalState.measure = MeasureScope.of(context);
+          return child!;
         },
-        home: const Scaffold(body: SizedBox.shrink()),
+        home: const HostScaffold(body: SizedBox.shrink()),
       ),
     ),
   );
@@ -254,7 +252,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     final outer = tester.element(find.text('open inner'));
-    final scrim = outer.colorScheme.scrim.withValues(alpha: 0.32);
+    final scrim = outer.colorScheme.alertScrim;
     expect(ModalRoute.of(outer)!.barrierColor, scrim);
 
     await tester.tap(find.text('open inner'));
@@ -304,30 +302,23 @@ void main() {
     expect(find.text('profile-a'), findsNothing);
   });
 
-  testWidgets(
-    'requestDisclaimerConsent maps agree, exit, and back to a boolean',
-    (tester) async {
-      await _pumpHost(tester);
+  testWidgets('requestDisclaimerConsent maps agree and back to a boolean', (
+    tester,
+  ) async {
+    await _pumpHost(tester);
 
-      final agreed = requestDisclaimerConsent();
-      await tester.pumpAndSettle();
-      expect(find.text('Data collection and privacy'), findsOneWidget);
-      await _agree(tester);
-      expect(await agreed, isTrue);
+    final agreed = requestDisclaimerConsent();
+    await tester.pumpAndSettle();
+    expect(find.text('Data collection and privacy'), findsOneWidget);
+    await _agree(tester);
+    expect(await agreed, isTrue);
 
-      final declined = requestDisclaimerConsent();
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Exit'));
-      await tester.pumpAndSettle();
-      expect(await declined, isFalse);
-
-      final dismissed = requestDisclaimerConsent();
-      await tester.pumpAndSettle();
-      rootNavigatorKey.currentState!.pop();
-      await tester.pumpAndSettle();
-      expect(await dismissed, isFalse);
-    },
-  );
+    final dismissed = requestDisclaimerConsent();
+    await tester.pumpAndSettle();
+    rootNavigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+    expect(await dismissed, isFalse);
+  });
 
   for (final size in [const Size(1000, 800), const Size(400, 800)]) {
     testWidgets(
@@ -378,7 +369,7 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(find.text('Exit'));
+      rootNavigatorKey.currentState!.pop();
       await tester.pumpAndSettle();
       expect(await agreed, isFalse);
     },
@@ -396,12 +387,12 @@ void main() {
     expect(find.text('Exit'), findsNothing);
   });
 
-  testWidgets('showNotifier delivers text through the StatusManager host', (
+  testWidgets('showBanner delivers text through the banner host', (
     tester,
   ) async {
-    await _pumpStatusManagerHost(tester);
+    await _pumpBannerHost(tester);
 
-    dialogs.showNotifier('something happened');
+    dialogs.showBanner('something happened');
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -409,12 +400,10 @@ void main() {
     expect(tester.takeException(), null);
   });
 
-  testWidgets('showNotifier drops empty text before reaching the host', (
-    tester,
-  ) async {
-    await _pumpStatusManagerHost(tester);
+  testWidgets('showBanner drops empty text', (tester) async {
+    await _pumpBannerHost(tester);
 
-    dialogs.showNotifier('');
+    dialogs.showBanner('');
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -422,12 +411,19 @@ void main() {
     expect(tester.takeException(), null);
   });
 
-  testWidgets('showNotifier is inert without a StatusManager ancestor', (
-    tester,
-  ) async {
-    await _pumpHost(tester);
+  testWidgets('showBanner is inert without a banner host', (tester) async {
+    await tester.pumpWidget(
+      WidgetsApp(
+        navigatorKey: globalState.navigatorKey,
+        color: const Color(0xFF000000),
+        onGenerateRoute: (settings) => CardPageRoute<void>(
+          settings: settings,
+          builder: (_) => const SizedBox.shrink(),
+        ),
+      ),
+    );
 
-    dialogs.showNotifier('no host listening');
+    dialogs.showBanner('no host listening');
     await tester.pumpAndSettle();
 
     expect(find.text('no host listening'), findsNothing);

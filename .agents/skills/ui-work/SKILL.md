@@ -20,7 +20,7 @@ dialogs, and interaction behavior.
   await, auto-dispose providers need a container-level hold, platform decisions are passed in as parameters).
 - Settings screens are built from the `ConfigToggleItem` family in `lib/widgets/config_item.dart`; the Settings Rows
   section of `.agents/architecture.md` says when a file-local helper or a named widget is warranted.
-- Every icon lives in `lib/icons/`, never the Material `Icons` font: reuse or add a glyph in `AppGlyphs` and show it
+- App-specific glyphs live in `lib/ui/icons/`, alongside shared Prism icons, never the Material `Icons` font: reuse or add a glyph in `AppGlyphs` and show it
   with `GlyphIcon`, or with `AnimatedGlyph` where it fills on selection. Glyphs are outlined, except inside a filled
   button, where they take `fill: 1`. The Icons section of `.agents/architecture.md` covers shape roles, the stroke, the
   fill animation, and when to fill.

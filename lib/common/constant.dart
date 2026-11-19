@@ -7,7 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 export 'package:flashco/flashco/build_defines.dart';
 
@@ -32,22 +32,16 @@ const helperProtocolVersionHeader = 'x-flashco-helper-protocol';
 final helperProtocolVersion = Platform.isWindows ? '8' : '6';
 const maxTextScale = 1.4;
 const minTextScale = 0.8;
-final baseInfoEdgeInsets = EdgeInsets.symmetric(
-  vertical: 16.mAp,
-  horizontal: 16.mAp,
-);
-final listHeaderPadding = EdgeInsets.only(
-  left: 16.mAp,
-  right: 16.mAp,
-  top: 24.mAp,
-  bottom: 8.mAp,
+const baseInfoEdgeInsets = EdgeInsets.symmetric(vertical: 16, horizontal: 16);
+const listHeaderPadding = EdgeInsets.only(
+  left: 16,
+  right: 16,
+  top: 24,
+  bottom: 8,
 );
 
 const listRowMinHeight = 56.0;
-const listRowVerticalPadding = 10.0;
-const pageToolbarHeight = 64.0;
 const sheetToolbarHeight = 48.0;
-const sheetAppBarHeight = 68.0;
 
 const watchExecution = false;
 
@@ -111,8 +105,6 @@ const maxConcurrentDelayTests = 32;
 const maxConcurrentImports = 4;
 const maxConcurrentIconLoads = 8;
 const animateDuration = Duration(milliseconds: 100);
-const midDuration = Duration(milliseconds: 200);
-const commonDuration = Duration(milliseconds: 300);
 
 const renderThrottleDuration = Duration(milliseconds: 300);
 const defaultUpdateDuration = Duration(days: 1);
@@ -141,6 +133,7 @@ const clashConfigKey = 'clash_config';
 const configKey = 'config';
 const systemDnsRecordKey = 'system_dns_record';
 const bootRecordKey = 'boot_record';
+const appliedConfigMd5Key = 'applied_config_md5';
 const defaultSystemDnsFallback = '223.5.5.5';
 const double dialogCommonWidth = 300;
 const repository = 'Artypoul/Flashco';

@@ -1,22 +1,30 @@
 import 'dart:io';
 
 import 'package:flashco/common/common.dart';
+import 'package:flashco/core/controller.dart';
+import 'package:flashco/core/interface.dart';
 import 'package:flashco/core/method.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
+import 'package:flashco/pages/editor.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
-import 'package:flashco/pages/editor.dart';
 import 'package:flashco/views/config/providers.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:prism_ui/prism_ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../helpers/app_paths.dart';
 import '../helpers/context_menu.dart';
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+
+class _MockCore extends Mock implements CoreHandlerInterface {}
 
 class _TestClashProviders extends ClashProviders {
   _TestClashProviders(this.initial);
@@ -86,14 +94,22 @@ ProviderContainer _containerFor(
   return container;
 }
 
+Finder _rowField(String title) => find.descendant(
+  of: find.widgetWithText(FormRow, title),
+  matching: find.byType(TextFormField),
+);
+
+Finder _formField(String title) => find.descendant(
+  of: find.widgetWithText(FormRow, title),
+  matching: find.byType(TextFormField),
+);
+
 void main() {
   late Directory home;
 
-  setUpAll(() {
-    home = Directory.systemTemp.createTempSync('flashco-rule-sets-view-');
-    AppPath.supportDirectory = () async => home;
-    AppPath.temporaryDirectory = () async => home;
-    AppPath.cacheDirectory = () async => home;
+  setUpAll(() async {
+    home = Directory.systemTemp.createTempSync('flclash-rule-sets-view-');
+    await useAppPaths(home);
   });
 
   tearDownAll(() {
@@ -179,23 +195,14 @@ void main() {
     await tester.tap(find.text('Import from URL'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Name'),
-      'Ad block',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
-      'https://example.com/more.yaml',
-    );
+    await tester.enterText(_formField('Name'), 'Ad block');
+    await tester.enterText(_formField('URL'), 'https://example.com/more.yaml');
     await tester.tap(find.text('Submit'));
     await tester.pumpAndSettle();
 
     expect(action.put, isEmpty);
 
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Name'),
-      'Extra rules',
-    );
+    await tester.enterText(_formField('Name'), 'Extra rules');
     await tester.tap(find.text('Submit'));
     await tester.pumpAndSettle();
 
@@ -229,10 +236,7 @@ void main() {
     await tester.tap(find.text('Import from URL'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
-      'https://example.com/ads.list',
-    );
+    await tester.enterText(_formField('URL'), 'https://example.com/ads.list');
     await tester.tap(find.text('Submit'));
     await tester.pumpAndSettle();
 
@@ -317,10 +321,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Import from URL'));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
-      'https://example.com/mixed.list',
-    );
+    await tester.enterText(_formField('URL'), 'https://example.com/mixed.list');
     await tester.tap(find.text('Submit'));
     await tester.pumpAndSettle();
 
@@ -369,8 +370,8 @@ void main() {
     await tester.tap(find.text('Options'));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(TextFormField, 'Name'), findsOneWidget);
-    expect(find.widgetWithText(TextFormField, 'URL'), findsNothing);
+    expect(_rowField('Name'), findsOneWidget);
+    expect(_rowField('URL'), findsNothing);
     expect(find.text('Behavior'), findsNothing);
     expect(find.text('Format'), findsNothing);
   });
@@ -407,12 +408,15 @@ void main() {
   });
 
   testWidgets('a remote rule set previews read-only on a tap', (tester) async {
+    final core = _MockCore();
+    when(() => core.dumpRuleSet(any())).thenAnswer((_) async => 'payload: []');
     final container = _containerFor(
       tester,
       overrides: [
         clashProvidersProvider.overrideWith(
           () => _TestClashProviders([appRules]),
         ),
+        coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
       ],
     );
 
@@ -460,11 +464,8 @@ void main() {
     expect(find.text('Behavior'), findsNothing);
     expect(find.text('Format'), findsNothing);
 
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
-      'https://example.com/ads.list',
-    );
-    await tester.tap(find.text('Confirm'));
+    await tester.enterText(_rowField('URL'), 'https://example.com/ads.list');
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
     await tester.pumpAndSettle();
 
     expect(
@@ -499,7 +500,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Confirm'));
+    await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
 
     expect(action.deleted, [appRules]);
@@ -535,7 +536,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('used by Work'), findsOneWidget);
-      await tester.tap(find.text('Confirm'));
+      await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
       expect(action.deleted, [appRules]);

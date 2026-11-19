@@ -29,7 +29,14 @@ import '../helpers/app_paths.dart';
 import '../helpers/preferences.dart';
 import '../helpers/test_profiles.dart';
 
-class _MockCoreHandlerInterface extends Mock implements CoreHandlerInterface {}
+class _MockCoreHandlerInterface extends Mock implements CoreHandlerInterface {
+  _MockCoreHandlerInterface() {
+    when(() => getExternalProviders()).thenAnswer((_) async => []);
+    when(
+      () => getProxies(),
+    ).thenAnswer((_) async => const ProxiesData(proxies: {}, all: []));
+  }
+}
 
 // checkAndUpdateAndCopy checks the file system before it refreshes, so its
 // failure tests need appPath to resolve to a real, writable directory.
@@ -79,6 +86,7 @@ class TestSetupAction extends SetupAction {
   final List<bool> coreRunningCalls = [];
   final List<String> events = [];
   final List<Completer<void>> pendingCoreCalls = [];
+  Completer<void>? coreCallEntered;
   int trafficResets = 0;
   int applyProfileCalls = 0;
   final List<bool> appliedForce = [];
@@ -109,6 +117,8 @@ class TestSetupAction extends SetupAction {
     if (blockCoreCalls) {
       final gate = Completer<void>();
       pendingCoreCalls.add(gate);
+      coreCallEntered?.complete();
+      coreCallEntered = null;
       await gate.future;
     }
     final error = coreRunningError;
@@ -708,9 +718,11 @@ void main() {
       markInitialized();
       final notifier = container.read(setupActionProvider.notifier);
       action.blockCoreCalls = true;
+      final entered = Completer<void>();
+      action.coreCallEntered = entered;
 
       final stopping = notifier.setRunning(false);
-      await Future<void>.delayed(Duration.zero);
+      await entered.future;
       final starting = notifier.setRunning(true);
       await Future<void>.delayed(Duration.zero);
 
@@ -734,9 +746,11 @@ void main() {
         final notifier = container.read(setupActionProvider.notifier);
         action.blockCoreCalls = true;
         action.unansweredCoreCalls.add(true);
+        final entered = Completer<void>();
+        action.coreCallEntered = entered;
 
         final starting = notifier.setRunning(true);
-        await Future<void>.delayed(Duration.zero);
+        await entered.future;
         final stopping = notifier.setRunning(false);
         await Future<void>.delayed(Duration.zero);
 

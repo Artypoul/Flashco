@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:prism_ui/prism_ui.dart';
 import 'package:test/test.dart';
 
 T roundTrip<T>(
@@ -341,10 +341,11 @@ void main() {
       expect(props.width, 0);
     });
 
-    test('size extension defaults to 680x580 when empty', () {
+    test('size extension defaults to 1280x880 when empty', () {
       const props = WindowProps();
-      expect(props.size.width, 680);
-      expect(props.size.height, 580);
+      expect(props.savedSize, isNull);
+      expect(props.size.width, 1280);
+      expect(props.size.height, 880);
     });
 
     test('size extension uses actual values', () {
@@ -360,6 +361,8 @@ void main() {
       expect(restored.height, 768);
       expect(restored.top, 100);
       expect(restored.left, 200);
+      expect(restored.size.width, 1024);
+      expect(restored.size.height, 768);
     });
   });
 
@@ -595,21 +598,21 @@ void main() {
   group('ProxiesStyleProps JSON round-trip', () {
     test('default values', () {
       const props = ProxiesStyleProps();
-      expect(props.type, ProxiesType.tab);
+      expect(props.type, ProxiesType.list);
       expect(props.sortType, ProxiesSortType.none);
       expect(props.layout, ProxiesLayout.standard);
     });
 
     test('round-trip with custom values', () {
       const props = ProxiesStyleProps(
-        type: ProxiesType.list,
+        type: ProxiesType.tab,
         sortType: ProxiesSortType.delay,
       );
       final restored = roundTrip(
         () => props.toJson(),
         ProxiesStyleProps.fromJson,
       );
-      expect(restored.type, ProxiesType.list);
+      expect(restored.type, ProxiesType.tab);
       expect(restored.sortType, ProxiesSortType.delay);
     });
 

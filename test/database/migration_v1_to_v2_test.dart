@@ -261,6 +261,51 @@ void _createLegacyMitm(
   );
 }
 
+void _seedCurrentData(Database raw) {
+  raw.execute(
+    'INSERT INTO profiles (id, type, label, url, extend_type, '
+    'auto_update_duration_millis, auto_update, selected_map, unfold_set, overrides) '
+    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [
+      7,
+      'url',
+      'saved',
+      'https://example.invalid/sub',
+      'standard',
+      60000,
+      1,
+      '{"PROXY":"Node A"}',
+      '["PROXY"]',
+      '{"tun":{"enable":false}}',
+    ],
+  );
+  raw.execute(
+    'INSERT INTO rules (id, rule_action, content, rule_target, "order") '
+    'VALUES (11, ?, ?, ?, ?), (12, ?, ?, ?, ?)',
+    [
+      'DOMAIN',
+      'first.example',
+      'DIRECT',
+      'a',
+      'DOMAIN',
+      'second.example',
+      'REJECT',
+      'b',
+    ],
+  );
+  raw.execute(
+    'INSERT INTO disabled_rules (profile_id, rule_id) VALUES (7, 12)',
+  );
+}
+
+Map<String, List<Map<String, Object?>>> _snapshot(Database raw) => {
+  for (final table in ['profiles', 'rules', 'disabled_rules'])
+    table: [
+      for (final row in raw.select('SELECT * FROM $table ORDER BY 1'))
+        Map.of(row),
+    ],
+};
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -277,12 +322,17 @@ void main() {
 
   tearDown(() => raw.close());
 
-  Future<fl.Database> openAndMigrate() async {
+  Future<fl.Database> openAndMigrate({bool autoClose = true}) async {
     final database = fl.Database(
       NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
     );
-    addTearDown(database.close);
-    await database.customSelect('SELECT 1').get();
+    try {
+      await database.customSelect('SELECT 1').get();
+    } catch (_) {
+      await database.close();
+      rethrow;
+    }
+    if (autoClose) addTearDown(database.close);
     return database;
   }
 
@@ -1047,5 +1097,91 @@ void main() {
       ),
       isNotEmpty,
     );
+  });
+
+  test(
+    'schema 22 without modules creates them and survives reopening',
+    () async {
+      _seedCurrentData(raw);
+      final before = _snapshot(raw);
+      raw.execute('DROP TABLE mitm_modules');
+      raw.execute('PRAGMA user_version = 22');
+      var database = await openAndMigrate(autoClose: false);
+      expect(_userVersion(raw), 23);
+      expect(_hasTable(raw, 'mitm_modules'), isTrue);
+      expect(_snapshot(raw), before);
+      await database.close();
+      database = await openAndMigrate();
+      expect(_userVersion(raw), 23);
+      expect(_snapshot(raw), before);
+    },
+  );
+
+  test('stage 23 failure rolls back stage 22 and retry preserves data', () async {
+    _seedCurrentData(raw);
+    final before = _snapshot(raw);
+    raw.execute('DROP TABLE ip_qualities');
+    _createLegacyMitm(raw, extraConstraint: ', UNIQUE (name)');
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time) VALUES (42, 'kept', '{\"arg\":\"value\"}', '{\"file\":\"hash\"}', 1234)",
+    );
+    raw.execute('PRAGMA user_version = 21');
+    await expectLater(openAndMigrate(), throwsStateError);
+    expect(_userVersion(raw), 21);
+    expect(_hasTable(raw, 'ip_qualities'), isFalse);
+    expect(_snapshot(raw), before);
+    expect(
+      raw
+          .select('SELECT arguments, resources FROM mitm_modules')
+          .single['arguments'],
+      '{"arg":"value"}',
+    );
+    await expectLater(openAndMigrate(), throwsStateError);
+    expect(_hasTable(raw, 'ip_qualities'), isFalse);
+    _createLegacyMitm(raw);
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time) VALUES (42, 'kept', '{\"arg\":\"value\"}', '{\"file\":\"hash\"}', 1234)",
+    );
+    final database = await openAndMigrate(autoClose: false);
+    expect(_userVersion(raw), 23);
+    expect(_snapshot(raw), before);
+    expect(
+      raw
+          .select('SELECT arguments, resources FROM mitm_modules')
+          .single['resources'],
+      '{"file":"hash"}',
+    );
+    await database.close();
+    await openAndMigrate();
+    expect(_snapshot(raw), before);
+    expect(
+      raw.select('SELECT arguments FROM mitm_modules').single['arguments'],
+      '{"arg":"value"}',
+    );
+  });
+
+  test('retained newer tables and rows survive a repeated upgrade', () async {
+    _seedCurrentData(raw);
+    final before = _snapshot(raw);
+    raw.execute(
+      "INSERT INTO ip_qualities (ip, quality, checked_at) VALUES ('192.0.2.1', '{}', 1234)",
+    );
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time) VALUES (42, 'kept', '{\"arg\":\"value\"}', '{\"file\":\"hash\"}', 1234)",
+    );
+    final ip = Map.of(raw.select('SELECT * FROM ip_qualities').single);
+    final module = Map.of(raw.select('SELECT * FROM mitm_modules').single);
+    raw.execute('PRAGMA user_version = 21');
+    final database = await openAndMigrate(autoClose: false);
+    expect(_userVersion(raw), 23);
+    expect(_snapshot(raw), before);
+    expect(Map.of(raw.select('SELECT * FROM ip_qualities').single), ip);
+    expect(Map.of(raw.select('SELECT * FROM mitm_modules').single), module);
+    await database.close();
+    await openAndMigrate();
+    expect(_userVersion(raw), 23);
+    expect(_snapshot(raw), before);
+    expect(Map.of(raw.select('SELECT * FROM ip_qualities').single), ip);
+    expect(Map.of(raw.select('SELECT * FROM mitm_modules').single), module);
   });
 }

@@ -725,8 +725,9 @@ void main() {
   group('makeRealProfileTask network settings', () {
     Future<YamlMap> runWith(
       PatchClashConfig realPatchConfig,
-      Map<String, dynamic> rawConfig,
-    ) async {
+      Map<String, dynamic> rawConfig, {
+      ProfileOverrides overrides = const ProfileOverrides(),
+    }) async {
       final result = await makeRealProfileTask(
         MakeRealProfileState(
           profilesPath: '/profiles',
@@ -735,6 +736,7 @@ void main() {
             await encodeJSONTask(rawConfig),
           ),
           realPatchConfig: realPatchConfig,
+          overrides: overrides,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],
@@ -745,18 +747,50 @@ void main() {
       return loadYaml(result.yaml) as YamlMap;
     }
 
-    test('tun settings replace the profile ones and leave the rest', () async {
-      final config = await runWith(
-        const PatchClashConfig(tun: Tun(mtu: 1400, strictRoute: true)),
-        {
-          'tun': {'mtu': 9000, 'strict-route': false, 'udp-timeout': 60},
+    test(
+      'tun takes stack from settings and other values from profile',
+      () async {
+        final config = await runWith(
+          const PatchClashConfig(tun: Tun(stack: TunStack.gvisor, mtu: 1400)),
+          {
+            'tun': {'mtu': 9000, 'strict-route': false, 'udp-timeout': 60},
+          },
+        );
+        final tun = config['tun'] as YamlMap;
+
+        expect(tun['stack'], 'gvisor');
+        expect(tun['mtu'], 9000);
+        expect(tun['strict-route'], false);
+        expect(tun.containsKey('congestion-controller'), isFalse);
+        expect(tun['udp-timeout'], 60);
+      },
+    );
+
+    test('saved legacy TUN selections reach the final profile', () async {
+      final patch = Config.realFromJson({
+        'patchClashConfig': {
+          'tun': {'mtu': 1400, 'strict-route': false, 'dns-hijack': <String>[]},
         },
+      }).patchClashConfig;
+      final config = await runWith(
+        patch,
+        {
+          'tun': {
+            'mtu': 9000,
+            'strict-route': true,
+            'dns-hijack': ['any:53'],
+            'udp-timeout': 60,
+          },
+        },
+        overrides: ProfileOverrides(
+          tun: patch.tunOverride,
+          tunOverrideKeys: patch.tunOverrideKeys,
+        ),
       );
       final tun = config['tun'] as YamlMap;
-
       expect(tun['mtu'], 1400);
-      expect(tun['strict-route'], true);
-      expect(tun['congestion-controller'], 'cubic');
+      expect(tun['strict-route'], false);
+      expect(tun['dns-hijack'], isEmpty);
       expect(tun['udp-timeout'], 60);
     });
 

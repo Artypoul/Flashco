@@ -5,6 +5,7 @@ import com.follow.flashco.models.SharedState
 import com.follow.flashco.service.models.NotificationParams
 import com.follow.flashco.service.models.VpnOptions
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -31,6 +32,10 @@ internal const val INVALID_CONFIG_MESSAGE = "Invalid configuration."
 internal const val VPN_PERMISSION_MESSAGE = "VPN permission required."
 internal const val START_FAILED_MESSAGE = "Failed to start service."
 
+internal fun isCoreSetupCall(data: String): Boolean = runCatching {
+    JsonParser.parseString(data).asJsonObject.get("method")?.asString == "config.setup"
+}.getOrDefault(false)
+
 private enum class StartOutcome {
     STARTED,
     FAILED,
@@ -45,6 +50,7 @@ private enum class StartOutcome {
 internal class ServiceStateMachine(private val host: ServiceStateHost) {
     private val transitionLock = Mutex()
     private val startPreparationLock = Mutex()
+    private val coreSetupLock = Mutex()
     private val mutableRunState = MutableStateFlow(RunState.STOPPED)
     private val arbiter = RunIntentArbiter()
 
@@ -69,6 +75,9 @@ internal class ServiceStateMachine(private val host: ServiceStateHost) {
             handleStartAction()
         }
     }
+
+    internal suspend fun <T> withCoreSetup(block: suspend () -> T): T =
+        coreSetupLock.withLock { block() }
 
     suspend fun awaitRunTime(): Long = transitionLock.withLock {
         host.runtime?.startedAtMillis?.takeIf { isRunRequested } ?: 0L
@@ -146,13 +155,17 @@ internal class ServiceStateMachine(private val host: ServiceStateHost) {
     // toggles this start off instead of racing a second setup against it.
     private suspend fun startFromPreferences() {
         val request = createRequest(running = true)
-        sharedState = host.loadSharedState()
-        if (sharedState.setupParams == null || sharedState.vpnOptions == null) {
+        val state = host.loadSharedState()
+        sharedState = state
+        if (state.setupParams == null || state.vpnOptions == null) {
             host.showToast(MISSING_CONFIG_MESSAGE)
             abandon(request)
             return
         }
-        if (!setupCore()) {
+        val setupSucceeded = withCoreSetup {
+            isCurrent(request) && setupCore(state, request)
+        }
+        if (!setupSucceeded || !isCurrent(request)) {
             abandon(request)
         } else if (launchStart(request).await() == StartOutcome.FAILED) {
             host.showToast(START_FAILED_MESSAGE)
@@ -185,25 +198,25 @@ internal class ServiceStateMachine(private val host: ServiceStateHost) {
         host.updateNotificationParams(notificationParams(sharedState))
     }
 
-    private suspend fun setupCore(): Boolean {
-        applySharedState()
-        host.showToast(sharedState.startTip)
+    private suspend fun setupCore(state: SharedState, request: RunRequest): Boolean {
+        host.updateNotificationParams(notificationParams(state))
+        host.showToast(state.startTip)
         return host.quickSetup(
             initParams(host.homeDirPath, host.sdkInt),
-            Gson().toJson(sharedState.setupParams),
+            Gson().toJson(state.setupParams),
         ).fold(
             onSuccess = { message ->
                 if (message.isEmpty()) {
                     true
                 } else {
                     host.log("Unable to set up core: $message")
-                    showConfigError(message)
+                    if (isCurrent(request)) showConfigError(message)
                     false
                 }
             },
             onFailure = { error ->
                 host.log("Unable to set up core: $error")
-                showConfigError(error.message)
+                if (isCurrent(request)) showConfigError(error.message)
                 false
             },
         )

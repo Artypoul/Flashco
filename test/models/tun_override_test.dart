@@ -39,12 +39,13 @@ void main() {
           jsonDecode(jsonEncode(json)) as Map<String, Object?>,
         );
 
-    test('picks each network value changed from its default', () {
+    test('preserves every explicitly saved network override', () {
       final config = decode({
         'tun': {
           'mtu': 1400,
           'congestion-controller': 'cubic',
           'strict-route': true,
+          'dns-hijack': <String>[],
           'route-address': <String>[],
           'route-exclude-address': ['10.0.0.0/8'],
         },
@@ -52,11 +53,17 @@ void main() {
 
       expect(config.tunOverrideKeys, {
         TunOverrideKey.mtu,
+        TunOverrideKey.congestionController,
         TunOverrideKey.strictRoute,
+        TunOverrideKey.dnsHijack,
+        TunOverrideKey.routeAddress,
         TunOverrideKey.routeExcludeAddress,
       });
       expect(config.tunOverride.mtu, 1400);
+      expect(config.tunOverride.congestionController, 'cubic');
       expect(config.tunOverride.strictRoute, isTrue);
+      expect(config.tunOverride.dnsHijack, isEmpty);
+      expect(config.tunOverride.routeAddress, isEmpty);
       expect(config.tunOverride.routeExcludeAddress, ['10.0.0.0/8']);
       expect(config.tun.mtu, 1400);
     });
@@ -116,14 +123,15 @@ void main() {
       );
     });
 
-    test('a list key without items writes nothing', () {
+    test('a selected empty list clears its profile value', () {
       expect(
         const ProfileTun().overrideJson({
           TunOverrideKey.disableIcmpForwarding,
           TunOverrideKey.excludeInterface,
         }),
-        {'disable-icmp-forwarding': false},
+        {'disable-icmp-forwarding': false, 'exclude-interface': <String>[]},
       );
+      expect(const ProfileTun().overrideJson({}), isEmpty);
     });
   });
 

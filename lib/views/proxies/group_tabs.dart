@@ -28,7 +28,7 @@ class GroupTabs extends StatefulWidget {
 class _GroupTabsState extends State<GroupTabs> {
   static const _fadeExtent = 24.0;
 
-  // A sheet's controller would hand the strip's drags to the sheet.
+  // Horizontal chip drags must not be interpreted as vertical sheet drags.
   final _scrollController = ScrollController();
   final _hasMore = ValueNotifier(false);
   final _fade = ValueNotifier(0.0);

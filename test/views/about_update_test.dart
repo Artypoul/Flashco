@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flashco/common/constant.dart';
+import 'package:flashco/common/app_update.dart';
 import 'package:flashco/common/preferences.dart';
 import 'package:flashco/common/request.dart';
 import 'package:flashco/l10n/l10n.dart';
@@ -70,7 +71,7 @@ void main() {
     container = ProviderContainer(overrides: _isolatedOverrides());
     globalState.container = container;
     container.listen(configProvider, (_, _) {});
-    originalRequestAdapter = request.dio.httpClientAdapter;
+    originalRequestAdapter = request.releaseDio.httpClientAdapter;
     launchedUrl = null;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_launcherChannel, (call) async {
@@ -85,7 +86,7 @@ void main() {
 
   tearDown(() {
     container.dispose();
-    request.dio.httpClientAdapter = originalRequestAdapter;
+    request.releaseDio.httpClientAdapter = originalRequestAdapter;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_launcherChannel, null);
   });
@@ -120,7 +121,7 @@ void main() {
     final adapter = _UpdateAdapter(
       (_) async => _releaseResponse('v1.2.3', '- Added manual release notes'),
     );
-    request.dio.httpClientAdapter = adapter;
+    request.releaseDio.httpClientAdapter = adapter;
     await pumpAbout(tester);
     final localizations = AppLocalizations.of(
       tester.element(find.byType(AboutView)),
@@ -147,7 +148,7 @@ void main() {
     final adapter = _UpdateAdapter((options) async {
       return _releaseResponse(tag, null);
     });
-    request.dio.httpClientAdapter = adapter;
+    request.releaseDio.httpClientAdapter = adapter;
     await pumpAbout(tester);
     final localizations = AppLocalizations.of(
       tester.element(find.byType(AboutView)),
@@ -166,11 +167,14 @@ void main() {
   testWidgets(
     'no longer remind disables auto checks but manual checks remain available',
     (tester) async {
+      final originalEligibility = resolveStableUpdateEligibility;
+      resolveStableUpdateEligibility = () => true;
+      addTearDown(() => resolveStableUpdateEligibility = originalEligibility);
       var tag = 'v1.2.3';
       final adapter = _UpdateAdapter(
         (_) async => _releaseResponse(tag, '- Keep settings'),
       );
-      request.dio.httpClientAdapter = adapter;
+      request.releaseDio.httpClientAdapter = adapter;
       await pumpAbout(tester);
       final localizations = AppLocalizations.of(
         tester.element(find.byType(AboutView)),
@@ -214,7 +218,7 @@ void main() {
   ) async {
     final response = Completer<ResponseBody>();
     final adapter = _UpdateAdapter((_) => response.future);
-    request.dio.httpClientAdapter = adapter;
+    request.releaseDio.httpClientAdapter = adapter;
     await pumpAbout(tester);
 
     final button = find.text('Проверить обновления');
@@ -248,7 +252,7 @@ void main() {
       }
       return ResponseBody.fromString('', 503);
     });
-    request.dio.httpClientAdapter = adapter;
+    request.releaseDio.httpClientAdapter = adapter;
     await pumpAbout(tester);
     final localizations = AppLocalizations.of(
       tester.element(find.byType(AboutView)),

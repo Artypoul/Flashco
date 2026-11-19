@@ -5,8 +5,9 @@ import 'package:flashco/common/preferences.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:prism_ui/prism_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 const _url = 'https://example.invalid/subscription';
 const _existing = Config(
@@ -25,6 +26,17 @@ const _existing = Config(
     tun: Tun(stack: TunStack.system, mtu: 1450),
   ),
 );
+
+class _FailingConfigStore extends InMemorySharedPreferencesStore {
+  _FailingConfigStore() : super.empty();
+  bool failConfig = false;
+
+  @override
+  Future<bool> setValue(String valueType, String key, Object value) {
+    if (failConfig && key == 'flutter.config') return Future.value(false);
+    return super.setValue(valueType, key, value);
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -73,6 +85,62 @@ void main() {
     expect(updated.patchClashConfig.tun.strictRoute, isTrue);
     expect(await preferences.werePersonalDefaultsApplied(), isTrue);
     expect(await preferences.getConfig(), updated);
+  });
+
+  test('embedded defaults resume after failed save and store reload', () async {
+    final previous = SharedPreferencesStorePlatform.instance;
+    final backend = _FailingConfigStore();
+    SharedPreferencesStorePlatform.instance = backend;
+    addTearDown(() => SharedPreferencesStorePlatform.instance = previous);
+    final store = await SharedPreferences.getInstance();
+    await store.reload();
+    await preferences.beginPersonalDefaultsInitialization(
+      enabled: true,
+      isNewInstallation: await preferences.isNewInstallation,
+    );
+    await store.reload();
+    expect(await preferences.isNewInstallation, isFalse);
+    expect(await preferences.isPersonalDefaultsInitializing, isTrue);
+    await preferences.saveConfig(const Config(themeProps: ThemeProps()));
+    await preferences.setVersion(2);
+    backend.failConfig = true;
+    await expectLater(
+      initializePersonalDefaults(
+        const Config(themeProps: ThemeProps()),
+        subscriptionUrl: _url,
+        enabled: true,
+        isNewInstallation: true,
+      ),
+      throwsStateError,
+    );
+    await store.reload();
+    expect(await preferences.isNewInstallation, isFalse);
+    expect(await preferences.isPersonalDefaultsInitializing, isTrue);
+    expect(await preferences.werePersonalDefaultsApplied(), isFalse);
+    backend.failConfig = false;
+    final resumed = await initializePersonalDefaults(
+      (await preferences.getConfig())!,
+      subscriptionUrl: _url,
+      enabled: true,
+      isNewInstallation: await preferences.isPersonalDefaultsInitializing,
+    );
+    expect(resumed.appSettingProps.locale, 'ru');
+    expect(resumed.appSettingProps.autoRun, isTrue);
+    expect(resumed.patchClashConfig.tun.strictRoute, isTrue);
+    await store.reload();
+    expect(await preferences.getConfig(), resumed);
+    expect(await preferences.werePersonalDefaultsApplied(), isTrue);
+    expect(await preferences.isPersonalDefaultsInitializing, isFalse);
+  });
+
+  test('existing installs cannot acquire a fresh defaults intent', () async {
+    await preferences.saveConfig(_existing);
+    await preferences.beginPersonalDefaultsInitialization(
+      enabled: true,
+      isNewInstallation: await preferences.isNewInstallation,
+    );
+    expect(await preferences.isPersonalDefaultsInitializing, isFalse);
+    expect(await preferences.getConfig(), _existing);
   });
 
   test('an existing store without a saved config is left untouched', () async {

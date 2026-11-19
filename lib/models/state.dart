@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:prism_ui/color.dart';
@@ -5,6 +6,7 @@ import 'package:prism_ui/color.dart';
 import 'app.dart';
 import 'clash_config.dart';
 import 'common.dart';
+import 'config.dart';
 import 'core.dart';
 import 'profile.dart';
 
@@ -104,6 +106,46 @@ abstract class MoreToolsSelectorState with _$MoreToolsSelectorState {
   const factory MoreToolsSelectorState({
     required List<NavigationItem> navigationItems,
   }) = _MoreToolsSelectorState;
+}
+
+@freezed
+abstract class PackageListSelectorState with _$PackageListSelectorState {
+  const factory PackageListSelectorState({
+    required List<Package> packages,
+    required AccessControlProps accessControlProps,
+  }) = _PackageListSelectorState;
+}
+
+extension PackageListSelectorStateExt on PackageListSelectorState {
+  List<Package> get list {
+    final isFilterSystemApp = accessControlProps.isFilterSystemApp;
+    final isFilterNonInternetApp = accessControlProps.isFilterNonInternetApp;
+    return packages
+        .where(
+          (item) =>
+              (isFilterSystemApp ? item.system == false : true) &&
+              (isFilterNonInternetApp ? item.internet == true : true),
+        )
+        .toList();
+  }
+
+  List<Package> getSortList(List<String> selectedList) {
+    final sort = accessControlProps.sort;
+
+    return list.sorted((a, b) {
+      final isSelectA = selectedList.contains(a.packageName);
+      final isSelectB = selectedList.contains(b.packageName);
+
+      if (isSelectA != isSelectB) {
+        return isSelectA ? -1 : 1;
+      }
+      return switch (sort) {
+        AccessSortType.none => 0,
+        AccessSortType.name => a.label.compareTo(b.label),
+        AccessSortType.time => b.lastUpdateTime.compareTo(a.lastUpdateTime),
+      };
+    });
+  }
 }
 
 @freezed

@@ -1,10 +1,10 @@
 # Project Context
 
-## WIP donor v0.9.3 checkpoint — 2026-11-19
+## v0.9.3 integration — 2026-11-19
 
-The implementation branch `codex/implement-flclash-v0.9.3` contains an incomplete donor import intended for a draft PR. Core is pinned to `024245dc72bc92f48237f865119afe0cd53ac9e6`, Prism to `63450c0ac0e8e1b2c0f3ed4ad7926dc94e083185`; source database schema is 23 and settings remain version 2. Dependencies/generated files/UI/updater are not yet reconciled, so this checkpoint is not build or release ready. See [implementation status](../docs/upstream/2026-11-19-v0.9.3-implementation-status.md); earlier baseline/results below are historical.
+The working branch `codex/implement-flclash-v0.9.3` continues [PR #16](https://github.com/Artypoul/Flashco/pull/16) from initial head `1d6e6a9a6c59d213930759830fa0748e977abc73`. The current source SHA and checks for that source SHA are recorded by the PR and its Actions runs. Source version is `0.9.3+2026111901`, SQLite schema 23 and settings migration version 2. Donor `be84736605527034689c95bf27828ff27d912c5e`, Core `024245dc72bc92f48237f865119afe0cd53ac9e6`, and Prism `63450c0ac0e8e1b2c0f3ed4ad7926dc94e083185` are pinned. Dependencies, generated output, UI, lifecycle and updater have been reconciled in the working tree, with local targeted checks recorded in the implementation status. Readiness A depends on the CI for that source SHA, artifact and review evidence; client release B additionally requires separately authorized signed-release and device checks. See the [implementation status](../docs/upstream/2026-11-19-v0.9.3-implementation-status.md) for exact evidence and remaining limits. Older dated baselines and build results below are historical.
 
-Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using a Material You design with Surfboard-like UI.
+Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with Flutter. It supports Android, Windows, macOS, and Linux, using the pinned Prism UI package and Flashco-specific presentation.
 
 ## Optional Android first-run subscription — 2026-11-18
 
@@ -21,7 +21,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 - The workflow tests both disabled and enabled Dart defines, then checks the actually emitted provider expressions with `TestRealityMlkemProviderDefaults`. That Go contract test uses `REALITY_MLKEM_FIXTURE_PATH` and skips outside the workflow when no Flutter-generated fixture is supplied. The enabled build artifact is named `flashco-personal-android-first-run-mlkem-<run_number>`.
 - Independent XHTTP download REALITY settings and preserved classical fingerprints are outside this default. See [PRODUCT.md](../PRODUCT.md) for behavior and [history.md](../history.md) for verified results.
 
-## Current Baseline — 2026-11-05 rollback
+## Historical Baseline — 2026-11-05 rollback
 
 - Repository: `Artypoul/Flashco`, base branch `main`, donor base v0.9.0. The user selected restoration of application code to
   `da07f58a94ea417ff3fe2d77317754dafa377d6f` (2026-11-01), before the new fallback, ML-KEM settings, recovery and Safe changes.
@@ -62,6 +62,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 - Build, release and personal CI currently pin Flutter 3.47.6 and Go 1.27.1; Android uses NDK r28c.
   Workflow definitions are the source of truth for these pins. The editor in `plugins/code_forge` came from `code_forge` 10.14.0, which
   needs Dart 3.13.2, so the CI pin cannot go below Flutter 3.47.2.
+- Windows numeric `FILEVERSION`/`PRODUCTVERSION` use semantic `major.minor.patch.0`, guarded to 16-bit components; the complete Flutter version and build remain in the resource strings, release manifest and Android versionCode. Repeated builds of the same semantic version therefore have equal numeric Windows revisions. Candidate/release workflows verify the actual app EXE inside the ZIP; an installer EXE has its own resource version. Inspect exact-source Actions artifacts for the actual Windows build metadata.
 - Before moving the pin, walk `flutter-upgrade.md`: it lists the workarounds tied to
   the current SDK, such as Impeller disabled on the Intel macOS release build.
 - The Dart SDK lower bound in `pubspec.yaml` sets the package language
@@ -72,7 +73,7 @@ Flashco is a multi-platform proxy client based on ClashMeta (mihomo), built with
 
 Two `pubspec.yaml` dependencies are pinned by commit SHA to donor-maintained forks under `chen08209`.
 They are separate from the current `Artypoul/Flashco` repository; do not assume write access to them.
-The Core submodule returns to `chen08209/Clash.Meta` at `8380d0e7462f061a964323e9bf3129a236fcc5d5` (see `.gitmodules`). The upstream fixes needed to remove
+The Core submodule is `chen08209/Clash.Meta` at the v0.9.3 integration pin above (see `.gitmodules`); `8380d0e7462f061a964323e9bf3129a236fcc5d5` was the historical rollback pin. The upstream fixes needed to remove
 the remaining dependency pins are recorded below.
 
 Each entry records what the fork changes and what has to be true before it can go

@@ -11,15 +11,15 @@ void main() {
     test('names the APK built for the running ABI', () {
       expect(
         selfUpdateAssetSuffix(Abi.androidArm64, windowsInstalled: false),
-        'android-arm64-v8a.apk',
+        'android.apk',
       );
       expect(
         selfUpdateAssetSuffix(Abi.androidArm, windowsInstalled: false),
-        'android-armeabi-v7a.apk',
+        'android.apk',
       );
       expect(
         selfUpdateAssetSuffix(Abi.androidX64, windowsInstalled: false),
-        'android-x86_64.apk',
+        'android.apk',
       );
     });
 
@@ -30,7 +30,7 @@ void main() {
       );
       expect(
         selfUpdateAssetSuffix(Abi.windowsArm64, windowsInstalled: true),
-        'windows-arm64-setup.exe',
+        isNull,
       );
       expect(
         selfUpdateAssetSuffix(Abi.windowsX64, windowsInstalled: false),
@@ -50,10 +50,43 @@ void main() {
     });
   });
 
+  test('stable updates exclude personal, debug and feature variants', () {
+    bool eligible({
+      bool debug = false,
+      String environment = 'stable',
+      bool android = true,
+      String packageName = 'com.follow.flashco',
+      String bundledSubscription = '',
+      String bundledFallback = '',
+      bool firstRun = false,
+      bool reality = false,
+      bool mitm = false,
+    }) => stableUpdateEligible(
+      debug: debug,
+      environment: environment,
+      android: android,
+      packageName: packageName,
+      bundledSubscription: bundledSubscription,
+      bundledFallback: bundledFallback,
+      firstRun: firstRun,
+      reality: reality,
+      mitm: mitm,
+    );
+    expect(eligible(), isTrue);
+    expect(eligible(debug: true), isFalse);
+    expect(eligible(environment: 'pre'), isFalse);
+    expect(eligible(packageName: 'com.follow.flashco.dev'), isFalse);
+    expect(eligible(bundledSubscription: 'personal'), isFalse);
+    expect(eligible(bundledFallback: 'personal'), isFalse);
+    expect(eligible(firstRun: true), isFalse);
+    expect(eligible(reality: true), isFalse);
+    expect(eligible(mitm: true), isFalse);
+  });
+
   test('releaseAssetName drops the tag prefix', () {
     expect(
-      releaseAssetName('v0.9.3', 'android-arm64-v8a.apk'),
-      'FlClash-0.9.3-android-arm64-v8a.apk',
+      releaseAssetName('v0.9.3', 'android.apk'),
+      'Flashco-0.9.3-android.apk',
     );
   });
 
@@ -63,19 +96,26 @@ void main() {
 
     test('reads the entry sha256sum wrote for a file', () {
       final sums =
-          '$digest  ./FlClash-0.9.2-android-arm64-v8a.apk\n'
+          '$digest  ./FlClash-0.9.2-android.apk\n'
           '${'0' * 64}  ./FlClash-0.9.2-windows-amd64-setup.exe\n';
 
-      expect(
-        releaseChecksum(sums, 'FlClash-0.9.2-android-arm64-v8a.apk'),
-        digest,
-      );
+      expect(releaseChecksum(sums, 'FlClash-0.9.2-android.apk'), digest);
     });
 
     test('accepts the binary marker, upper case and CRLF', () {
       final sums = '${digest.toUpperCase()} *FlClash.apk\r\n';
 
       expect(releaseChecksum(sums, 'FlClash.apk'), digest);
+    });
+
+    test('rejects duplicate entries', () {
+      expect(
+        releaseChecksum(
+          '$digest  FlClash.apk\n$digest  FlClash.apk',
+          'FlClash.apk',
+        ),
+        isNull,
+      );
     });
 
     test('answers null for a file the listing does not name', () {

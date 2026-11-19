@@ -64,6 +64,23 @@ void main() {
     expect(tun['include-uid'], [1000]);
   });
 
+  test('a selected empty list clears the profile list', () async {
+    final tun = await _tunOf(
+      rawConfig: {
+        'tun': {
+          'exclude-interface': ['eth1'],
+          'include-uid': [1000],
+        },
+      },
+      overrides: const ProfileOverrides(
+        tun: ProfileTun(excludeInterface: []),
+        tunOverrideKeys: {TunOverrideKey.excludeInterface},
+      ),
+    );
+    expect(tun['exclude-interface'], isEmpty);
+    expect(tun['include-uid'], [1000]);
+  });
+
   test('hijacks every port 53 query over the profile unless a key is '
       'picked', () async {
     const profileHijack = {

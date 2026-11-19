@@ -287,7 +287,7 @@ and Riverpod's automatic retry is off because a retry after an HTTP 429 spends t
 
 ## Icons
 
-`lib/icons/` holds every icon the app shows. Nothing in `lib/` uses the Material icon font, and
+`lib/ui/icons/` holds app-specific glyphs and exports the shared Prism icons. Nothing in `lib/` uses the Material icon font, and
 `test/lint/material_icons_test.dart` fails on any `Icons.*` or `AnimatedIcons.*`, so every icon shares one stroke and
 can animate its shape.
 A `Glyph` is a list of shapes on a 24-unit grid, stroked at `Glyph.strokeWidth` with round caps and joins and

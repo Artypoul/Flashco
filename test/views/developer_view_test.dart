@@ -6,6 +6,7 @@ import 'package:flashco/views/developer.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:prism_ui/switch.dart';
 
 import '../helpers/test_app.dart';
@@ -42,6 +43,12 @@ void main() {
     // canCrashCore reads appEnv, which only the real app bootstrap populates.
     // 'dev' also enables the crash-test row.
     globalState.appEnv = 'dev';
+    globalState.packageInfo = PackageInfo(
+      appName: 'Flashco',
+      packageName: 'com.follow.flashco',
+      version: '0.0.0',
+      buildNumber: '0',
+    );
   });
 
   testWidgets('toggles developer mode through the header switch', (

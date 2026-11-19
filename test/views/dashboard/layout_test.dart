@@ -434,6 +434,16 @@ void main() {
   });
 
   testWidgets('a phone shows the saved cards edge to edge', (tester) async {
+    final settings = container.listen(appSettingProvider, (_, _) {});
+    addTearDown(settings.close);
+    const saved = [
+      DashboardWidget.currentOutbound,
+      DashboardWidget.vpnButton,
+      DashboardWidget.networkTakeover,
+    ];
+    container
+        .read(appSettingProvider.notifier)
+        .update((state) => state.copyWith(dashboardWidgets: saved));
     await pumpDashboard(
       tester,
       const Size(400, 900),
@@ -445,6 +455,7 @@ void main() {
     expect(card.right, 400 - 16);
     expect(find.byType(VpnCard), findsOneWidget);
     expect(find.byType(NetworkTakeoverCard), findsNothing);
+    expect(container.read(appSettingProvider).dashboardWidgets, saved);
 
     await teardown(tester);
   });

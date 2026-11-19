@@ -41,6 +41,22 @@ class Preferences {
     await preferences?.setInt('version', version);
   }
 
+  Future<String?> getAppliedConfigMd5() async {
+    final store = await sharedPreferencesCompleter.future;
+    return store?.getString(appliedConfigMd5Key);
+  }
+
+  Future<void> saveAppliedConfigMd5(String? value) async {
+    final store = await sharedPreferencesCompleter.future;
+    if (store == null) return;
+    final saved = value == null
+        ? await store.remove(appliedConfigMd5Key)
+        : await store.setString(appliedConfigMd5Key, value);
+    if (!saved) {
+      throw StateError('Failed to save applied config digest');
+    }
+  }
+
   Future<bool> wasBundledSubscriptionImported(String url) async {
     final store = await sharedPreferencesCompleter.future;
     return store?.getBool('bundledSubscription.${url.toMd5()}') ?? false;
@@ -57,6 +73,33 @@ class Preferences {
   Future<bool> werePersonalDefaultsApplied() async {
     final store = await sharedPreferencesCompleter.future;
     return store?.getBool('personalDefaults.v1') ?? false;
+  }
+
+  Future<void> beginPersonalDefaultsInitialization({
+    required bool enabled,
+    required bool isNewInstallation,
+  }) async {
+    if (!enabled || !isNewInstallation) return;
+    final store = await sharedPreferencesCompleter.future;
+    if (store == null || store.containsKey('personalDefaults.initializing')) {
+      return;
+    }
+    if (!await store.setBool('personalDefaults.initializing', true)) {
+      throw StateError('Failed to save personal defaults initialization');
+    }
+  }
+
+  Future<bool> get isPersonalDefaultsInitializing async {
+    final store = await sharedPreferencesCompleter.future;
+    return store?.getBool('personalDefaults.initializing') ?? false;
+  }
+
+  Future<void> finishPersonalDefaultsInitialization() async {
+    final store = await sharedPreferencesCompleter.future;
+    if (store?.containsKey('personalDefaults.initializing') != true) return;
+    if (!await store!.remove('personalDefaults.initializing')) {
+      throw StateError('Failed to finish personal defaults initialization');
+    }
   }
 
   Future<void> initializeSubscriptionOnboarding({
@@ -150,8 +193,31 @@ class Preferences {
     }
   }
 
-  Future<void> saveShareState(SharedState shareState) async {
+  Future<void> saveShareState(
+    SharedState shareState, {
+    bool preserveSetupBase = true,
+  }) async {
     final preferences = await sharedPreferencesCompleter.future;
+    final params = shareState.setupParams;
+    if (preserveSetupBase && params != null) {
+      final raw = preferences?.getString('sharedState');
+      if (raw != null) {
+        try {
+          final previous = json.decode(raw) as Map<String, dynamic>;
+          final setup = previous['setupParams'] as Map<String, dynamic>?;
+          final base = setup?['base'] as Map<String, dynamic>?;
+          shareState = shareState.copyWith(
+            setupParams: params.copyWith(
+              base: base == null ? null : SetupBase.fromJson(base),
+            ),
+          );
+        } on FormatException {
+          // A corrupt legacy state must not prevent a fresh state from saving.
+        } on TypeError {
+          // Legacy state can contain fields in an older shape.
+        }
+      }
+    }
     await preferences?.setString('sharedState', json.encode(shareState));
   }
 

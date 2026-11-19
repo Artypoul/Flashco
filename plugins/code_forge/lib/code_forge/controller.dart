@@ -71,6 +71,9 @@ abstract interface class CodeForgeView {
 
   int? textOffsetAt(Offset position);
 
+  @visibleForTesting
+  bool get debugFoldComputationCurrent;
+
   void toggleFold(int line);
 
   void scrollToLine(int line);

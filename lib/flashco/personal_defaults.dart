@@ -1,6 +1,6 @@
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:prism_ui/theme_data.dart';
 
 bool shouldApplyPersonalDefaults({
   required String subscriptionUrl,

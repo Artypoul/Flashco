@@ -11,6 +11,8 @@ const _allowed = {
   'lib/widgets/inherited.dart',
   // A drag on the editor's completion overlay must never move a sheet.
   'lib/features/editor/completion_popup.dart',
+  // The horizontal group strip must not transfer horizontal drags to a sheet.
+  'lib/views/proxies/group_tabs.dart',
 };
 
 int _lineOf(String source, int offset) =>

@@ -28,7 +28,13 @@ class _AccessViewState extends ConsumerState<AccessView>
   @override
   void initState() {
     super.initState();
-    _pinedList = ref.read(accessControlStateProvider).currentList;
+    final saved = ref.read(vpnSettingProvider).accessControlProps;
+    _pinedList = saved.currentList;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(accessControlStateProvider.notifier).value = saved;
+      }
+    });
     ref.listenManual(
       accessControlStateProvider.select((state) => state.mode),
       (_, _) => _pinList(),

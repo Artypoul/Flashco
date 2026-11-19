@@ -1615,7 +1615,7 @@ Set<TunOverrideKey> _tunOverrideKeysFromJson(List<Object?> json) => {
 
 extension TunOverrideExt on ProfileTun {
   Map<String, Object?> overrideJson(Set<TunOverrideKey> keys) =>
-      _overrideJson(toJson(), TunOverrideKey.values, keys);
+      _overrideJson(toJson(), TunOverrideKey.values, keys, keepEmpty: keys);
 }
 
 /// Network TUN values changed from their defaults become app-wide overrides.

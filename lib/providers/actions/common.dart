@@ -84,7 +84,9 @@ class CommonAction extends _$CommonAction {
   }
 
   Future<bool> autoCheckUpdate() async {
-    if (!ref.read(appSettingProvider).autoCheckUpdate) return false;
+    if (!ref.read(appSettingProvider).autoCheckUpdate || !isStableUpdateBuild) {
+      return false;
+    }
     final Map<String, dynamic>? res;
     try {
       res = await request.checkForUpdate();
@@ -150,7 +152,22 @@ class CommonAction extends _$CommonAction {
     if (data != null) {
       final context = globalState.navigatorKey.currentContext!;
       final tag = data['tag_name'] as String;
-      final suffix = selfUpdateSuffix;
+      final candidate = selfUpdateSuffix;
+      final assets = data['assets'];
+      final suffix =
+          candidate != null &&
+              assets is List &&
+              assets.any(
+                (asset) =>
+                    asset is Map &&
+                    asset['name'] == releaseAssetName(tag, candidate),
+              ) &&
+              assets.any(
+                (asset) =>
+                    asset is Map && asset['name'] == releaseChecksumsName,
+              )
+          ? candidate
+          : null;
       final res = await dialogs.showMessage(
         title: currentAppLocalizations.discoverNewVersion,
         message: _releaseSpan(context, tag, data['body'] as String?),
@@ -199,6 +216,17 @@ class CommonAction extends _$CommonAction {
     );
     if (release == null) return;
     final tag = release['tag_name'] as String;
+    final assets = release['assets'];
+    if (assets is! List ||
+        !assets.any(
+          (asset) =>
+              asset is Map && asset['name'] == releaseAssetName(tag, suffix),
+        ) ||
+        !assets.any(
+          (asset) => asset is Map && asset['name'] == releaseChecksumsName,
+        )) {
+      return;
+    }
     await _downloadUpdate(tag, releaseAssetName(tag, suffix));
   }
 
@@ -231,6 +259,7 @@ class CommonAction extends _$CommonAction {
           );
         },
       );
+      if (cancelToken.isCancelled) throw cancelToken.cancelError!;
       download.value = UpdateReady(tag, path);
       dialogs.showBanner(
         currentAppLocalizations.updateReadyTip,

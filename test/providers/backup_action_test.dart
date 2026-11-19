@@ -52,7 +52,7 @@ void main() {
   });
 
   ProviderContainer buildContainer() {
-    final container = ProviderContainer();
+    final container = ProviderContainer()..listen(configProvider, (_, _) {});
     addTearDown(container.dispose);
     return container;
   }

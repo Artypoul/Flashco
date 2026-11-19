@@ -213,7 +213,7 @@ class Database extends _$Database {
         );
       }
       final objects = await customSelect(
-        "SELECT name FROM sqlite_master WHERE tbl_name = ? "
+        'SELECT name FROM sqlite_master WHERE tbl_name = ? '
         "AND type IN ('trigger', 'index')",
         variables: [Variable.withString(name)],
       ).get();
@@ -639,23 +639,28 @@ String _schemaTokens(String sql) {
       .join(' ');
 }
 
+// Accepted layouts are exact known schemas, normalized only for SQL tokens.
+const _legacyMitmFixtureDefinition =
+    'CREATE TABLE mitm_modules (id INTEGER NOT NULL PRIMARY KEY, '
+    "name TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', url TEXT, "
+    'enabled INTEGER NOT NULL DEFAULT 1, "order" INTEGER, '
+    "arguments TEXT NOT NULL DEFAULT '{}', resources TEXT NOT NULL DEFAULT '{}', "
+    'system TEXT, scripts INTEGER NOT NULL DEFAULT 0, '
+    'last_update_time INTEGER NOT NULL, '
+    'update_interval_minutes INTEGER NOT NULL DEFAULT 1440)';
+
+const _legacyMitmDriftDefinition =
+    'CREATE TABLE "mitm_modules" ("id" INTEGER NOT NULL, "name" TEXT NOT NULL, '
+    '"description" TEXT NOT NULL DEFAULT \'\', "url" TEXT NULL, '
+    '"enabled" INTEGER NOT NULL DEFAULT 1 CHECK ("enabled" IN (0, 1)), '
+    '"order" INTEGER NULL, "arguments" TEXT NOT NULL DEFAULT \'{}\', '
+    '"resources" TEXT NOT NULL DEFAULT \'{}\', "system" TEXT NULL, '
+    '"scripts" INTEGER NOT NULL DEFAULT 0, "last_update_time" INTEGER NOT NULL, '
+    '"update_interval_minutes" INTEGER NOT NULL DEFAULT 1440, PRIMARY KEY ("id"))';
+
 final _knownLegacyMitmDefinitions = [
-  // The pinned donor migration fixture.
-  "CREATE TABLE mitm_modules (id INTEGER NOT NULL PRIMARY KEY, "
-      "name TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', url TEXT, "
-      'enabled INTEGER NOT NULL DEFAULT 1, "order" INTEGER, '
-      "arguments TEXT NOT NULL DEFAULT '{}', resources TEXT NOT NULL DEFAULT '{}', "
-      'system TEXT, scripts INTEGER NOT NULL DEFAULT 0, '
-      'last_update_time INTEGER NOT NULL, '
-      'update_interval_minutes INTEGER NOT NULL DEFAULT 1440)',
-  // Drift's generated form of the same columns and primary key.
-  'CREATE TABLE "mitm_modules" ("id" INTEGER NOT NULL, "name" TEXT NOT NULL, '
-      '"description" TEXT NOT NULL DEFAULT \'\', "url" TEXT NULL, '
-      '"enabled" INTEGER NOT NULL DEFAULT 1 CHECK ("enabled" IN (0, 1)), '
-      '"order" INTEGER NULL, "arguments" TEXT NOT NULL DEFAULT \'{}\', '
-      '"resources" TEXT NOT NULL DEFAULT \'{}\', "system" TEXT NULL, '
-      '"scripts" INTEGER NOT NULL DEFAULT 0, "last_update_time" INTEGER NOT NULL, '
-      '"update_interval_minutes" INTEGER NOT NULL DEFAULT 1440, PRIMARY KEY ("id"))',
+  _legacyMitmFixtureDefinition,
+  _legacyMitmDriftDefinition,
 ].map(_schemaTokens).toSet();
 
 const _ipQualityColumns = <String, (String, bool, bool)>{

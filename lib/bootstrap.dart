@@ -14,13 +14,14 @@ import 'package:flashco/common/tray.dart';
 import 'package:flashco/common/window.dart';
 import 'package:flashco/database/database.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/flashco/personal_defaults.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/disclaimer.dart';
 import 'package:flashco/views/navigation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -100,8 +101,18 @@ class Bootstrap {
     globalState.packageInfo = await PackageInfo.fromPlatform();
     final isNewInstallation =
         await preferences.isNewInstallation ||
+        await preferences.isPersonalDefaultsInitializing ||
         (_subscriptionOnboardingEnabled &&
             await preferences.isSubscriptionOnboardingInitializing);
+    await preferences.beginPersonalDefaultsInitialization(
+      enabled: shouldApplyPersonalDefaults(
+        subscriptionUrl: bundledSubscriptionUrl,
+        enabled: (system.isAndroid || system.isWindows) && !safeModeBuild,
+        isNewInstallation: isNewInstallation,
+        subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
+      ),
+      isNewInstallation: isNewInstallation,
+    );
     await preferences.initializeSubscriptionOnboarding(
       enabled: _subscriptionOnboardingEnabled,
       isNewInstallation: isNewInstallation,
@@ -117,20 +128,20 @@ class Bootstrap {
       config = config.copyWith(currentProfileId: null);
       await preferences.saveConfig(config);
     }
-    config = await initializePersonalDefaults(
-      config,
-      subscriptionUrl: bundledSubscriptionUrl,
+    await preferences.stageBundledFallback(
+      bundledSubscriptionUrl,
+      bundledFallbackConfig,
       isNewInstallation: isNewInstallation,
-      subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&
           !_bootDecision.isDegraded,
     );
-    await preferences.stageBundledFallback(
-      bundledSubscriptionUrl,
-      bundledFallbackConfig,
+    config = await initializePersonalDefaults(
+      config,
+      subscriptionUrl: bundledSubscriptionUrl,
       isNewInstallation: isNewInstallation,
+      subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&

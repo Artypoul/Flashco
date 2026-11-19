@@ -27,6 +27,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object ServiceController {
     private val lock = Mutex()
@@ -54,12 +56,18 @@ object ServiceController {
         }
     }
 
+    // A cancelled Flutter scope must not release the setup lock while Go is still applying.
+    suspend fun invokeSetup(data: String): ByteArray = suspendCoroutine { continuation ->
+        invokeMethod(data) { response -> continuation.resume(response) }
+            .onFailure { error -> continuation.resumeWithException(error) }
+    }
+
     suspend fun quickSetup(
         initParams: String,
         setupParams: String,
     ): Result<String> = runCatching {
         NetworkObserver.start()
-        suspendCancellableCoroutine { continuation ->
+        suspendCoroutine { continuation ->
             Core.quickSetup(initParams, setupParams) { result ->
                 continuation.resume(result.orEmpty())
             }

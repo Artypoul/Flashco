@@ -1,15 +1,14 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/manager/app_manager.dart';
 import 'package:flashco/models/common.dart';
 import 'package:flashco/providers/providers.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-typedef OnSelected = void Function(int index);
+import 'package:prism_ui/prism_ui.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -19,8 +18,9 @@ class HomePage extends ConsumerWidget {
     final hasViewSize = ref.watch(
       viewSizeProvider.select((size) => !size.isEmpty),
     );
+    // Paint before Windows reveals the window to avoid a black frame.
     if (!hasViewSize) {
-      return const SizedBox.shrink();
+      return ColoredBox(color: SurfaceLevel.page.colorOf(context.colorScheme));
     }
     return HomeBackScopeContainer(
       child: AppSidebarContainer(
@@ -31,11 +31,6 @@ class HomePage extends ConsumerWidget {
                   .watch(currentNavigationItemsStateProvider)
                   .value;
               final isMobile = ref.watch(isMobileViewProvider);
-              final floating = ref.watch(
-                appSettingProvider.select(
-                  (state) => state.floatingNavigationBar,
-                ),
-              );
               return _HomePageView(
                 navigationItems: navigationItems,
                 pageBuilder: (_, index) {
@@ -44,7 +39,6 @@ class HomePage extends ConsumerWidget {
                     key: ValueKey(navigationItem.label),
                     item: navigationItem,
                     isMobile: isMobile,
-                    docked: isMobile && floating,
                     view: navigationItem.builder(context),
                   );
                 },
@@ -74,8 +68,8 @@ class _HomeShell extends ConsumerWidget {
     final floating = ref.watch(
       appSettingProvider.select((state) => state.floatingNavigationBar),
     );
-    return Material(
-      color: context.colorScheme.surface,
+    return Surface(
+      color: SurfaceLevel.page.colorOf(context.colorScheme),
       child: Column(
         children: [
           Expanded(
@@ -98,19 +92,21 @@ class _HomeShell extends ConsumerWidget {
                   bottom: 0,
                   child: AnimatedVisibility.bottomNavigation(
                     visible: isMobile && floating,
-                    child: _NavigationPadding(
-                      child: NavigationDock(
-                        destinations: [
-                          for (final item in navigationItems)
-                            NavigationDockDestination(
-                              glyph: item.glyph,
-                              label: item.label.label,
-                            ),
-                        ],
-                        selectedIndex: state.currentIndex,
-                        onSelected: (index) {
-                          _handleToPage(navigationItems[index].label, ref);
-                        },
+                    child: BarItemPresence.held(
+                      child: _NavigationPadding(
+                        child: NavigationDock(
+                          destinations: [
+                            for (final item in navigationItems)
+                              NavigationDockDestination(
+                                glyph: item.glyph,
+                                label: item.label.label,
+                              ),
+                          ],
+                          selectedIndex: state.currentIndex,
+                          onSelected: (index) {
+                            _handleToPage(navigationItems[index].label, ref);
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -187,28 +183,26 @@ class _NavigationPage extends StatelessWidget {
     super.key,
     required this.item,
     required this.isMobile,
-    required this.docked,
     required this.view,
   });
 
   final NavigationItem item;
   final bool isMobile;
-  final bool docked;
   final Widget view;
 
   @override
   Widget build(BuildContext context) {
+    // The host owns the key because a pushed copy can overlap its pop.
     final scopedView = PageFocusScope(
-      child: DockedPageScope(docked: docked, child: view),
+      child: KeyedSubtree(key: GlobalObjectKey(item.label), child: view),
     );
     final keptView = KeepScope(
       key: ValueKey(item.label),
-      keep: item.keep,
       child: isMobile
           ? scopedView
           : Navigator(
               key: ValueKey('${item.label.name}_navigator'),
-              pages: [MaterialPage(child: scopedView)],
+              pages: [RootPage(child: scopedView)],
               onDidRemovePage: (_) {},
             ),
     );
@@ -386,9 +380,11 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   }
 }
 
+const _restingDelta = 0.001;
+
 /// Cancels the page view's slide so a tab switch cross-fades in place, and
 /// wraps every page even when off so switching the setting keeps their state.
-class _FadeTabPage extends StatelessWidget {
+class _FadeTabPage extends StatefulWidget {
   const _FadeTabPage({
     super.key,
     required this.controller,
@@ -402,26 +398,55 @@ class _FadeTabPage extends StatelessWidget {
   final bool enabled;
   final Widget child;
 
+  @override
+  State<_FadeTabPage> createState() => _FadeTabPageState();
+}
+
+class _FadeTabPageState extends State<_FadeTabPage> {
+  final _snapshot = SnapshotController();
+
+  @override
+  void dispose() {
+    _snapshot.dispose();
+    super.dispose();
+  }
+
+  // controller.page clamps to the old layout before an inserted page fits.
   double get _delta {
-    if (!controller.hasClients || !controller.position.hasContentDimensions) {
+    final controller = widget.controller;
+    if (!controller.hasClients) {
       return 0;
     }
-    final page = controller.page ?? position.toDouble();
-    return (position - page).clamp(-1.0, 1.0);
+    final metrics = controller.position;
+    if (!metrics.hasContentDimensions || metrics.viewportDimension == 0) {
+      return 0;
+    }
+    final page = metrics.pixels / metrics.viewportDimension;
+    return (widget.position - page).clamp(-1.0, 1.0);
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: widget.controller,
       builder: (_, child) {
-        final delta = enabled ? _delta : 0.0;
+        final offset = _delta;
+        _snapshot.allowSnapshotting = offset.abs() > _restingDelta;
+        final delta = widget.enabled ? offset : 0.0;
         return FractionalTranslation(
           translation: Offset(-delta, 0),
           child: Opacity(opacity: 1 - delta.abs(), child: child),
         );
       },
-      child: child,
+      child: SnapshotWidget(
+        controller: _snapshot,
+        mode: SnapshotMode.permissive,
+        autoresize: true,
+        child: LiquidGlassHost(
+          enabled: LiquidGlassScope.of(context),
+          child: widget.child,
+        ),
+      ),
     );
   }
 }
@@ -433,7 +458,7 @@ class HomeBackScopeContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    return CommonPopScope(
+    return PopGuard(
       onPop: (context) async {
         final pageLabel = ref.read(shownPageLabelProvider);
         final realContext =

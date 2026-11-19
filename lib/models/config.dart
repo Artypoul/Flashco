@@ -3,7 +3,6 @@ import 'package:flashco/enum/enum.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:material_ui/material_ui.dart' show DynamicSchemeVariant;
 
 import 'models.dart';
 import 'package:prism_ui/prism_ui.dart';
@@ -421,6 +420,18 @@ Object? _readLiquidGlass(Map<dynamic, dynamic> json, String key) {
     false => LiquidGlassMode.none.name,
     final value => value,
   };
+}
+
+enum DynamicSchemeVariant {
+  tonalSpot,
+  fidelity,
+  monochrome,
+  neutral,
+  vibrant,
+  expressive,
+  content,
+  rainbow,
+  fruitSalad,
 }
 
 @freezed

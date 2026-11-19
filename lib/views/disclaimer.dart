@@ -1,9 +1,9 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/providers/app.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<bool> requestDisclaimerConsent() async {
@@ -21,7 +21,7 @@ class DisclaimerView extends StatelessWidget {
 
   static const _maxContentWidth = 720.0;
 
-  List<({String title, String content})> _leadingTerms(AppLocalizations l) => [
+  List<({String title, String content})> _terms(AppLocalizations l) => [
     (
       title: l.disclaimerSoftwareTitle,
       content:
@@ -38,9 +38,7 @@ class DisclaimerView extends StatelessWidget {
     ),
     (title: l.disclaimerWarrantyTitle, content: l.disclaimerWarrantyContent),
     (title: l.disclaimerLiabilityTitle, content: l.disclaimerLiabilityContent),
-  ];
-
-  List<({String title, String content})> _trailingTerms(AppLocalizations l) => [
+    (title: l.disclaimerPrivacyTitle, content: l.disclaimerPrivacyContent),
     (title: l.disclaimerLicenseTitle, content: l.disclaimerLicenseContent),
     (title: l.disclaimerChangesTitle, content: l.disclaimerChangesContent),
     (title: l.disclaimerAcceptTitle, content: l.disclaimerAcceptContent),
@@ -75,18 +73,20 @@ class DisclaimerView extends StatelessWidget {
     final appLocalizations = context.appLocalizations;
     final terms = _buildTerms(appLocalizations);
     final body = _buildBody(
-      padding: const EdgeInsets.symmetric(
-        horizontal: _mobileGutter,
-      ).copyWith(top: context.contentTopPadding, bottom: 32),
+      padding: const EdgeInsets.symmetric(horizontal: _mobileGutter).copyWith(
+        top: context.contentTopPadding,
+        // Below the terms the consent bar takes the system bar itself.
+        bottom: 32 + (requireConsent ? 0 : context.bottomInset),
+      ),
       children: terms,
     );
     if (!requireConsent) {
-      return CommonScaffold(title: appLocalizations.disclaimer, body: body);
+      return Scaffold(title: appLocalizations.disclaimer, body: body);
     }
     return Consumer(
       builder: (context, ref, _) {
         if (ref.watch(isMobileViewProvider)) {
-          return CommonScaffold(
+          return Scaffold(
             title: appLocalizations.disclaimer,
             body: _ConsentLayout(
               maxWidth: _maxContentWidth,
@@ -96,8 +96,9 @@ class DisclaimerView extends StatelessWidget {
             ),
           );
         }
-        return Scaffold(
-          body: SafeArea(
+        return Surface(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(
             child: _ConsentLayout(
               maxWidth: _maxContentWidth,
               gutter: _desktopGutter,
@@ -114,9 +115,7 @@ class DisclaimerView extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 20),
                     child: Text(
                       appLocalizations.disclaimer,
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTextStyle.title2.of(context, emphasized: true),
                     ),
                   ),
                   ...terms,
@@ -130,25 +129,11 @@ class DisclaimerView extends StatelessWidget {
   }
 
   List<Widget> _buildTerms(AppLocalizations appLocalizations) {
-    final leadingTerms = _leadingTerms(appLocalizations);
-    final trailingTerms = _trailingTerms(appLocalizations);
-    final privacyIndex = leadingTerms.length + 1;
     return [
       _DisclaimerIntro(text: appLocalizations.disclaimerDesc),
-      for (final (index, term) in leadingTerms.indexed)
+      for (final (index, term) in _terms(appLocalizations).indexed)
         _DisclaimerTerm(
           index: index + 1,
-          title: term.title,
-          content: term.content,
-        ),
-      _DisclaimerTerm(
-        index: privacyIndex,
-        title: appLocalizations.disclaimerPrivacyTitle,
-        content: appLocalizations.disclaimerPrivacyContent,
-      ),
-      for (final (index, term) in trailingTerms.indexed)
-        _DisclaimerTerm(
-          index: privacyIndex + index + 1,
           title: term.title,
           content: term.content,
         ),
@@ -166,7 +151,7 @@ class _DisclaimerIntro extends StatelessWidget {
     final colorScheme = context.colorScheme;
     return DecoratedBox(
       decoration: ShapeDecoration(
-        color: colorScheme.primaryContainer,
+        color: context.raisedSurfaceLevel.colorOf(colorScheme),
         shape: AppShape.xl,
       ),
       child: Padding(
@@ -174,19 +159,14 @@ class _DisclaimerIntro extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GlyphIcon(
-              AppGlyphs.gavel,
-              size: 28,
-              color: colorScheme.onPrimaryContainer,
-            ),
+            GlyphIcon(AppGlyphs.gavel, size: 28, color: colorScheme.primary),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 text,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                  height: 1.6,
-                ),
+                style: AppTextStyle.subheadline
+                    .of(context)
+                    .copyWith(color: colorScheme.onSurfaceVariant, height: 1.6),
               ),
             ),
           ],
@@ -212,7 +192,6 @@ class _DisclaimerTerm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final textTheme = context.textTheme;
     return Padding(
       padding: const EdgeInsets.only(top: 28),
       child: Column(
@@ -222,7 +201,7 @@ class _DisclaimerTerm extends StatelessWidget {
             children: [
               DecoratedBox(
                 decoration: ShapeDecoration(
-                  color: colorScheme.secondaryContainer,
+                  color: context.raisedSurfaceLevel.colorOf(colorScheme),
                   shape: AppShape.full,
                 ),
                 child: SizedBox.square(
@@ -230,22 +209,16 @@ class _DisclaimerTerm extends StatelessWidget {
                   child: Center(
                     child: Text(
                       '$index',
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSecondaryContainer,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: AppTextStyle.caption1
+                          .of(context, emphasized: true)
+                          .copyWith(color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  title,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: Text(title, style: AppTextStyle.headline.of(context)),
               ),
             ],
           ),
@@ -264,10 +237,9 @@ class _TermParagraphs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = context.textTheme.bodyMedium?.copyWith(
-      color: context.colorScheme.onSurfaceVariant,
-      height: 1.6,
-    );
+    final style = AppTextStyle.subheadline
+        .of(context)
+        .copyWith(color: context.colorScheme.onSurfaceVariant, height: 1.6);
     final paragraphs = text.split('\n\n');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -317,60 +289,26 @@ class _ConsentBar extends StatelessWidget {
     required this.compact,
   });
 
-  Widget _buildExitButton(BuildContext context) {
-    return ElasticButton(
-      child: OutlinedButton(
-        onPressed: () {
-          Navigator.of(context).pop(false);
-        },
-        child: Text(context.appLocalizations.exit),
-      ),
-    );
-  }
-
-  Widget _buildAgreeButton(BuildContext context, {required String label}) {
+  Widget _buildAgreeButton(BuildContext context) {
     return ElasticButton(
       child: FilledButton(
         onPressed: () => Navigator.of(context).pop(true),
-        child: Text(label),
+        child: Text(context.appLocalizations.agree),
       ),
     );
   }
 
-  Widget _buildCompactActions(BuildContext context) {
-    final appLocalizations = context.appLocalizations;
-    return Row(
-      children: [
-        Expanded(child: _buildExitButton(context)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildAgreeButton(context, label: appLocalizations.agree),
-        ),
-      ],
-    );
-  }
+  Widget _buildCompactActions(BuildContext context) =>
+      Row(children: [Expanded(child: _buildAgreeButton(context))]);
 
-  Widget _buildActions(BuildContext context) {
-    final appLocalizations = context.appLocalizations;
-    return Row(
-      children: [
-        const Spacer(),
-        const SizedBox(width: 12),
-        _buildExitButton(context),
-        const SizedBox(width: 12),
-        _buildAgreeButton(context, label: appLocalizations.agree),
-      ],
-    );
-  }
+  Widget _buildActions(BuildContext context) =>
+      Row(children: [const Spacer(), _buildAgreeButton(context)]);
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: context.colorScheme.surface,
-        border: Border(
-          top: BorderSide(color: context.colorScheme.outlineVariant),
-        ),
+        color: SurfaceLevel.page.colorOf(context.colorScheme),
       ),
       child: SafeArea(
         top: false,

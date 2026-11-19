@@ -37,11 +37,7 @@ class BootGuard {
     }
     final record = await _readRecord();
     final exitInfo = await _readExitInfo();
-    final decision = resolveBootDecision(
-      record: record,
-      exitInfo: exitInfo,
-      crashReported: false,
-    );
+    final decision = resolveBootDecision(record: record, exitInfo: exitInfo);
     if (decision.isDegraded) {
       commonPrint.log(
         'Previous launch did not finish: $decision',

@@ -19,7 +19,7 @@ import 'package:flashco/providers/database.dart';
 import 'package:flashco/providers/state.dart';
 import 'package:flashco/state.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -157,7 +157,7 @@ void main() {
 
   setUp(() {
     core = _MockCoreHandlerInterface();
-    when(() => core.validateConfig(any())).thenAnswer((_) async => '');
+    when(() => core.validateConfig(any())).thenAnswer((_) async => null);
     when(() => core.getProfileGroupReferences(any())).thenAnswer((
       invocation,
     ) async {
@@ -196,7 +196,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const TestApp(withStatusManager: true, child: SizedBox()),
+        child: const TestApp(child: SizedBox()),
       ),
     );
   }

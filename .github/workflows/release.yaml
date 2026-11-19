@@ -47,6 +47,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+          submodules: recursive
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -72,6 +73,10 @@ jobs:
               raise SystemExit('Expected exactly the two native hook settings.')
           path.write_bytes(source.replace(before, after, 1))
           PY
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Resolve Dart dependencies without native assets
         run: flutter pub get
       - name: Verify release identity and published history
@@ -114,6 +119,10 @@ jobs:
           ndk-version: ${{ env.NDK_VERSION }}
           add-to-path: true
           link-to-sdk: true
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Verify Go and Rust toolchains
         run: |
           go version
@@ -179,6 +188,10 @@ jobs:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: false
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Verify Go and Rust toolchains
         run: |
           go version
@@ -189,6 +202,12 @@ jobs:
         run: git diff --exit-code -- pubspec.yaml pubspec.lock
       - name: Build Windows x64 EXE and ZIP (setup.dart rejects disabled asset hooks)
         run: dart setup.dart windows --env stable --targets exe,zip
+      - name: Verify packaged Windows app version
+        shell: pwsh
+        run: |
+          $zip = @(Get-Item 'dist/*-windows-amd64.zip')
+          if ($zip.Count -ne 1) { throw 'Expected exactly one Windows ZIP.' }
+          ./tool/verify_windows_app_version.ps1 -ZipPath ($zip[0].FullName) -OutputPath 'dist/windows-app-version.json'
       - uses: actions/upload-artifact@v4
         with:
           name: release-windows-${{ github.run_id }}-${{ github.run_attempt }}
@@ -274,6 +293,10 @@ jobs:
         with:
           name: release-windows-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/release-bundle
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Get Flutter dependencies with native hooks enabled
         run: flutter pub get
       - name: Keep tracked dependency declarations unchanged
@@ -362,6 +385,10 @@ jobs:
           run-id: ${{ needs.preflight.outputs.original_run_id }}
           github-token: ${{ github.token }}
           path: build/release-bundle
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Get Flutter dependencies with native hooks enabled
         run: flutter pub get
       - name: Keep tracked dependency declarations unchanged

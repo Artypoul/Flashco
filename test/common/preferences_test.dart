@@ -7,6 +7,7 @@ import 'package:flashco/common/preferences.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 import '../helpers/preferences.dart';
 
@@ -18,6 +19,17 @@ const _sharedState = SharedState(
   stopText: 'stopped',
   onlyStatisticsProxy: true,
 );
+
+class _FailingDigestStore extends InMemorySharedPreferencesStore {
+  _FailingDigestStore() : super.empty();
+
+  @override
+  Future<bool> setValue(String valueType, String key, Object value) async =>
+      false;
+
+  @override
+  Future<bool> remove(String key) async => false;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +50,20 @@ void main() {
 
       await preferences.saveAppliedConfigMd5(null);
       expect(store.containsKey(appliedConfigMd5Key), isFalse);
+    });
+
+    test('reports failure to persist or clear the digest', () async {
+      final previous = SharedPreferencesStorePlatform.instance;
+      SharedPreferencesStorePlatform.instance = _FailingDigestStore();
+      addTearDown(() => SharedPreferencesStorePlatform.instance = previous);
+      await expectLater(
+        preferences.saveAppliedConfigMd5('digest'),
+        throwsStateError,
+      );
+      await expectLater(
+        preferences.saveAppliedConfigMd5(null),
+        throwsStateError,
+      );
     });
   });
 
@@ -157,6 +183,58 @@ void main() {
       SharedState.fromJson(json.decode(raw!) as Map<String, Object?>),
       _sharedState,
     );
+  });
+
+  test(
+    'shared state updates preserve the active setup base until replaced',
+    () async {
+      const first = SetupBase(path: '/first', overlay: 'one');
+      const second = SetupBase(path: '/second', overlay: 'two');
+      const params = SetupParams(
+        base: first,
+        selectedMap: {'group': 'node'},
+        options: CoreOptions(testUrl: 'https://example.invalid'),
+      );
+      SharedState readState() => SharedState.fromJson(
+        json.decode(store.getString('sharedState')!) as Map<String, Object?>,
+      );
+
+      await preferences.saveShareState(
+        _sharedState.copyWith(setupParams: params),
+        preserveSetupBase: false,
+      );
+      expect(readState().setupParams?.base, first);
+      await preferences.saveShareState(
+        _sharedState.copyWith(setupParams: params.copyWith(base: null)),
+      );
+      expect(readState().setupParams?.base, first);
+      await preferences.saveShareState(
+        _sharedState.copyWith(setupParams: params.copyWith(base: second)),
+        preserveSetupBase: false,
+      );
+      expect(readState().setupParams?.base, second);
+      await preferences.saveShareState(
+        _sharedState.copyWith(setupParams: params.copyWith(base: null)),
+        preserveSetupBase: false,
+      );
+      expect(readState().setupParams?.base, isNull);
+    },
+  );
+
+  test('a corrupt old shared state does not block a fresh state', () async {
+    await store.setString('sharedState', '{broken');
+    const params = SetupParams(
+      base: SetupBase(path: '/new', overlay: 'new'),
+      selectedMap: {},
+      options: CoreOptions(testUrl: ''),
+    );
+    await preferences.saveShareState(
+      _sharedState.copyWith(setupParams: params),
+    );
+    final restored = SharedState.fromJson(
+      json.decode(store.getString('sharedState')!) as Map<String, Object?>,
+    );
+    expect(restored.setupParams?.base, params.base);
   });
 
   test('clearPreferences empties every stored key', () async {

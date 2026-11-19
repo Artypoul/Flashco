@@ -5,6 +5,14 @@ import 'package:prism_ui/icons/glyph.dart';
 import 'package:prism_ui/icons/glyphs.dart';
 
 abstract final class AppGlyphs {
+  static const power = Glyph([
+    GlyphArc(12, 13, 8, -math.pi / 4, math.pi * 1.5, role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(12, 3),
+      GlyphVertex(12, 12),
+    ], role: GlyphRole.line),
+  ]);
+
   static const dashboard = Glyph([
     GlyphBox(3.5, 3.5, 10.5, 11.5, 2),
     GlyphBox(13.5, 3.5, 20.5, 9.5, 2),

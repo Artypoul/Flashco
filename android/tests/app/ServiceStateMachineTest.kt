@@ -7,6 +7,7 @@ import com.follow.flashco.service.models.NotificationParams
 import com.follow.flashco.service.models.VpnOptions
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -116,6 +117,7 @@ private class FakeHost(override val scope: CoroutineScope) : ServiceStateHost {
     var stoppedNotifications = 0
     var lastInitParams: String? = null
     var lastSetupParams: String? = null
+    val completedSetups = mutableListOf<String>()
 
     override fun log(message: String) {
         logs += message
@@ -148,6 +150,7 @@ private class FakeHost(override val scope: CoroutineScope) : ServiceStateHost {
         lastInitParams = initParams
         lastSetupParams = setupParams
         duringSetup?.invoke()
+        completedSetups += setupParams
         return setupResult
     }
 
@@ -667,6 +670,84 @@ class ServiceStateMachineTest {
 
         assertEquals(0, host.stopCalls)
         assertEquals(RunState.STARTED, machine.runState.value)
+    }
+
+    @Test
+    fun `a later native start applies its configuration after a superseded setup`() = runTest {
+        val host = FakeHost(backgroundScope)
+        val machine = ServiceStateMachine(host)
+        val firstEntered = CompletableDeferred<Unit>()
+        val releaseFirst = CompletableDeferred<Unit>()
+        val firstState = configuredState().copy(
+            setupParams = JsonParser.parseString("""{"profile":"first"}""").asJsonObject,
+        )
+        val secondState = configuredState().copy(
+            setupParams = JsonParser.parseString("""{"profile":"second"}""").asJsonObject,
+        )
+        host.storedSharedState = firstState
+        host.duringSetup = {
+            if (host.setupCalls == 1) {
+                firstEntered.complete(Unit)
+                releaseFirst.await()
+            }
+        }
+        val first = backgroundScope.launch { machine.handleStartAction() }
+        firstEntered.await()
+        machine.requestStop().await()
+        host.storedSharedState = secondState
+        val second = backgroundScope.launch { machine.handleStartAction() }
+        testScheduler.runCurrent()
+        releaseFirst.complete(Unit)
+        first.join()
+        second.join()
+
+        assertEquals(
+            listOf(Gson().toJson(firstState.setupParams), Gson().toJson(secondState.setupParams)),
+            host.completedSetups,
+        )
+        assertEquals(RunState.STARTED, machine.runState.value)
+    }
+
+    @Test
+    fun `flutter setup follows an in flight native setup and remains applied`() = runTest {
+        val host = FakeHost(backgroundScope)
+        val machine = ServiceStateMachine(host)
+        val nativeEntered = CompletableDeferred<Unit>()
+        val releaseNative = CompletableDeferred<Unit>()
+        var applied = ""
+        var savedDigest = ""
+        host.duringSetup = {
+            nativeEntered.complete(Unit)
+            releaseNative.await()
+            applied = "native A"
+        }
+        val native = backgroundScope.launch { machine.handleStartAction() }
+        nativeEntered.await()
+        machine.requestStop().await()
+        val flutter = backgroundScope.launch {
+            machine.withCoreSetup {
+                applied = "flutter B"
+                savedDigest = "B"
+            }
+            machine.requestStart().await()
+        }
+        testScheduler.runCurrent()
+        assertEquals("", savedDigest)
+        releaseNative.complete(Unit)
+        native.join()
+        flutter.join()
+
+        assertEquals("flutter B", applied)
+        assertEquals("B", savedDigest)
+        assertEquals(RunState.STARTED, machine.runState.value)
+    }
+
+    @Test
+    fun `only config setup requests use the shared setup boundary`() {
+        assertTrue(isCoreSetupCall("""{"id":"4","method":"config.setup","arguments":{}}"""))
+        assertFalse(isCoreSetupCall("""{"method":"config.update"}"""))
+        assertFalse(isCoreSetupCall("""{"method":"other","arguments":{"method":"config.setup"}}"""))
+        assertFalse(isCoreSetupCall("not json"))
     }
 
     @Test

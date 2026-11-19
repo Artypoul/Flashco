@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flashco/common/common.dart';
 import 'package:flashco/manager/android_manager.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/plugins/service.dart';
@@ -12,10 +14,26 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 import '../helpers/preferences.dart';
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+
+class _RecordingPreferencesStore extends InMemorySharedPreferencesStore {
+  _RecordingPreferencesStore() : super.empty();
+
+  final sharedStateWritten = Completer<void>();
+
+  @override
+  Future<bool> setValue(String valueType, String key, Object value) async {
+    final result = await super.setValue(valueType, key, value);
+    if (key == 'flutter.sharedState' && !sharedStateWritten.isCompleted) {
+      sharedStateWritten.complete();
+    }
+    return result;
+  }
+}
 
 class _RecordingSetupAction extends SetupAction {
   static final requests = <bool>[];
@@ -32,10 +50,13 @@ void main() {
 
   late ProviderContainer container;
   late SharedPreferences store;
+  late _RecordingPreferencesStore platformStore;
 
   setUp(() async {
     await mockPreferences();
     store = await SharedPreferences.getInstance();
+    platformStore = _RecordingPreferencesStore();
+    SharedPreferencesStorePlatform.instance = platformStore;
     _RecordingSetupAction.requests.clear();
     container = ProviderContainer(
       overrides: [
@@ -93,21 +114,43 @@ void main() {
   testWidgets('persists shared state after the debounce window', (
     tester,
   ) async {
+    // The debounce runs in the widget test's fake-async zone.
+    final originalPreferences = preferences.sharedPreferencesCompleter;
+    addTearDown(
+      () => preferences.sharedPreferencesCompleter = originalPreferences,
+    );
+    preferences.sharedPreferencesCompleter = Completer<SharedPreferences?>()
+      ..complete(store);
     await pumpAndroidManager(tester);
     expect(store.getString('sharedState'), isNull);
 
+    final changes = <SharedState>[];
+    final subscription = container.listen(
+      sharedStateProvider,
+      (_, next) => changes.add(next),
+    );
+    addTearDown(subscription.close);
     container.read(patchClashConfigProvider.notifier).value =
         const PatchClashConfig(testUrl: 'http://shared.test');
     await tester.pump();
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
+    expect(
+      container.read(sharedStateProvider).setupParams?.options.testUrl,
+      'http://shared.test',
+    );
+    await tester.pump();
+    expect(changes.last.setupParams?.options.testUrl, 'http://shared.test');
+    await tester.pump(const Duration(milliseconds: 999));
+    expect(platformStore.sharedStateWritten.isCompleted, isFalse);
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(platformStore.sharedStateWritten.isCompleted, isTrue);
 
     final raw = store.getString('sharedState');
     expect(raw, isNotNull);
     final restored = SharedState.fromJson(
       json.decode(raw!) as Map<String, Object?>,
     );
-    expect(restored.onlyStatisticsProxy, isFalse);
+    expect(restored.setupParams?.options.testUrl, 'http://shared.test');
     expect(tester.takeException(), null);
 
     await tester.pumpWidget(const SizedBox.shrink());

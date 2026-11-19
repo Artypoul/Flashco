@@ -27,7 +27,6 @@ const _swayBob = 1.25;
 const _roomDuration = Duration(milliseconds: 260);
 const _appearDuration = Duration(milliseconds: 200);
 const _appearScale = 0.92;
-const _liftGrowth = 0.03;
 
 /// Edits the shown cards where they stand: each sways, a removable one wears
 /// a remove badge, and a held card drags to a new place.
@@ -206,20 +205,24 @@ class _DashboardEditorState extends ConsumerState<DashboardEditor>
               },
               // The held card rides in the overlay, outside the density scope,
               // and takes its key along while the list leaves its place empty.
-              proxyDecorator: (_, index, animation) => DashboardDensityScope(
-                density: DashboardDensity.mobile,
-                scale: scale,
-                child: spaced(
-                  _LiftedCard(
-                    animation: animation,
-                    child: AbsorbPointer(
-                      child: RepaintBoundary(
-                        key: widget.cardKeyOf(cards[index]),
-                        child: cards[index].card,
+              proxyDecorator: (_, index, animation) => commonProxyDecorator(
+                DashboardDensityScope(
+                  density: DashboardDensity.mobile,
+                  scale: scale,
+                  child: spaced(
+                    _LiftedCard(
+                      animation: animation,
+                      child: AbsorbPointer(
+                        child: RepaintBoundary(
+                          key: widget.cardKeyOf(cards[index]),
+                          child: cards[index].card,
+                        ),
                       ),
                     ),
                   ),
                 ),
+                index,
+                animation,
               ),
               onReorderItem: _reorder,
             ),
@@ -490,20 +493,17 @@ class _LiftedCard extends StatelessWidget {
       animation: animation,
       builder: (context, child) {
         final t = Curves.easeOut.transform(animation.value);
-        return Transform.scale(
-          scale: 1 + _liftGrowth * t,
-          child: DecoratedBox(
-            decoration: ShapeDecoration(
-              shape: shape,
-              shadows: [
-                for (final shadow in shadows)
-                  shadow.copyWith(
-                    color: shadow.color.withValues(alpha: shadow.color.a * t),
-                  ),
-              ],
-            ),
-            child: child,
+        return DecoratedBox(
+          decoration: ShapeDecoration(
+            shape: shape,
+            shadows: [
+              for (final shadow in shadows)
+                shadow.copyWith(
+                  color: shadow.color.withValues(alpha: shadow.color.a * t),
+                ),
+            ],
           ),
+          child: child,
         );
       },
       child: Surface.transparent(child: child),

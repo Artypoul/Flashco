@@ -10,6 +10,8 @@ import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart';
+import 'package:prism_ui/theme_data.dart' show ThemeMode;
+import 'package:sqlite3/sqlite3.dart' as sqlite;
 
 import '../helpers/app_paths.dart';
 
@@ -574,6 +576,114 @@ void main() {
         },
       );
     }
+
+    test('restores a settings v2 and schema 21 Flashco archive', () async {
+      const fallback = FallbackConfig(
+        selector: 'PROXY',
+        name: 'Fallback',
+        url: 'https://example.invalid/204',
+        interval: 10,
+        timeout: 3000,
+        lazy: false,
+        expectedStatus: '204',
+      );
+      const profile = Profile(
+        id: 1,
+        type: ProfileType.url,
+        label: 'Saved subscription',
+        url: 'https://example.invalid/sub',
+        autoUpdateDuration: Duration(hours: 1),
+        selectedMap: {'PROXY': 'Node A'},
+        unfoldSet: {'PROXY'},
+        overrides: ProfileOverrides(fallback: fallback),
+      );
+      const rules = [
+        Rule(
+          id: 31,
+          content: 'first.example',
+          ruleTarget: 'DIRECT',
+          order: 'a0',
+        ),
+        Rule(
+          id: 32,
+          content: 'second.example',
+          ruleTarget: 'REJECT',
+          order: 'a1',
+        ),
+      ];
+      const disabled = [DisabledRule(profileId: 1, ruleId: 32)];
+      final script = Script(
+        id: 2,
+        label: 'Script',
+        lastUpdateTime: DateTime(2026),
+      );
+      final source = db.Database(NativeDatabase(File(databasePath)));
+      await source.restore([profile], [script], rules, disabled, []);
+      await source.close();
+      final raw = sqlite.sqlite3.open(databasePath);
+      expect(
+        raw
+            .select('SELECT "order" FROM rules ORDER BY "order"')
+            .map((row) => row['order']),
+        ['a0', 'a1'],
+      );
+      raw.execute('DROP TABLE ip_qualities');
+      raw.execute('DROP TABLE mitm_modules');
+      raw.execute('PRAGMA user_version = 21');
+      raw.close();
+      writeFile(join(home.path, 'profiles', '1.yaml'), 'proxies: [Node A]');
+      writeFile(join(home.path, 'scripts', '2.js'), 'function main() {}');
+      const config = Config(
+        currentProfileId: 1,
+        appSettingProps: AppSettingProps(locale: 'ru', autoRun: false),
+        themeProps: ThemeProps(
+          themeMode: ThemeMode.dark,
+          primaryColor: 0xff123456,
+          sidebarBlur: true,
+        ),
+        patchClashConfig: PatchClashConfig(tun: Tun(enable: false)),
+      );
+      final archivePath = await backup(
+        configMap: {...config.toJson(), 'version': 2},
+        entries: const ['profiles/1.yaml', 'scripts/2.js'],
+      );
+      final data = await restore(archivePath);
+      expect(data.profiles.single, profile);
+      expect(data.scripts.single, script);
+      expect(data.rules.map((rule) => rule.id), [31, 32]);
+      expect(data.rules.map((rule) => rule.order), ['a0', 'a1']);
+      expect(data.disabledRules, disabled);
+      expect(Config.fromJson(data.configMap!), config);
+      final restoredTheme = Config.fromJson(data.configMap!).themeProps;
+      expect(restoredTheme.themeMode, ThemeMode.dark);
+      expect(restoredTheme.primaryColor, 0xff123456);
+      expect(restoredTheme.sidebarBlur, isTrue);
+      expect(
+        File(join(staging.path, 'profiles', '1.yaml')).readAsStringSync(),
+        'proxies: [Node A]',
+      );
+      expect(
+        File(join(staging.path, 'scripts', '2.js')).readAsStringSync(),
+        'function main() {}',
+      );
+      final restored = db.Database(
+        NativeDatabase(File(join(root.path, 'restored-$uniqueId.sqlite'))),
+      );
+      await restored.restore(
+        data.profiles,
+        data.scripts,
+        data.rules,
+        data.disabledRules,
+        data.proxyGroups,
+      );
+      expect(await restored.profilesDao.query().get(), [profile]);
+      expect(await restored.rulesDao.queryDisabledRuleIds(1).get(), [32]);
+      expect(
+        (await restored.rulesDao.queryGlobalRules().get()).map((r) => r.id),
+        [31, 32],
+      );
+      await restored.close();
+    });
 
     test('the archive carries the database, the config and only the listed '
         'files', () async {

@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 class Request {
   late final Dio dio;
   late final Dio _clashDio;
+  late final Dio releaseDio;
   String? userAgent;
 
   ProviderReader? _read;
@@ -23,6 +24,15 @@ class Request {
 
   Request() {
     dio = Dio(BaseOptions(headers: {'User-Agent': browserUa}));
+    releaseDio = Dio(BaseOptions(headers: {'User-Agent': browserUa}));
+    releaseDio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        // HttpOverrides may relax verification for subscriptions; releases never do.
+        client.badCertificateCallback = null;
+        return client;
+      },
+    );
     _clashDio = Dio();
     _clashDio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
@@ -85,6 +95,53 @@ class Request {
     }
   }
 
+  Future<String> downloadVerifiedRelease({
+    required String tag,
+    required String name,
+    required String directory,
+    required CancelToken cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final path = '$directory${Platform.pathSeparator}$name';
+    final file = File(path);
+    try {
+      final sums = await releaseDio.getUri<String>(
+        releaseAssetUri(tag, releaseChecksumsName),
+        options: Options(responseType: ResponseType.plain),
+        cancelToken: cancelToken,
+      );
+      _requireHttpsRedirects(sums);
+      final expected = releaseChecksum(sums.data ?? '', name);
+      if (expected == null) throw ReleaseNotVerifiedException(name);
+      final response = await releaseDio.downloadUri(
+        releaseAssetUri(tag, name),
+        path,
+        cancelToken: cancelToken,
+        onReceiveProgress: onReceiveProgress,
+      );
+      _requireHttpsRedirects(response);
+      if (cancelToken.isCancelled || await fileSha256(path) != expected) {
+        if (cancelToken.isCancelled) throw cancelToken.cancelError!;
+        throw ReleaseNotVerifiedException(name);
+      }
+      return path;
+    } catch (_) {
+      if (await file.exists()) await file.delete();
+      rethrow;
+    }
+  }
+
+  void _requireHttpsRedirects(Response<dynamic> response) {
+    if (response.realUri.scheme != 'https' ||
+        response.redirects.any(
+          (redirect) =>
+              redirect.location.hasScheme &&
+              redirect.location.scheme != 'https',
+        )) {
+      throw const FormatException('Insecure release redirect');
+    }
+  }
+
   /// Null when this build is current; throws when GitHub cannot be asked.
   Future<Map<String, dynamic>?> checkForUpdate() async {
     final release = await latestRelease();
@@ -96,13 +153,13 @@ class Request {
   }
 
   /// The release page redirect still answers once the hourly API quota is spent.
-  @visibleForTesting
   Future<Map<String, dynamic>> latestRelease() async {
     try {
-      final response = await dio.get<Map<String, dynamic>>(
+      final response = await releaseDio.get<Map<String, dynamic>>(
         'https://api.github.com/repos/$repository/releases/latest',
         options: Options(responseType: ResponseType.json),
       );
+      _requireHttpsRedirects(response);
       return response.data!;
     } on DioException catch (error) {
       commonPrint.log(
@@ -110,7 +167,7 @@ class Request {
         logLevel: LogLevel.warning,
       );
     }
-    final response = await dio.get<void>(
+    final response = await releaseDio.get<void>(
       'https://github.com/$repository/releases/latest',
       options: Options(
         followRedirects: false,

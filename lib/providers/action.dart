@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart' show CancelToken, DioException;
 import 'package:flashco/common/app_data.dart';
 import 'package:flashco/common/boot_guard.dart';
 import 'package:flashco/common/common.dart';
@@ -18,11 +19,12 @@ import 'package:flashco/providers/actions/system_exit.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/providers/mitm.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
-import 'package:flutter/foundation.dart' show compute;
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart' show compute, listEquals;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' show basename, join;
+import 'package:path/path.dart' show basename, basenameWithoutExtension, join;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 

@@ -95,6 +95,15 @@ class _CodeForgeState extends State<CodeForge>
       _renderer?._getTextOffsetFromPosition(position);
 
   @override
+  bool get debugFoldComputationCurrent {
+    final renderer = _renderer;
+    return renderer != null &&
+        (!renderer._foldsInBackground ||
+            (!_controller.isBufferActive &&
+                renderer._asyncFoldsVersion == _controller.contentVersion));
+  }
+
+  @override
   void toggleFold(int line) => _renderer?._toggleFoldAtLine(line);
 
   @override

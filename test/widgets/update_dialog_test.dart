@@ -63,6 +63,10 @@ String _bodyWith(String payload) =>
 Map<String, dynamic> release(String? body) => <String, dynamic>{
   'tag_name': 'v0.8.96',
   'body': body,
+  'assets': [
+    {'name': 'Flashco-0.8.96-android-arm64-v8a.apk'},
+    {'name': 'SHA256SUMS'},
+  ],
 };
 
 Future<ProviderContainer> pumpApp(WidgetTester tester, {Locale? locale}) async {
@@ -174,7 +178,7 @@ void main() {
   });
 
   group('a build that updates itself', () {
-    const asset = 'FlClash-0.8.96-android-arm64-v8a.apk';
+    const asset = 'Flashco-0.8.96-android-arm64-v8a.apk';
     final package = utf8.encode('package');
     final digest = sha256.convert(package).toString();
     late Directory home;

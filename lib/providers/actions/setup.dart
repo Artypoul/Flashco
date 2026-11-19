@@ -20,11 +20,13 @@ class _RunRequest {
   final bool running;
   final bool initialize;
   final DateTime? previousStartTime;
+  final bool forceApply;
 
   const _RunRequest({
     required this.running,
     required this.initialize,
     required this.previousStartTime,
+    required this.forceApply,
   });
 }
 
@@ -140,26 +142,36 @@ class SetupAction extends _$SetupAction {
   @protected
   Future<DateTime?> serviceStartTime() async => service?.getRunTime();
 
-  Future<void> _updateStartTime() async {
-    _startTime = await serviceStartTime();
-  }
-
   Future<void> initStatus() async {
     if (!globalState.needInitStatus) {
       return;
     }
-    if (system.isAndroid) {
-      await _updateStartTime();
-    }
+    final token = _latestRunRequest;
+    final startTime = await serviceStartTime();
+    if (!identical(token, _latestRunRequest)) return;
+    final isServiceRunning = startTime != null && startTime.isBeforeNow;
+    final digest = isServiceRunning
+        ? await preferences.getAppliedConfigMd5()
+        : null;
+    if (!identical(token, _latestRunRequest)) return;
+    _startTime = startTime;
+    if (isServiceRunning) globalState.lastConfigMd5 = digest;
     final shouldRun = _isRunning || ref.read(appSettingProvider).autoRun;
     if (shouldRun) {
-      await setRunning(true, initialize: true);
+      await _setRunning(true, initialize: true, forceApply: !isServiceRunning);
     } else {
       await globalState.safeRun(() => applyProfile(force: true));
     }
   }
 
-  Future<bool> setRunning(bool running, {bool initialize = false}) {
+  Future<bool> setRunning(bool running, {bool initialize = false}) =>
+      _setRunning(running, initialize: initialize, forceApply: true);
+
+  Future<bool> _setRunning(
+    bool running, {
+    required bool initialize,
+    required bool forceApply,
+  }) {
     if (running && !initialize && !ref.read(initProvider)) {
       return Future.value(true);
     }
@@ -168,6 +180,7 @@ class SetupAction extends _$SetupAction {
       running: running,
       initialize: running && initialize,
       previousStartTime: _startTime,
+      forceApply: forceApply,
     );
     _latestRunRequest = request;
     _setLocalRunning(running);
@@ -181,7 +194,7 @@ class SetupAction extends _$SetupAction {
     if (request.initialize) {
       var applied = false;
       try {
-        applied = await applyProfile(force: true);
+        applied = await applyProfile(force: request.forceApply);
       } catch (_) {
         applied = false;
       }
@@ -194,7 +207,13 @@ class SetupAction extends _$SetupAction {
       }
       try {
         await _setCoreRunning(request);
-      } catch (_) {
+      } catch (error) {
+        if (isUnansweredCoreError(error)) {
+          if (_isCurrent(request)) {
+            await globalState.safeRun(() => setRunning(false));
+          }
+          return false;
+        }
         _rollbackRunning(request);
         rethrow;
       }
@@ -203,11 +222,15 @@ class SetupAction extends _$SetupAction {
 
     try {
       await _setCoreRunning(request);
-    } catch (_) {
+    } catch (error) {
+      if (!_isCurrent(request) && isUnansweredCoreError(error)) {
+        return true;
+      }
       _rollbackRunning(request);
       rethrow;
     }
-    if (_isCurrent(request)) {
+    final applied = await inputsApplied();
+    if (_isCurrent(request) && !applied) {
       applyProfileDebounce(force: true, silence: true);
     }
     return true;
@@ -216,17 +239,27 @@ class SetupAction extends _$SetupAction {
   Future<bool> _stop(_RunRequest request) async {
     try {
       await _setCoreRunning(request);
-    } catch (_) {
-      _rollbackRunning(request);
+    } catch (error) {
+      if (isUnansweredCoreError(error)) {
+        if (!_isCurrent(request)) return true;
+        _clearStoppedState();
+      } else {
+        _rollbackRunning(request);
+      }
       rethrow;
     }
     if (!_isCurrent(request)) {
       return true;
     }
+    _clearStoppedState();
+    return true;
+  }
+
+  void _clearStoppedState() {
+    ref.read(runningVpnOptionsProvider.notifier).value = null;
     resetCoreTraffic();
     ref.read(trafficsProvider.notifier).clear();
     ref.read(totalTrafficProvider.notifier).value = const Traffic();
-    return true;
   }
 
   Future<void> _setCoreRunning(_RunRequest request) {
@@ -246,10 +279,9 @@ class SetupAction extends _$SetupAction {
 
   Future<void> _setListening(bool running, {_RunRequest? request}) async {
     final vpnOptions = await ref.read(vpnOptionsProvider.future);
-    if (request != null && request.initialize && !_isCurrent(request)) {
-      return;
-    }
+    if (request != null && !_isCurrent(request)) return;
     await setCoreRunning(running);
+    if (request != null && !_isCurrent(request)) return;
     ref.read(runningVpnOptionsProvider.notifier).value = running
         ? vpnOptions
         : null;
@@ -290,8 +322,13 @@ class SetupAction extends _$SetupAction {
   }
 
   @protected
-  Future<bool> setCoreRunning(bool running) {
-    return running ? _core.startListener() : _core.stopListener();
+  Future<bool> setCoreRunning(bool running) async {
+    if (running) {
+      await _core.startListener();
+    } else {
+      await _core.stopListener();
+    }
+    return true;
   }
 
   @protected
@@ -364,13 +401,23 @@ class SetupAction extends _$SetupAction {
   /// already runs is not rebuilt, which on a large profile takes a while.
   void autoApplyProfile() {
     runAfterFrame(() async {
-      if (!await _inputsApplied()) {
+      if (!await inputsApplied()) {
         await applyProfile();
       }
     });
   }
 
-  Future<bool> _inputsApplied() async {
+  void applyIfGlobalRulesUsed() {
+    final profile = ref.read(currentProfileProvider);
+    if (profile == null ||
+        profile.type == ProfileType.custom ||
+        profile.extendType != ExtendType.standard) {
+      return;
+    }
+    applyProfileDebounce(silence: true);
+  }
+
+  Future<bool> inputsApplied() async {
     final applied = _appliedInputs;
     if (applied == null) {
       return false;
@@ -606,7 +653,7 @@ class SetupAction extends _$SetupAction {
       );
       return res.base == null ? res.yaml : await _core.buildProfile(res.base!);
     } catch (e) {
-      dialogs.showNotifier(e.toString(), level: MessageLevel.error);
+      dialogs.showBanner(e.toString(), level: BannerLevel.error);
     }
     return '';
   }
@@ -665,9 +712,9 @@ class SetupAction extends _$SetupAction {
         ref
             .read(patchClashConfigProvider.notifier)
             .update((state) => state.copyWith.tun(enable: false));
-        dialogs.showNotifier(
+        dialogs.showBanner(
           currentAppLocalizations.tunAuthorizationFailed,
-          level: MessageLevel.error,
+          level: BannerLevel.error,
         );
         return false;
     }
@@ -746,12 +793,18 @@ class SetupAction extends _$SetupAction {
     }
     // Go answers a config it rejects by running its built-in default, which
     // has no proxies, so until this push succeeds no applied config is known.
+    if (system.isAndroid) {
+      await preferences.saveAppliedConfigMd5(null);
+    }
     _appliedInputs = null;
     globalState.lastConfigMd5 = null;
     globalState.lastConfigCounts = null;
     if (system.isAndroid) {
       await ref.read(vpnOptionsProvider.future);
-      await preferences.saveShareState(ref.read(sharedStateProvider));
+      await preferences.saveShareState(
+        ref.read(sharedStateProvider).copyWith(setupParams: setupParams),
+        preserveSetupBase: false,
+      );
     }
     // Recaptured so _start's catch can roll back after safeRun swallows it.
     (Object, StackTrace)? handoffFailure;
@@ -765,7 +818,16 @@ class SetupAction extends _$SetupAction {
           }
           final profileId = profile?.id;
           if (profileId != null) {
-            await appPath.ensureProviderDirs(profileId);
+            // An elevated Core may own these directories; it can reclaim
+            // them when it applies the config under its own permissions.
+            try {
+              await appPath.ensureProviderDirs(profileId);
+            } on FileSystemException catch (error) {
+              commonPrint.log(
+                'provider directories unavailable: ${compactError(error)}',
+                logLevel: LogLevel.warning,
+              );
+            }
           }
           try {
             await _core.setupConfig(
@@ -784,6 +846,9 @@ class SetupAction extends _$SetupAction {
             handoffFailure = (e, s);
           }
           rethrow;
+        }
+        if (system.isAndroid && !profileFailed) {
+          await preferences.saveAppliedConfigMd5(yamlMd5);
         }
         globalState.lastConfigMd5 = yamlMd5;
         globalState.lastConfigCounts =
