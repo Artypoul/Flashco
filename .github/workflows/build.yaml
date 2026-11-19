@@ -193,6 +193,21 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify Windows checkout before build
+        id: windows_checkout
+        if: matrix.platform == 'windows'
+        shell: bash
+        run: dart run tool/verify_candidate_checkout.dart "$GITHUB_SHA"
+
+      - name: Show bounded tracked changes on checkout failure
+        if: failure() && matrix.platform == 'windows' && steps.windows_checkout.outcome == 'failure'
+        shell: bash
+        run: |
+          diff_file="$RUNNER_TEMP/flashco-tracked.diff"
+          trap 'rm -f "$diff_file"' EXIT
+          git diff --no-ext-diff --no-color > "$diff_file"
+          python -c 'import pathlib, sys; d = pathlib.Path(sys.argv[1]).read_bytes(); sys.stdout.buffer.write(d[:131072]); sys.stdout.buffer.write(b"\n[tracked diff truncated at 128 KiB]\n" if len(d) > 131072 else b"")' "$diff_file"
+
       # Compiles the desktop runners and the native plugin code that only the
       # tagged release matrix built before; the bundle itself is discarded.
       - name: Build debug bundle

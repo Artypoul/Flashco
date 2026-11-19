@@ -46,22 +46,36 @@ Future<bool> verifySourceCheckout({
   bool requireCa = false,
   File? caFile,
   String expectedCaDigest = verifiedCaDigest,
+  void Function(String)? onFailure,
 }) async {
+  bool fail(String reason) {
+    onFailure?.call(reason);
+    return false;
+  }
+
   final head = await runner('git', ['rev-parse', 'HEAD']);
   if (head.exitCode != 0 ||
       head.stdout.trim().toLowerCase() != sourceSha.toLowerCase()) {
-    return false;
+    return fail(
+      'HEAD mismatch or git failure: ${head.stdout.trim()} ${head.stderr.trim()}',
+    );
   }
   final status = await runner('git', [
     'status',
     '--porcelain',
     '--untracked-files=no',
   ]);
-  if (status.exitCode != 0) return false;
+  if (status.exitCode != 0) {
+    return fail('Root git status failed: ${status.stderr.trim()}');
+  }
   final changed = status.stdout.trimRight();
-  if (changed.isEmpty) return !requireCa;
+  if (changed.isEmpty) {
+    return requireCa
+        ? fail('Expected verified CA change is absent from root status.')
+        : true;
+  }
   if (changed != ' M core/Clash.Meta' && changed != ' m core/Clash.Meta') {
-    return false;
+    return fail('Unexpected root git status:\n$changed');
   }
   final recorded = await runner('git', ['rev-parse', 'HEAD:core/Clash.Meta']);
   final actual = await runner('git', [
@@ -73,7 +87,9 @@ Future<bool> verifySourceCheckout({
   if (recorded.exitCode != 0 ||
       actual.exitCode != 0 ||
       recorded.stdout.trim() != actual.stdout.trim()) {
-    return false;
+    return fail(
+      'Core gitlink mismatch or git failure: recorded=${recorded.stdout.trim()}, actual=${actual.stdout.trim()}, errors=${recorded.stderr.trim()} ${actual.stderr.trim()}',
+    );
   }
   final nested = await runner('git', [
     '-C',
@@ -84,12 +100,19 @@ Future<bool> verifySourceCheckout({
   ]);
   if (nested.exitCode != 0 ||
       nested.stdout.trimRight() != ' M component/ca/ca-certificates.crt') {
-    return false;
+    return fail(
+      'Unexpected Core git status: ${nested.stdout.trimRight()} ${nested.stderr.trim()}',
+    );
   }
   final ca = caFile ?? File('core/Clash.Meta/component/ca/ca-certificates.crt');
-  if (!await ca.exists()) return false;
-  return (await sha256.bind(ca.openRead()).first).toString() ==
-      expectedCaDigest;
+  if (!await ca.exists()) return fail('Verified CA file is missing.');
+  final actualCaDigest = (await sha256.bind(ca.openRead()).first).toString();
+  if (actualCaDigest != expectedCaDigest) {
+    return fail(
+      'Verified CA digest mismatch: actual=$actualCaDigest, expected=$expectedCaDigest',
+    );
+  }
+  return true;
 }
 
 class _FileContentIdentity {

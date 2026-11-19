@@ -54,6 +54,20 @@ void main() {
       actualSubmodule = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
       rootStatus += ' M pubspec.lock\n';
       expect(await valid(), isFalse);
+      final diagnostics = <String>[];
+      expect(
+        await verifySourceCheckout(
+          runner: runner,
+          sourceSha: head,
+          requireCa: true,
+          caFile: ca,
+          expectedCaDigest: digest,
+          onFailure: diagnostics.add,
+        ),
+        isFalse,
+      );
+      expect(diagnostics.single, contains(' M pubspec.lock'));
+      expect(diagnostics.single, contains('Unexpected root git status'));
       rootStatus = ' M pubspec.lock\n';
       expect(await valid(), isFalse);
       rootStatus = ' M core/Clash.Meta\n';

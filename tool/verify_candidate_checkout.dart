@@ -23,6 +23,7 @@ Future<void> main(List<String> args) async {
     },
     sourceSha: args.single,
     requireCa: true,
+    onFailure: stderr.writeln,
   );
   if (!valid) {
     stderr.writeln(
