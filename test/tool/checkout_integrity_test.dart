@@ -7,6 +7,82 @@ import '../../tool/release_cli.dart';
 
 void main() {
   test(
+    'Flutter registrants stay clean after LF regeneration on CRLF hosts',
+    () async {
+      final temp = await Directory.systemTemp.createTemp('registrant-git-');
+      addTearDown(() => temp.delete(recursive: true));
+      Future<String> git(List<String> args) async {
+        final result = await Process.run(
+          'git',
+          args,
+          workingDirectory: temp.path,
+        );
+        expect(
+          result.exitCode,
+          0,
+          reason: '${result.stdout}\n${result.stderr}',
+        );
+        return result.stdout.toString();
+      }
+
+      const paths = [
+        'linux/flutter/generated_plugin_registrant.cc',
+        'linux/flutter/generated_plugin_registrant.h',
+        'linux/flutter/generated_plugins.cmake',
+        'macos/Flutter/GeneratedPluginRegistrant.swift',
+        'windows/flutter/generated_plugin_registrant.cc',
+        'windows/flutter/generated_plugin_registrant.h',
+        'windows/flutter/generated_plugins.cmake',
+      ];
+      final generated = <String, String>{};
+      await File('.gitattributes').copy('${temp.path}/.gitattributes');
+      for (final path in paths) {
+        final content = File(path).readAsStringSync().replaceAll('\r\n', '\n');
+        generated[path] = content;
+        File('${temp.path}/$path')
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content);
+      }
+      await git(['init', '-q']);
+      await git(['config', 'core.autocrlf', 'true']);
+      await git(['add', '.']);
+      await git([
+        '-c',
+        'user.name=Fixture',
+        '-c',
+        'user.email=fixture@example.invalid',
+        'commit',
+        '-qm',
+        'fixture',
+      ]);
+      for (final path in paths) {
+        File('${temp.path}/$path').deleteSync();
+      }
+      await git(['checkout', '--', ...paths]);
+      for (final path in paths) {
+        final file = File('${temp.path}/$path');
+        expect(file.readAsStringSync(), generated[path]);
+        file.writeAsStringSync(generated[path]!);
+      }
+      expect(
+        await git(['status', '--porcelain', '--untracked-files=no']),
+        isEmpty,
+      );
+      File(
+        '${temp.path}/${paths.first}',
+      ).writeAsStringSync('${generated[paths.first]}\n// actual edit\n');
+      expect(
+        await git(['status', '--porcelain', '--untracked-files=no']),
+        contains(' M ${paths.first}'),
+      );
+      expect(
+        await git(['diff', '--no-ext-diff', '--no-color']),
+        contains('+// actual edit'),
+      );
+    },
+  );
+
+  test(
     'accepts only the verified CA change at the recorded submodule head',
     () async {
       final temp = await Directory.systemTemp.createTemp('checkout-integrity-');
