@@ -1,16 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flashco/common/constant.dart';
 import 'package:flashco/providers/app.dart';
-import 'package:flashco/widgets/inherited.dart';
-import 'package:flashco/widgets/scaffold.dart';
-import 'package:flashco/widgets/scroll.dart';
-import 'package:flashco/widgets/sheet.dart';
-import 'package:flashco/widgets/sheet_header.dart';
-import 'package:flashco/widgets/side_sheet.dart';
-import 'package:flashco/widgets/snap_sheet.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flutter/gestures.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,7 +17,7 @@ const _mobile = Size(400, 900);
 const _desktop = Size(1200, 900);
 
 Widget _sheet(BuildContext context, ScrollController? controller) {
-  return CommonScaffold(
+  return Scaffold(
     title: 'title',
     body: ListView.builder(
       controller: controller,
@@ -61,9 +57,9 @@ class _OwnControllerListState extends State<_OwnControllerList> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
+    return Scaffold(
       title: 'title',
-      body: CommonScrollBar(
+      body: Scrollbar(
         controller: _controller,
         child: ListView.builder(
           controller: _controller,
@@ -129,6 +125,77 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
   }
 
+  testWidgets('a sheet floats as a card inset from the sides and foot below '
+      'its tallest detent, and spans the display there', (tester) async {
+    await openSheet(tester);
+    final page = find.byType(Scaffold);
+    ClipRSuperellipseLayer clip() => tester.layers
+        .whereType<ClipRSuperellipseLayer>()
+        .firstWhere((layer) => layer.clipRSuperellipse!.width == _mobile.width);
+    const inset = sheetFloatInset;
+
+    expect(tester.getRect(page).left, moreOrLessEquals(inset));
+    expect(tester.getRect(page).right, moreOrLessEquals(_mobile.width - inset));
+    expect(
+      tester.getRect(page).bottom,
+      moreOrLessEquals(_mobile.height - inset),
+    );
+    final floating = clip().clipRSuperellipse!;
+    expect(floating.tlRadius.x, AppCorner.xxl);
+    expect(floating.blRadius.x, AppCorner.xxl);
+
+    await tester.drag(content(), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(page).left, 0);
+    expect(tester.getRect(page).right, _mobile.width);
+    final spanning = clip().clipRSuperellipse!;
+    expect(spanning.tlRadius.x, AppCorner.xxl);
+    expect(spanning.blRadius.x, 0);
+
+    await close(tester);
+  });
+
+  testWidgets('a sheet under a status bar clips at its own top', (
+    tester,
+  ) async {
+    tester.view.padding = const FakeViewPadding(top: 40);
+    addTearDown(tester.view.resetPadding);
+    await openSheet(tester);
+    final layer = tester.layers.whereType<ClipRSuperellipseLayer>().firstWhere(
+      (layer) => layer.clipRSuperellipse!.width == _mobile.width,
+    );
+    final transform = layer.parent! as TransformLayer;
+    final card = MatrixUtils.transformRect(
+      transform.transform!,
+      layer.clipRSuperellipse!.outerRect,
+    );
+
+    expect(
+      card.top,
+      moreOrLessEquals(tester.getRect(find.byType(Scaffold)).top),
+    );
+    await close(tester);
+  });
+
+  testWidgets('a floating sheet follows the finger one to one', (tester) async {
+    await openSheet(tester);
+    final collapsed = sheetTop(tester);
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(SheetDragHandle)),
+    );
+    await gesture.moveBy(const Offset(0, -kDragSlopDefault));
+    await tester.pump();
+    final start = sheetTop(tester);
+    for (var i = 0; i < 10; i++) {
+      await gesture.moveBy(const Offset(0, -10));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(start, lessThan(collapsed + 1));
+    expect(sheetTop(tester), closeTo(start - 100, 1));
+    await gesture.up();
+    await close(tester);
+  });
+
   testWidgets('a drag on a collapsed sheet expands it and leaves the content '
       'where it was', (tester) async {
     await openSheet(tester);
@@ -157,9 +224,9 @@ void main() {
   ) async {
     await openSheet(
       tester,
-      builder: (context, controller) => CommonScaffold(
+      builder: (context, controller) => Scaffold(
         title: 'title',
-        body: CommonScrollBar(
+        body: Scrollbar(
           controller: controller,
           child: ListView.builder(
             controller: controller,
@@ -242,9 +309,8 @@ void main() {
     await close(tester);
   });
 
-  testWidgets('the keyboard raises the sheet without rebuilding its content', (
-    tester,
-  ) async {
+  testWidgets('the keyboard carries the sheet in step, frame by frame, '
+      'without rebuilding its content', (tester) async {
     var builds = 0;
     await openSheet(
       tester,
@@ -255,18 +321,14 @@ void main() {
     );
     addTearDown(tester.view.resetViewInsets);
     final shown = builds;
+    final collapsed = _mobile.height * (1 - snapSheetDetents.first);
 
-    for (final height in [100.0, 200.0, 300.0]) {
+    for (final height in [100.0, 200.0, 300.0, 200.0, 100.0, 0.0]) {
       tester.view.viewInsets = FakeViewPadding(bottom: height);
       await tester.pump();
+      expect(sheetTop(tester), closeTo(collapsed - height, 1));
     }
     expect(builds, shown);
-
-    await tester.pumpAndSettle();
-    expect(
-      sheetTop(tester),
-      closeTo(_mobile.height * (1 - snapSheetDetents.last), 1),
-    );
 
     await close(tester);
   });
@@ -287,8 +349,8 @@ void main() {
     await close(tester);
   });
 
-  testWidgets('a short drag down springs the collapsed sheet back and a fling '
-      'down closes it', (tester) async {
+  testWidgets('a short drag down springs the collapsed sheet back and a hard '
+      'fling down closes it', (tester) async {
     final result = await openSheet(tester);
     var closed = false;
     unawaited(result.then((_) => closed = true));
@@ -300,10 +362,36 @@ void main() {
     expect(closed, isFalse);
     expect(sheetTop(tester), closeTo(collapsed, 1));
 
-    await tester.fling(content(), const Offset(0, 80), 1500);
+    await tester.fling(content(), const Offset(0, 80), 3000);
     await tester.pumpAndSettle();
 
     expect(closed, isTrue);
+
+    await close(tester);
+  });
+
+  testWidgets('a sheet popped while a finger drags it still leaves', (
+    tester,
+  ) async {
+    final result = await openSheet(tester);
+    var closed = false;
+    unawaited(result.then((_) => closed = true));
+
+    final gesture = await tester.startGesture(tester.getCenter(content()));
+    for (var step = 0; step < 5; step++) {
+      await gesture.moveBy(const Offset(0, 30));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    Navigator.of(tester.element(find.text('title'))).pop();
+    for (var step = 0; step < 5; step++) {
+      await gesture.moveBy(const Offset(0, -40));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(closed, isTrue);
+    expect(find.text('title'), findsNothing);
 
     await close(tester);
   });
@@ -349,7 +437,7 @@ void main() {
     await close(tester);
   });
 
-  testWidgets('a short flick up lands on the detent its velocity projects to', (
+  testWidgets('a flick up lands on the detent its velocity projects to', (
     tester,
   ) async {
     await openSheet(tester);
@@ -362,15 +450,20 @@ void main() {
 
     await tester.fling(content(), const Offset(0, -60), 800);
     await tester.pumpAndSettle();
+    expect(sheetTop(tester), closeTo(collapsed, 1));
+
+    await tester.fling(content(), const Offset(0, -60), 2000);
+    await tester.pumpAndSettle();
     expect(sheetTop(tester), closeTo(expanded, 1));
 
     await close(tester);
   });
 
-  testWidgets('a hard fling up settles without overshooting the detent', (
+  testWidgets('a hard fling up overshoots the detent only slightly', (
     tester,
   ) async {
     await openSheet(tester);
+    final collapsed = _mobile.height * (1 - snapSheetDetents.first);
     final expanded = _mobile.height * (1 - snapSheetDetents.last);
 
     await tester.fling(content(), const Offset(0, -100), 8000);
@@ -380,7 +473,48 @@ void main() {
       highest = min(highest, sheetTop(tester));
     }
 
-    expect(highest, greaterThan(expanded - 1));
+    expect(highest, greaterThan(expanded - (collapsed - expanded) * 0.03));
+    expect(sheetTop(tester), closeTo(expanded, 1));
+
+    await close(tester);
+  });
+
+  testWidgets('a drag on the handle past the tallest detent rubber-bands the '
+      'sheet and it springs back from there', (tester) async {
+    await openSheet(tester);
+    final expanded = _mobile.height * (1 - snapSheetDetents.last);
+    final collapsed = _mobile.height * (1 - snapSheetDetents.first);
+    final extent = min(100.0, expanded - stackedSheetPeek);
+    final overshoot = 600 - kDragSlopDefault - (collapsed - expanded);
+    final stretch = (1 - 1 / (overshoot * 0.55 / extent + 1)) * extent;
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(SheetDragHandle)),
+    );
+    for (var i = 0; i < 60; i++) {
+      await gesture.moveBy(const Offset(0, -10));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(sheetTop(tester), closeTo(expanded - stretch, 2));
+
+    await gesture.up();
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(sheetTop(tester), lessThan(expanded - stretch / 2));
+
+    final again = await tester.startGesture(
+      tester.getCenter(find.byType(SheetDragHandle)),
+    );
+    await again.moveBy(const Offset(0, -kDragSlopDefault - 1));
+    await tester.pump(const Duration(milliseconds: 16));
+    final caught = sheetTop(tester);
+    await again.moveBy(const Offset(0, -1));
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(caught, lessThan(expanded - 5));
+    expect(sheetTop(tester), closeTo(caught, 1));
+
+    await again.up();
+    await tester.pumpAndSettle();
+    expect(sheetTop(tester), closeTo(expanded, 1));
 
     await close(tester);
   });
@@ -428,7 +562,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(sheetTop(tester), closeTo(expanded, 1));
-    expect(contentOffset(tester), closeTo(300 - kDragSlopDefault, 1));
+    // The content keeps under the finger while it still floats a little.
+    expect(contentOffset(tester), closeTo(300 - kDragSlopDefault, 4));
 
     await close(tester);
   });
@@ -478,9 +613,9 @@ void main() {
       'comes to fit', (tester) async {
     await openSheet(
       tester,
-      builder: (_, controller) => CommonScaffold(
+      builder: (_, controller) => Scaffold(
         title: 'title',
-        body: CommonScrollBar(
+        body: Scrollbar(
           controller: controller,
           child: ListView.builder(
             controller: controller,
@@ -513,12 +648,90 @@ void main() {
     await close(tester);
   });
 
+  testWidgets('one drag up opens the sheet and scrolls the content with what '
+      'is left of it', (tester) async {
+    await openSheet(tester);
+    final collapsed = _mobile.height * (1 - snapSheetDetents.first);
+    final expanded = _mobile.height * (1 - snapSheetDetents.last);
+
+    await tester.drag(content(), const Offset(0, -500));
+    await tester.pumpAndSettle();
+
+    expect(sheetTop(tester), closeTo(expanded, 1));
+    expect(
+      contentOffset(tester),
+      closeTo(500 - kDragSlopDefault - (collapsed - expanded), 1),
+    );
+
+    await close(tester);
+  });
+
+  testWidgets('a drag down that scrolls the content back to its top leaves '
+      'the sheet open, and the next one takes it down', (tester) async {
+    await openSheet(tester);
+    final collapsed = _mobile.height * (1 - snapSheetDetents.first);
+    final expanded = _mobile.height * (1 - snapSheetDetents.last);
+    await tester.drag(content(), const Offset(0, -500));
+    await tester.pumpAndSettle();
+    expect(contentOffset(tester), greaterThan(100));
+
+    final gesture = await tester.startGesture(tester.getCenter(content()));
+    for (var step = 0; step < 40; step++) {
+      await gesture.moveBy(const Offset(0, 10));
+      await tester.pump(const Duration(milliseconds: 16));
+      expect(sheetTop(tester), closeTo(expanded, 1));
+    }
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(contentOffset(tester), 0);
+    expect(sheetTop(tester), closeTo(expanded, 1));
+
+    await tester.drag(content(), const Offset(0, 200));
+    await tester.pumpAndSettle();
+    expect(sheetTop(tester), closeTo(collapsed, 1));
+
+    await close(tester);
+  });
+
+  testWidgets('a sheet let go past half of its height carries on down '
+      'smoothly without springing back first', (tester) async {
+    final result = await openSheet(tester);
+    var closed = false;
+    unawaited(result.then((_) => closed = true));
+
+    final gesture = await tester.createGesture();
+    await gesture.down(tester.getCenter(content()));
+    var time = Duration.zero;
+    for (var i = 0; i < 20; i++) {
+      time += const Duration(milliseconds: 16);
+      await gesture.moveBy(const Offset(0, 16), timeStamp: time);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    var last = sheetTop(tester);
+    await gesture.up(timeStamp: time + const Duration(milliseconds: 100));
+    while (find.byType(SheetDragHandle).evaluate().isNotEmpty) {
+      await tester.pump(const Duration(milliseconds: 16));
+      if (find.byType(SheetDragHandle).evaluate().isEmpty) {
+        break;
+      }
+      expect(sheetTop(tester) - last, inInclusiveRange(0, 40));
+      last = sheetTop(tester);
+    }
+    await tester.pump();
+    expect(closed, isTrue);
+
+    await close(tester);
+  });
+
   testWidgets('a wheel tick on a sheet too short to scroll expands it', (
     tester,
   ) async {
     await openSheet(
       tester,
-      builder: (_, controller) => CommonScaffold(
+      builder: (_, controller) => Scaffold(
         title: 'title',
         body: ListView(
           controller: controller,
@@ -696,7 +909,7 @@ void main() {
           builder: (context, ref, _) => ref.watch(isMobileViewProvider)
               ? page
               : Navigator(
-                  pages: [MaterialPage<void>(child: page)],
+                  pages: [RootPage<void>(child: page)],
                   onDidRemovePage: (_) {},
                 ),
         ),
@@ -726,6 +939,70 @@ void main() {
 
     expect(closed, isTrue);
     expect(closedWith, 'done');
+
+    await close(tester);
+  });
+
+  testWidgets('a dark sheet presents a level above the page it covers', (
+    tester,
+  ) async {
+    final plain = seededColorScheme(
+      seedColor: const Color(defaultPrimaryColor),
+      brightness: Brightness.dark,
+    );
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    for (final page in [plain, plain.toPureBlack(true)]) {
+      final sheet = page.elevated;
+      expect(sheet.surface, SurfaceLevel.card.colorOf(page));
+      expect(
+        SurfaceLevel.card.colorOf(sheet),
+        SurfaceLevel.block.colorOf(page),
+      );
+      expect(
+        SurfaceLevel.block.colorOf(sheet),
+        SurfaceLevel.inset.colorOf(page),
+      );
+      final theme = ThemeData(colorScheme: page, elevatedColorScheme: sheet);
+      await tester.pumpWidget(
+        TestApp(
+          wrapInProviderScope: true,
+          theme: theme,
+          child: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showSnapSheet<void>(context, builder: _sheet),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      );
+
+      for (final size in [_mobile, _desktop]) {
+        await setView(tester, size);
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+
+        final title = find.text('title');
+        expect(
+          Theme.of(tester.element(title)).colorScheme.surface,
+          sheet.surface,
+        );
+        expect(
+          find.ancestor(
+            of: title,
+            matching: find.byWidgetPredicate(
+              (widget) => widget is Surface && widget.color == sheet.surface,
+            ),
+          ),
+          findsWidgets,
+        );
+
+        await tester.tapAt(const Offset(10, 10));
+        await tester.pumpAndSettle();
+        expect(title, findsNothing);
+      }
+    }
 
     await close(tester);
   });

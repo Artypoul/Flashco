@@ -8,7 +8,7 @@ import 'package:flashco/enum/enum.dart';
 import 'package:flashco/providers/action.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tray/tray.dart';
 

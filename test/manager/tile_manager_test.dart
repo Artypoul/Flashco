@@ -4,11 +4,12 @@ import 'package:flashco/manager/tile_manager.dart';
 import 'package:flashco/plugins/tile.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_profiles.dart';
+import '../helpers/test_app.dart';
 
 class _RecordingSetupAction extends SetupAction {
   static final requests = <bool>[];
@@ -46,7 +47,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(home: TileManager(child: SizedBox.shrink())),
+        child: const HostApp(home: TileManager(child: SizedBox.shrink())),
       ),
     );
     await tester.pump();

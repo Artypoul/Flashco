@@ -1,16 +1,19 @@
 import 'package:flashco/common/common.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/action.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/database.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/profiles/add.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+import '../helpers/host_scaffold.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 class _RecordingProfilesAction extends ProfilesAction {
   final batches = <List<String>>[];
@@ -31,6 +34,11 @@ class _RecordingProfilesAction extends ProfilesAction {
   Future<void> addProfilesFromLinks(List<String> links) async =>
       batches.add(links);
 }
+
+Finder _field(String title) => find.descendant(
+  of: find.widgetWithText(FormRow, title),
+  matching: find.byType(TextFormField),
+);
 
 ProviderContainer _containerFor(
   WidgetTester tester, {
@@ -56,26 +64,33 @@ ProviderContainer _containerFor(
   return container;
 }
 
-void main() {
-  testWidgets('lists the QR code, file, link, and custom entries', (
-    tester,
-  ) async {
-    final container = _containerFor(tester);
-
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: TestApp(
-          child: Scaffold(
-            body: Builder(
-              builder: (context) =>
-                  AddProfileView(context: context, origin: context),
+Future<void> _openMenu(WidgetTester tester, ProviderContainer container) async {
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: TestApp(
+        child: HostScaffold(
+          body: Center(
+            child: AddProfileMenu(
+              builder: (open) =>
+                  FilledButton(onPressed: open, child: const Text('add')),
             ),
           ),
         ),
       ),
-    );
-    await tester.pumpAndSettle();
+    ),
+  );
+  await tester.tap(find.text('add'));
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('offers the QR code, file, link, and custom entries', (
+    tester,
+  ) async {
+    final container = _containerFor(tester);
+
+    await _openMenu(tester, container);
 
     final l10n = currentAppLocalizations;
     expect(find.text(l10n.qrcode), findsOne);
@@ -95,20 +110,7 @@ void main() {
       profiles: [Profile.normal(url: 'https://example.com/old')],
     );
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: TestApp(
-          child: Scaffold(
-            body: Builder(
-              builder: (context) =>
-                  AddProfileView(context: context, origin: context),
-            ),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await _openMenu(tester, container);
 
     final l10n = currentAppLocalizations;
     await tester.tap(find.text(l10n.link));
@@ -133,26 +135,13 @@ void main() {
     final action = _RecordingProfilesAction();
     final container = _containerFor(tester, profilesAction: action);
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: TestApp(
-          child: Scaffold(
-            body: Builder(
-              builder: (context) =>
-                  AddProfileView(context: context, origin: context),
-            ),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await _openMenu(tester, container);
 
     final l10n = currentAppLocalizations;
     await tester.tap(find.text(l10n.link));
     await tester.pumpAndSettle();
     await tester.enterText(
-      find.widgetWithText(TextFormField, l10n.link),
+      _field(l10n.link),
       'trojan://pass@example.com:443#HK',
     );
     await tester.pump();
@@ -169,32 +158,13 @@ void main() {
     final action = _RecordingProfilesAction();
     final container = _containerFor(tester, profilesAction: action);
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: TestApp(
-          child: Scaffold(
-            body: Builder(
-              builder: (context) =>
-                  AddProfileView(context: context, origin: context),
-            ),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await _openMenu(tester, container);
 
     final l10n = currentAppLocalizations;
     await tester.tap(find.text(l10n.link));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.widgetWithText(TextFormField, l10n.link),
-      'https://example.com/sub',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, l10n.ageSecretKey),
-      ' AGE-SECRET-KEY-1A ',
-    );
+    await tester.enterText(_field(l10n.link), 'https://example.com/sub');
+    await tester.enterText(_field(l10n.ageSecretKey), ' AGE-SECRET-KEY-1A ');
     await tester.pump();
     await tester.tap(find.text(l10n.submit));
     await tester.pumpAndSettle();
@@ -210,26 +180,13 @@ void main() {
     final action = _RecordingProfilesAction();
     final container = _containerFor(tester, profilesAction: action);
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: TestApp(
-          child: Scaffold(
-            body: Builder(
-              builder: (context) =>
-                  AddProfileView(context: context, origin: context),
-            ),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await _openMenu(tester, container);
 
     final l10n = currentAppLocalizations;
     await tester.tap(find.text(l10n.link));
     await tester.pumpAndSettle();
     await tester.enterText(
-      find.widgetWithText(TextFormField, l10n.link),
+      _field(l10n.link),
       'wireguard://key@example.com:51820',
     );
     await tester.pump();

@@ -4,11 +4,12 @@ import 'package:flashco/pages/editor.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/profiles/preview.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_app.dart';
+import '../plugins/code_forge/support.dart' show initEditorNative;
 
 class _StubSetupAction extends SetupAction {
   static String yaml = '';
@@ -28,6 +29,7 @@ void main() {
 
   setUpAll(() async {
     await AppLocalizations.load(const Locale('en'));
+    await initEditorNative();
   });
 
   setUp(() {
@@ -64,7 +66,10 @@ void main() {
   }
 
   String? loaded(WidgetTester tester) {
-    return tester.widget<EditorView>(find.byType(EditorView)).content;
+    return tester
+        .state<EditorViewState>(find.byType(EditorView))
+        .controller
+        ?.text;
   }
 
   testWidgets('asks for the profile it was given and shows its yaml', (

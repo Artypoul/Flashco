@@ -23,6 +23,65 @@ void main() {
       expect(concurrency['cancel-in-progress'], isFalse);
     });
 
+    test('checks out Prism and verifies CA before each release job', () {
+      final jobs = _map(_workflow()['jobs']);
+      for (final jobId in [
+        'preflight',
+        'android',
+        'windows',
+        'bundle',
+        'publish',
+      ]) {
+        final steps = _steps(_map(jobs[jobId]));
+        final checkout = steps.singleWhere(
+          (step) => step['uses'] == 'actions/checkout@v4',
+        );
+        expect(_map(checkout['with'])['submodules'], 'recursive');
+        final caIndex = steps.indexWhere(
+          (step) =>
+              '${step['run']}'.contains('bash .github/scripts/fetch-ca.sh'),
+        );
+        final dependencies = steps.indexWhere(
+          (step) => '${step['run']}'.contains('flutter pub get'),
+        );
+        expect(caIndex, greaterThanOrEqualTo(0), reason: jobId);
+        expect(dependencies, greaterThan(caIndex), reason: jobId);
+      }
+      final script = File('.github/scripts/fetch-ca.sh').readAsStringSync();
+      expect(
+        script,
+        contains(
+          'a41b5d356aea97a529fe27e0f7316d2f9d946d75927476cf9cf1b90637d00505',
+        ),
+      );
+      expect(script, contains('sha256sum -c -'));
+    });
+
+    test('verifies the packaged Windows application version before upload', () {
+      final jobs = _map(_workflow()['jobs']);
+      final steps = _steps(_map(jobs['windows']));
+      final build = steps.indexWhere(
+        (step) => '${step['run']}'.contains('dart setup.dart windows'),
+      );
+      final verify = steps.indexWhere(
+        (step) => '${step['run']}'.contains('verify_windows_app_version.ps1'),
+      );
+      final upload = steps.indexWhere(
+        (step) => '${step['uses']}'.startsWith('actions/upload-artifact@'),
+      );
+      expect(build, greaterThanOrEqualTo(0));
+      expect(verify, greaterThan(build));
+      expect(upload, greaterThan(verify));
+      expect('${steps[verify]['run']}', contains('windows-amd64.zip'));
+      final installer = steps.indexWhere(
+        (step) =>
+            '${step['run']}'.contains('verify_windows_installer_version.ps1'),
+      );
+      expect(installer, greaterThan(build));
+      expect(upload, greaterThan(installer));
+      expect('${steps[installer]['run']}', contains('windows-amd64-setup.exe'));
+    });
+
     test(
       'isolates metadata checks, signing credentials, and write permission',
       () {

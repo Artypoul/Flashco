@@ -1,3 +1,11 @@
 # freezed emits lines of trailing spaces, and generated code is never edited by hand.
 lib/**/generated/** -whitespace
 /test/fixtures/release/gh-assets-sha256sums-response.http -text
+# Flutter regenerates these files with LF on every host.
+/linux/flutter/generated_plugin_registrant.cc text eol=lf
+/linux/flutter/generated_plugin_registrant.h text eol=lf
+/linux/flutter/generated_plugins.cmake text eol=lf
+/macos/Flutter/GeneratedPluginRegistrant.swift text eol=lf
+/windows/flutter/generated_plugin_registrant.cc text eol=lf
+/windows/flutter/generated_plugin_registrant.h text eol=lf
+/windows/flutter/generated_plugins.cmake text eol=lf

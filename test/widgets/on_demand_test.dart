@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/on_demand.dart';
 import 'package:flashco/providers/state.dart';
-import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/config/on_demand.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wifi_ssid/wifi_ssid.dart';
@@ -62,6 +62,7 @@ void main() {
     bool batteryIgnored = false,
     bool isAndroid = false,
     bool isMacOS = false,
+    bool isWindows = false,
     bool isStart = false,
     Locale? locale,
     Size size = const Size(1400, 1000),
@@ -91,7 +92,11 @@ void main() {
         container: container,
         child: TestApp(
           locale: locale,
-          child: OnDemandView(isAndroid: isAndroid, isMacOS: isMacOS),
+          child: OnDemandView(
+            isAndroid: isAndroid,
+            isMacOS: isMacOS,
+            isWindows: isWindows,
+          ),
         ),
       ),
     );
@@ -105,7 +110,7 @@ void main() {
 
     expect(find.text('SSIDs are empty'), findsOneWidget);
     expect(find.byTooltip('Add'), findsOneWidget);
-    expect(find.text('Select all'), findsNothing);
+    expect(find.byTooltip('Select all'), findsNothing);
     expect(find.byGlyph(AppGlyphs.delete), findsNothing);
   });
 
@@ -123,11 +128,11 @@ void main() {
     await pumpView(tester, ssids: ['Home', 'Office']);
     expect(find.byGlyph(AppGlyphs.delete), findsNothing);
 
-    await tester.tap(find.byType(CommonCheckBox).first);
+    await tester.tap(find.byType(Checkbox).first);
     await tester.pumpAndSettle();
 
     expect(find.byGlyph(AppGlyphs.delete), findsOneWidget);
-    expect(find.text('Select all'), findsOneWidget);
+    expect(find.byTooltip('Select all'), findsOneWidget);
     expect(find.byTooltip('Add'), findsNothing);
   });
 
@@ -135,14 +140,14 @@ void main() {
     tester,
   ) async {
     await pumpView(tester, ssids: ['Home', 'Office']);
-    await tester.tap(find.byType(CommonCheckBox).first);
+    await tester.tap(find.byType(Checkbox).first);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Select all'));
+    await tester.tap(find.byTooltip('Select all'));
     await tester.pumpAndSettle();
     expect(container.read(itemsProvider(_viewKey(tester))), {'Home', 'Office'});
 
-    await tester.tap(find.text('Select all'));
+    await tester.tap(find.byTooltip('Select all'));
     await tester.pumpAndSettle();
     expect(
       find.byTooltip('Add'),
@@ -155,7 +160,7 @@ void main() {
     tester,
   ) async {
     await pumpView(tester, ssids: ['Home', 'Office']);
-    await tester.tap(find.byType(CommonCheckBox).first);
+    await tester.tap(find.byType(Checkbox).first);
     await tester.pumpAndSettle();
 
     await tester.tap(find.byGlyph(AppGlyphs.delete));
@@ -242,6 +247,25 @@ void main() {
 
     expect(requests, 1);
     expect(find.text('Location permission required'), findsOneWidget);
+  });
+
+  testWidgets('Windows refused location access offers the settings', (
+    tester,
+  ) async {
+    const channel = MethodChannel('wifi_ssid');
+    final messenger = tester.binding.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(
+      channel,
+      (_) async => WifiSsidPermission.permanentlyDenied.index,
+    );
+    addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+    await pumpView(tester, isWindows: true);
+
+    await tester.tap(find.text('Tap to authorize'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Location permission required'), findsOneWidget);
+    expect(find.text('Go'), findsOneWidget);
   });
 
   testWidgets('Android also asks to be left out of battery optimization', (

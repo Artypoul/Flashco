@@ -15,7 +15,7 @@ import 'package:flashco/providers/database.dart';
 import 'package:flashco/providers/state.dart';
 import 'package:flashco/state.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:yaml/yaml.dart';
@@ -513,23 +513,23 @@ proxy-groups:
       expect(config.proxyGroups.single.name, 'GLOBAL');
     });
 
-    test(
-      'drops include-all-providers and keeps the proxies of include-all',
-      () {
-        final config = _read('''
+    test('keeps include-all proxy and provider selections', () {
+      final config = _read('''
 proxy-groups:
   - {name: All, type: select, include-all: true}
   - {name: Providers, type: select, include-all-providers: true}
 ''');
 
-        final [all, providers] = config.proxyGroups;
-        expect(all.includeAll, isNull);
-        expect(all.includeAllProxies, isTrue);
-        expect(all.includeAllProviders, isNull);
-        expect(providers.includeAllProviders, isNull);
-        expect(providers.includeAllProxies, isNull);
-      },
-    );
+      final [all, providers] = config.proxyGroups;
+      expect(all.toJson().containsKey('include-all'), isFalse);
+      expect(all.includeAllProxies, isTrue);
+      expect(all.includeAllProviders, isTrue);
+      expect(providers.includeAllProviders, isTrue);
+      expect(providers.includeAllProxies, isNull);
+      expect(all.definition['include-all-proxies'], isTrue);
+      expect(all.definition['include-all-providers'], isTrue);
+      expect(providers.definition['include-all-providers'], isTrue);
+    });
 
     test('renames the proxies DNS servers dial through', () {
       final config = _read(
@@ -687,7 +687,7 @@ tun:
       );
       compiledUrls = [];
       final core = _MockCoreHandlerInterface();
-      when(() => core.validateConfig(any())).thenAnswer((_) async => '');
+      when(() => core.validateConfig(any())).thenAnswer((_) async => null);
       when(() => core.compileRuleSet(any(), url: any(named: 'url'))).thenAnswer(
         (invocation) async {
           compiledUrls.add(invocation.namedArguments[#url] as String);

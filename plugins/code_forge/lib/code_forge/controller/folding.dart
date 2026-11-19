@@ -22,6 +22,12 @@ extension CodeForgeControllerFolding on CodeForgeController {
   /// ```
   void toggleFold(int lineNumber) => _mountedView.toggleFold(lineNumber);
 
+  /// Whether background folds match the current document.
+  /// Small documents compute folds on demand.
+  @visibleForTesting
+  bool get debugFoldComputationCurrent =>
+      _view?.debugFoldComputationCurrent ?? false;
+
   CodeForgeView get _mountedView =>
       _view ?? (throw StateError('No editor is mounted on this controller'));
 

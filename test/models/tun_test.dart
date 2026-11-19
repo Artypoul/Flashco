@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:test/test.dart';
 
@@ -39,18 +40,29 @@ void main() {
     expect(Tun.fromJson({'mtu': 1500}).mtu, 1500);
   });
 
-  test('the core keeps the route list and gets private ranges excluded', () {
-    final tun = const Tun(
-      routeAddress: ['1.0.0.0/8'],
-      routeExcludeAddress: ['1.1.1.0/24'],
-    ).getRealTun(bypassPrivateRoute: true);
+  test('desktop TUN preserves the selected auto-route value', () {
+    for (final autoRoute in [false, true]) {
+      final tun = Tun(
+        enable: true,
+        autoRoute: autoRoute,
+        stack: TunStack.gvisor,
+        mtu: 1400,
+        routeAddress: const ['1.0.0.0/8'],
+      );
 
-    expect(tun.autoRoute, isTrue);
-    expect(tun.routeAddress, ['1.0.0.0/8']);
-    expect(tun.routeExcludeAddress, ['1.1.1.0/24', ...privateRouteAddress]);
+      expect(tun.coreJson, {
+        'enable': true,
+        'device': tun.device,
+        'stack': 'gvisor',
+        'auto-route': autoRoute,
+      });
+    }
   });
 
-  test('a config update patches every Tun key on desktop', () {
-    expect(_keysOf('core/protocol.go', 'tunSchema', 'json'), tunKeys);
+  test('a config update patches every key the desktop TUN takes', () {
+    expect(
+      _keysOf('core/protocol.go', 'tunSchema', 'json'),
+      const Tun().coreJson.keys.toSet(),
+    );
   });
 }

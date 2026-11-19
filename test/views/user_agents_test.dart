@@ -1,11 +1,11 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/config/user_agents.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,6 +13,7 @@ import '../helpers/context_menu.dart';
 import '../helpers/glyph_finders.dart';
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 void main() {
   late ProviderContainer container;
@@ -73,7 +74,7 @@ void main() {
       findsNWidgets(defaultUserAgents.length),
     );
     await openMenu(tester, currentAppLocalizations.defaultText);
-    expect(find.byType(CommonPopupMenu), findsNothing);
+    expect(find.byType(PopupMenu), findsNothing);
     await openMenu(tester, defaultUserAgents.first);
     expect(find.text(currentAppLocalizations.edit), findsOneWidget);
   });
@@ -91,7 +92,7 @@ void main() {
     await tester.tap(find.text(defaultUserAgents.last));
     await openMenu(tester, defaultUserAgents.last);
     expect(selected(), isNull);
-    expect(find.byType(CommonPopupMenu), findsNothing);
+    expect(find.byType(PopupMenu), findsNothing);
 
     final sortButton = find.widgetWithGlyph(IconButton, AppGlyphs.sort);
     expect(tester.widget<IconButton>(sortButton).isSelected, isTrue);
@@ -169,7 +170,7 @@ void main() {
     await openMenu(tester, defaultUserAgents.last);
     await tester.tap(find.text(currentAppLocalizations.delete));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(currentAppLocalizations.confirm));
+    await tester.tap(find.text(currentAppLocalizations.delete));
     await tester.pumpAndSettle();
 
     expect(saved(), [defaultUserAgents.first]);
@@ -188,7 +189,7 @@ void main() {
     await openMenu(tester, defaultUserAgents.first);
     await tester.tap(find.text(currentAppLocalizations.delete));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(currentAppLocalizations.confirm));
+    await tester.tap(find.text(currentAppLocalizations.delete));
     await tester.pumpAndSettle();
 
     expect(saved(), [defaultUserAgents.last, 'Legacy/1.0']);

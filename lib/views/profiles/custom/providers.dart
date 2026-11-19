@@ -3,36 +3,14 @@ import 'dart:io';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/form/form.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/profiles/custom/members.dart';
-import 'package:flashco/views/profiles/custom/quick_edit.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-typedef ReferencedProviders = ({List<String> proxy, List<String> rule});
-
-/// A custom profile declares only the providers its groups and rules name, so
-/// naming one is what lists it here.
-ReferencedProviders referencedProviders(WidgetRef ref, int profileId) {
-  final groups = ref.watch(proxyGroupsProvider(profileId)).value ?? const [];
-  final rules = ref.watch(profileRulesProvider(profileId)).value ?? const [];
-  final overrideRuleSets = ref.watch(
-    profileProvider(
-      profileId,
-    ).select((profile) => SelectValue(profile?.overrides.ruleSets ?? const {})),
-  );
-  return (
-    proxy: {for (final group in groups) ...?group.use}.toList(),
-    rule: {
-      for (final rule in rules) ...rule.ruleSets,
-      ...overrideRuleSets.value,
-    }.toList(),
-  );
-}
 
 class CustomProvidersView extends ConsumerWidget {
   final int profileId;
@@ -42,7 +20,9 @@ class CustomProvidersView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
-    final (:proxy, :rule) = referencedProviders(ref, profileId);
+    final (:proxy, :rule) = ref.watch(
+      customReferencedProvidersProvider(profileId),
+    );
     final data = ref.watch(customProfileDataProvider(profileId));
     final profiles = {
       for (final profile in ref.watch(profilesProvider))
@@ -53,7 +33,7 @@ class CustomProvidersView extends ConsumerWidget {
           in ref.watch(clashProvidersProvider).value ?? const <ClashProvider>[])
         provider.label: provider,
     };
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.providers,
       body: NullStatusSwitcher(
         isEmpty: proxy.isEmpty && rule.isEmpty,
@@ -62,11 +42,12 @@ class CustomProvidersView extends ConsumerWidget {
           illustration: NullStatusIllustration.proxies,
         ),
         child: ListView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ).copyWith(top: context.contentTopPadding, bottom: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+            top: context.sectionsTopPadding,
+            bottom: 16 + context.bottomInset,
+          ),
           children: [
-            generateSectionV3(
+            generateSection(
               title: appLocalizations.proxies,
               items: [
                 for (final name in proxy)
@@ -79,7 +60,7 @@ class CustomProvidersView extends ConsumerWidget {
                   ),
               ],
             ),
-            generateSectionV3(
+            generateSection(
               title: appLocalizations.rules,
               items: [
                 for (final name in rule)
@@ -161,12 +142,13 @@ class _ProxyProviderItem extends ConsumerWidget {
           ? InfoMessageButton(
               message: context.appLocalizations.invalidProxyProvider(name),
             )
-          : CommonMinIconButtonTheme(
-              child: ElasticButton(
-                child: IconButton.filledTonal(
+          : TonalButtonTheme(
+              size: TonalButtonSize.compact,
+              child: ElasticPress(
+                child: IconButton(
                   tooltip: context.appLocalizations.edit,
                   onPressed: () => _handleEdit(context, ref),
-                  icon: const GlyphIcon(AppGlyphs.edit, fill: 1),
+                  icon: const GlyphIcon(AppGlyphs.edit),
                 ),
               ),
             ),
@@ -407,15 +389,11 @@ class _ProxyProviderOptionsViewState
     return FormRow(
       title: option.label(context.appLocalizations),
       leading: leading,
-      trailing: TextFormField(
-        textAlign: TextAlign.end,
+      trailing: FormRowTextField(
         initialValue: value,
         inputFormatters: TextInputLimits.limit(maxLength),
         onChanged: (value) => onChanged(value.isEmpty ? null : value),
-        decoration: InputDecoration.collapsed(
-          border: const NoInputBorder(),
-          hintText: context.appLocalizations.optional,
-        ),
+        hintText: context.appLocalizations.optional,
       ),
     );
   }
@@ -435,21 +413,17 @@ class _ProxyProviderOptionsViewState
         spacing: 4,
         children: [
           Flexible(
-            child: TextFormField(
+            child: FormRowTextField(
               keyboardType: TextInputType.number,
               inputFormatters: TextInputLimits.digitsOnly(
                 TextInputLimits.number,
               ),
-              textAlign: TextAlign.end,
               initialValue: value?.toString(),
               onChanged: (value) => onChanged(int.tryParse(value)),
-              decoration: InputDecoration.collapsed(
-                border: const NoInputBorder(),
-                hintText: context.appLocalizations.optional,
-              ),
+              hintText: context.appLocalizations.optional,
             ),
           ),
-          Text(suffix, style: context.textTheme.bodyMedium),
+          Text(suffix, style: AppTextStyle.subheadline.of(context)),
         ],
       ),
     );
@@ -602,21 +576,21 @@ class _ProxyProviderOptionsViewState
         if (!_shown.contains(option)) option,
     ];
     void handleAdd() => _handleAddOption(remaining);
-    return CommonScaffold(
+    return Scaffold(
       title: widget.name,
-      iconActions: customFormActions(context, onSave: _handleSave),
+      confirmationAction: customSaveAction(context, onPressed: _handleSave),
       body: CustomScrollView(
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
-            ).copyWith(top: context.contentTopPadding),
+            ).copyWith(top: context.sectionsTopPadding),
             sliver: const ProxyProviderFiltersSliver(),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
-            ).copyWith(bottom: 20),
+            ).copyWith(bottom: 20 + context.bottomInset),
             sliver: SliverList.list(
               children: [
                 generateAnimatedSection(

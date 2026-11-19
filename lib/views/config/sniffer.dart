@@ -1,11 +1,12 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/features/form/form.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/pages/editor.dart';
 import 'package:flashco/views/config/override.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 extension on SnifferOverrideKey {
@@ -24,12 +25,8 @@ extension on SnifferOverrideKey {
   };
 
   ConfigLabel? get description => switch (this) {
-    SnifferOverrideKey.enable => (l) => l.snifferStatusDesc,
-    SnifferOverrideKey.overrideDest => (l) => l.overrideDestinationDesc,
     SnifferOverrideKey.forceDnsMapping => (l) => l.forceDnsMappingDesc,
-    SnifferOverrideKey.parsePureIp => (l) => l.parsePureIpDesc,
     SnifferOverrideKey.forceDomain => (l) => l.forceDomainDesc,
-    SnifferOverrideKey.skipDomain => (l) => l.skipDomainDesc,
     _ => null,
   };
 }
@@ -249,11 +246,12 @@ class _SniffView extends ConsumerWidget {
     return BaseScaffold(
       title: overrideKey.label(appLocalizations),
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ).copyWith(top: context.contentTopPadding, bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+          top: context.sectionsTopPadding,
+          bottom: 16 + context.bottomInset,
+        ),
         children: [
-          generateSectionV3(
+          generateSection(
             items: [
               ConfigListEditItem(
                 title: (l) => l.ports,

@@ -14,16 +14,16 @@ import 'package:flashco/common/tray.dart';
 import 'package:flashco/common/window.dart';
 import 'package:flashco/database/database.dart';
 import 'package:flashco/enum/enum.dart';
+import 'package:flashco/flashco/personal_defaults.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/disclaimer.dart';
 import 'package:flashco/views/navigation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_color_utilities/palettes/tonal_palette.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class Bootstrap {
@@ -58,10 +58,10 @@ class Bootstrap {
   }
 
   Future<DynamicColorSeeds> _initDynamicColor() async {
-    TonalPalette? primaryPalette;
+    ({Color light, Color dark})? systemSeeds;
     Color? accentColor;
     try {
-      primaryPalette = await _getSystemPrimaryPalette();
+      systemSeeds = await DynamicColorPlugin.getSystemSeeds();
     } catch (error) {
       commonPrint.log(
         'Failed to get core palette: $error',
@@ -77,8 +77,8 @@ class Bootstrap {
       );
     }
     return (
-      lightSeed: primaryPalette != null ? Color(primaryPalette.get(40)) : null,
-      darkSeed: primaryPalette != null ? Color(primaryPalette.get(80)) : null,
+      lightSeed: systemSeeds?.light,
+      darkSeed: systemSeeds?.dark,
       accentColor: accentColor ?? const Color(defaultPrimaryColor),
     );
   }
@@ -93,18 +93,6 @@ class Bootstrap {
     exit(0);
   }
 
-  Future<TonalPalette?> _getSystemPrimaryPalette() async {
-    final raw = await DynamicColorPlugin.channel.invokeMethod<List<dynamic>>(
-      DynamicColorPlugin.methodName,
-    );
-    if (raw == null || raw.length < TonalPalette.commonSize) {
-      return null;
-    }
-    return TonalPalette.fromList(
-      raw.sublist(0, TonalPalette.commonSize).cast<int>(),
-    );
-  }
-
   Future<ProviderContainer> _initData(
     int version,
     DynamicColorSeeds dynamicColor,
@@ -113,8 +101,18 @@ class Bootstrap {
     globalState.packageInfo = await PackageInfo.fromPlatform();
     final isNewInstallation =
         await preferences.isNewInstallation ||
+        await preferences.isPersonalDefaultsInitializing ||
         (_subscriptionOnboardingEnabled &&
             await preferences.isSubscriptionOnboardingInitializing);
+    await preferences.beginPersonalDefaultsInitialization(
+      enabled: shouldApplyPersonalDefaults(
+        subscriptionUrl: bundledSubscriptionUrl,
+        enabled: (system.isAndroid || system.isWindows) && !safeModeBuild,
+        isNewInstallation: isNewInstallation,
+        subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
+      ),
+      isNewInstallation: isNewInstallation,
+    );
     await preferences.initializeSubscriptionOnboarding(
       enabled: _subscriptionOnboardingEnabled,
       isNewInstallation: isNewInstallation,
@@ -130,20 +128,20 @@ class Bootstrap {
       config = config.copyWith(currentProfileId: null);
       await preferences.saveConfig(config);
     }
-    config = await initializePersonalDefaults(
-      config,
-      subscriptionUrl: bundledSubscriptionUrl,
+    await preferences.stageBundledFallback(
+      bundledSubscriptionUrl,
+      bundledFallbackConfig,
       isNewInstallation: isNewInstallation,
-      subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&
           !_bootDecision.isDegraded,
     );
-    await preferences.stageBundledFallback(
-      bundledSubscriptionUrl,
-      bundledFallbackConfig,
+    config = await initializePersonalDefaults(
+      config,
+      subscriptionUrl: bundledSubscriptionUrl,
       isNewInstallation: isNewInstallation,
+      subscriptionOnFirstRun: _subscriptionOnboardingEnabled,
       enabled:
           (system.isAndroid || system.isWindows) &&
           !safeModeBuild &&

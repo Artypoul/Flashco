@@ -1,0 +1,980 @@
+[
+  {
+    "base_path": ".agents/architecture.md",
+    "flashco_path": ".agents/architecture.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".agents/commands.md",
+    "flashco_path": ".agents/commands.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".agents/flutter-upgrade.md",
+    "flashco_path": ".agents/flutter-upgrade.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".agents/project.md",
+    "flashco_path": ".agents/project.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".agents/rules.md",
+    "flashco_path": ".agents/rules.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".agents/skills/localization/SKILL.md",
+    "flashco_path": ".agents/skills/localization/SKILL.md",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".agents/skills/ui-work/SKILL.md",
+    "flashco_path": ".agents/skills/ui-work/SKILL.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".github/workflows/build.yaml",
+    "flashco_path": ".github/workflows/build.yaml",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": ".gitignore",
+    "flashco_path": ".gitignore",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "AGENTS.md",
+    "flashco_path": "AGENTS.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "CHANGELOG.md",
+    "flashco_path": "CHANGELOG.md",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "README.md",
+    "flashco_path": "README.md",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "README_zh_CN.md",
+    "flashco_path": "README_zh_CN.md",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "android/app/build.gradle.kts",
+    "flashco_path": "android/app/build.gradle.kts",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "android/app/src/main/AndroidManifest.xml",
+    "flashco_path": "android/app/src/main/AndroidManifest.xml",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "android/app/src/main/kotlin/com/follow/clash/ServiceController.kt",
+    "flashco_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceController.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/app/src/main/kotlin/com/follow/clash/ServiceStateHost.kt",
+    "flashco_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateHost.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/app/src/main/kotlin/com/follow/clash/ServiceStateMachine.kt",
+    "flashco_path": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateMachine.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/app/src/main/kotlin/com/follow/clash/models/State.kt",
+    "flashco_path": "android/app/src/main/kotlin/com/follow/flashco/models/State.kt",
+    "status": "text_conflict",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/app/src/main/kotlin/com/follow/clash/plugins/AppPlugin.kt",
+    "flashco_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/AppPlugin.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/app/src/main/kotlin/com/follow/clash/plugins/ServicePlugin.kt",
+    "flashco_path": "android/app/src/main/kotlin/com/follow/flashco/plugins/ServicePlugin.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/common/build.gradle.kts",
+    "flashco_path": "android/common/build.gradle.kts",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "android/common/src/main/java/com/follow/clash/common/Ext.kt",
+    "flashco_path": "android/common/src/main/java/com/follow/flashco/common/Ext.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/common/src/main/java/com/follow/clash/common/GlobalState.kt",
+    "flashco_path": "android/common/src/main/java/com/follow/flashco/common/GlobalState.kt",
+    "status": "text_conflict",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/core/build.gradle.kts",
+    "flashco_path": "android/core/build.gradle.kts",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "android/core/src/main/java/com/follow/clash/core/Core.kt",
+    "flashco_path": "android/core/src/main/java/com/follow/flashco/core/Core.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/service/src/main/java/com/follow/clash/service/ManagedService.kt",
+    "flashco_path": "android/service/src/main/java/com/follow/flashco/service/ManagedService.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/service/src/main/java/com/follow/clash/service/ProxyService.kt",
+    "flashco_path": "android/service/src/main/java/com/follow/flashco/service/ProxyService.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/service/src/main/java/com/follow/clash/service/VpnService.kt",
+    "flashco_path": "android/service/src/main/java/com/follow/flashco/service/VpnService.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/service/src/main/java/com/follow/clash/service/modules/ServiceModules.kt",
+    "flashco_path": "android/service/src/main/java/com/follow/flashco/service/modules/ServiceModules.kt",
+    "status": "text_clean",
+    "normalized_android_package": true
+  },
+  {
+    "base_path": "android/tests/app/ServiceStateMachineTest.kt",
+    "flashco_path": "android/tests/app/ServiceStateMachineTest.kt",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "android/tests/app/SharedStateTest.kt",
+    "flashco_path": "android/tests/app/SharedStateTest.kt",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "arb/intl_en.arb",
+    "flashco_path": "arb/intl_en.arb",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "arb/intl_ja.arb",
+    "flashco_path": "arb/intl_ja.arb",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "arb/intl_ru.arb",
+    "flashco_path": "arb/intl_ru.arb",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "arb/intl_zh_CN.arb",
+    "flashco_path": "arb/intl_zh_CN.arb",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "build_config.yaml",
+    "flashco_path": "build_config.yaml",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "changelog.json",
+    "flashco_path": "changelog.json",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "core/config_test.go",
+    "flashco_path": "core/config_test.go",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "core/go.mod",
+    "flashco_path": "core/go.mod",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "core/hub_test.go",
+    "flashco_path": "core/hub_test.go",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "core/ipc_test.go",
+    "flashco_path": "core/ipc_test.go",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "core/method.go",
+    "flashco_path": "core/method.go",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "core/protocol.go",
+    "flashco_path": "core/protocol.go",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/application.dart",
+    "flashco_path": "lib/application.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/bootstrap.dart",
+    "flashco_path": "lib/bootstrap.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/app_localizations.dart",
+    "flashco_path": "lib/common/app_localizations.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/app_ports.dart",
+    "flashco_path": "lib/common/app_ports.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/backup.dart",
+    "flashco_path": "lib/common/backup.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/boot_guard.dart",
+    "flashco_path": "lib/common/boot_guard.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/common.dart",
+    "flashco_path": "lib/common/common.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/compute.dart",
+    "flashco_path": "lib/common/compute.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/constant.dart",
+    "flashco_path": "lib/common/constant.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/context.dart",
+    "flashco_path": "lib/common/context.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/converter.dart",
+    "flashco_path": "lib/common/converter.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/dialog.dart",
+    "flashco_path": "lib/common/dialog.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/function.dart",
+    "flashco_path": "lib/common/function.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/future.dart",
+    "flashco_path": "lib/common/future.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/http.dart",
+    "flashco_path": "lib/common/http.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/input_entries.dart",
+    "flashco_path": "lib/common/input_entries.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/keyboard.dart",
+    "flashco_path": "lib/common/keyboard.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/l10n_labels.dart",
+    "flashco_path": "lib/common/l10n_labels.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/layout.dart",
+    "flashco_path": "lib/common/layout.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/migration.dart",
+    "flashco_path": "lib/common/migration.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/num.dart",
+    "flashco_path": "lib/common/num.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/path.dart",
+    "flashco_path": "lib/common/path.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/preferences.dart",
+    "flashco_path": "lib/common/preferences.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/print.dart",
+    "flashco_path": "lib/common/print.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/proxy.dart",
+    "flashco_path": "lib/common/proxy.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/request.dart",
+    "flashco_path": "lib/common/request.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/service_probe.dart",
+    "flashco_path": "lib/common/service_probe.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/system.dart",
+    "flashco_path": "lib/common/system.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/task.dart",
+    "flashco_path": "lib/common/task.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/tray.dart",
+    "flashco_path": "lib/common/tray.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/webdav.dart",
+    "flashco_path": "lib/common/webdav.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/common/window.dart",
+    "flashco_path": "lib/common/window.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/controller.dart",
+    "flashco_path": "lib/core/controller.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/desktop/rpc_client.dart",
+    "flashco_path": "lib/core/desktop/rpc_client.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/event.dart",
+    "flashco_path": "lib/core/event.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/interface.dart",
+    "flashco_path": "lib/core/interface.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/lib.dart",
+    "flashco_path": "lib/core/lib.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/method.dart",
+    "flashco_path": "lib/core/method.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/core/service.dart",
+    "flashco_path": "lib/core/service.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/database/database.dart",
+    "flashco_path": "lib/database/database.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/enum/enum.dart",
+    "flashco_path": "lib/enum/enum.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/connection/tracker_info_item.dart",
+    "flashco_path": "lib/features/connection/tracker_info_item.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/connection/tracker_info_list.dart",
+    "flashco_path": "lib/features/connection/tracker_info_list.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/connection/tracker_speed_ranker.dart",
+    "flashco_path": "lib/features/connection/tracker_speed_ranker.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/editor/completion.dart",
+    "flashco_path": "lib/features/editor/completion.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/editor/completion_popup.dart",
+    "flashco_path": "lib/features/editor/completion_popup.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/custom_issue.dart",
+    "flashco_path": "lib/features/form/custom_issue.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/filter.dart",
+    "flashco_path": "lib/features/form/filter.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/form_row.dart",
+    "flashco_path": "lib/features/form/form_row.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/list_editor_page.dart",
+    "flashco_path": "lib/features/form/list_editor_page.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/nested_form_sheet.dart",
+    "flashco_path": "lib/features/form/nested_form_sheet.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/rule.dart",
+    "flashco_path": "lib/features/form/rule.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/rule_preset.dart",
+    "flashco_path": "lib/features/form/rule_preset.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/form/selection_sheet.dart",
+    "flashco_path": "lib/features/form/selection_sheet.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/ip_quality/ip_quality_sheet.dart",
+    "flashco_path": "lib/features/ip_quality/ip_quality_sheet.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/ip_quality/ip_quality_text.dart",
+    "flashco_path": "lib/features/ip_quality/ip_quality_text.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/features/ip_quality/labels.dart",
+    "flashco_path": "lib/features/ip_quality/labels.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/l10n/intl/messages_en.dart",
+    "flashco_path": "lib/l10n/intl/messages_en.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/l10n/intl/messages_ja.dart",
+    "flashco_path": "lib/l10n/intl/messages_ja.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/l10n/intl/messages_ru.dart",
+    "flashco_path": "lib/l10n/intl/messages_ru.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/l10n/intl/messages_zh_CN.dart",
+    "flashco_path": "lib/l10n/intl/messages_zh_CN.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/l10n/l10n.dart",
+    "flashco_path": "lib/l10n/l10n.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/main.dart",
+    "flashco_path": "lib/main.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/android_manager.dart",
+    "flashco_path": "lib/manager/android_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/app_manager.dart",
+    "flashco_path": "lib/manager/app_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/connectivity_manager.dart",
+    "flashco_path": "lib/manager/connectivity_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/core_manager.dart",
+    "flashco_path": "lib/manager/core_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/hotkey_manager.dart",
+    "flashco_path": "lib/manager/hotkey_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/locale_manager.dart",
+    "flashco_path": "lib/manager/locale_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/proxy_manager.dart",
+    "flashco_path": "lib/manager/proxy_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/theme_manager.dart",
+    "flashco_path": "lib/manager/theme_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/tile_manager.dart",
+    "flashco_path": "lib/manager/tile_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/tray_manager.dart",
+    "flashco_path": "lib/manager/tray_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/vpn_manager.dart",
+    "flashco_path": "lib/manager/vpn_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/manager/window_manager.dart",
+    "flashco_path": "lib/manager/window_manager.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/clash_config.dart",
+    "flashco_path": "lib/models/clash_config.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/common.dart",
+    "flashco_path": "lib/models/common.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/config.dart",
+    "flashco_path": "lib/models/config.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/core.dart",
+    "flashco_path": "lib/models/core.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/generated/clash_config.freezed.dart",
+    "flashco_path": "lib/models/generated/clash_config.freezed.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/generated/clash_config.g.dart",
+    "flashco_path": "lib/models/generated/clash_config.g.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/generated/config.freezed.dart",
+    "flashco_path": "lib/models/generated/config.freezed.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/generated/config.g.dart",
+    "flashco_path": "lib/models/generated/config.g.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/generated/state.freezed.dart",
+    "flashco_path": "lib/models/generated/state.freezed.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/generated/state.g.dart",
+    "flashco_path": "lib/models/generated/state.g.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/ip_quality.dart",
+    "flashco_path": "lib/models/ip_quality.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/models.dart",
+    "flashco_path": "lib/models/models.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/profile.dart",
+    "flashco_path": "lib/models/profile.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/models/state.dart",
+    "flashco_path": "lib/models/state.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/pages/editor.dart",
+    "flashco_path": "lib/pages/editor.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/pages/error.dart",
+    "flashco_path": "lib/pages/error.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/pages/home.dart",
+    "flashco_path": "lib/pages/home.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/pages/scan.dart",
+    "flashco_path": "lib/pages/scan.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/plugins/app.dart",
+    "flashco_path": "lib/plugins/app.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/plugins/service.dart",
+    "flashco_path": "lib/plugins/service.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/action.dart",
+    "flashco_path": "lib/providers/action.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/actions/clash_providers.dart",
+    "flashco_path": "lib/providers/actions/clash_providers.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/actions/profiles.dart",
+    "flashco_path": "lib/providers/actions/profiles.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/actions/setup.dart",
+    "flashco_path": "lib/providers/actions/setup.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/app.dart",
+    "flashco_path": "lib/providers/app.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/database.dart",
+    "flashco_path": "lib/providers/database.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/generated/action.g.dart",
+    "flashco_path": "lib/providers/generated/action.g.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/generated/database.g.dart",
+    "flashco_path": "lib/providers/generated/database.g.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/generated/state.g.dart",
+    "flashco_path": "lib/providers/generated/state.g.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/ip_quality.dart",
+    "flashco_path": "lib/providers/ip_quality.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/outbound_ip.dart",
+    "flashco_path": "lib/providers/outbound_ip.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/route_state.dart",
+    "flashco_path": "lib/providers/route_state.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/routed_probe.dart",
+    "flashco_path": "lib/providers/routed_probe.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/service_status.dart",
+    "flashco_path": "lib/providers/service_status.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/state.dart",
+    "flashco_path": "lib/providers/state.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/state/profile.dart",
+    "flashco_path": "lib/providers/state/profile.dart",
+    "status": "text_clean",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/providers/state/system.dart",
+    "flashco_path": "lib/providers/state/system.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/state.dart",
+    "flashco_path": "lib/state.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/views/about.dart",
+    "flashco_path": "lib/views/about.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/views/access.dart",
+    "flashco_path": "lib/views/access.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/views/backup_and_restore.dart",
+    "flashco_path": "lib/views/backup_and_restore.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/views/config/advanced.dart",
+    "flashco_path": "lib/views/config/advanced.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/views/config/dns.dart",
+    "flashco_path": "lib/views/config/dns.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  },
+  {
+    "base_path": "lib/views/config/filters.dart",
+    "flashco_path": "lib/views/config/filters.dart",
+    "status": "text_conflict",
+    "normalized_android_package": false
+  }
+]

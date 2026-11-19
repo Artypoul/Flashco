@@ -10,7 +10,7 @@ import 'package:flashco/core/desktop/launch_policy.dart';
 import 'package:flashco/core/desktop/model.dart';
 import 'package:flashco/core/method.dart';
 import 'package:flashco/l10n/l10n.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

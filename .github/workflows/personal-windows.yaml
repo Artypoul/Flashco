@@ -82,6 +82,10 @@ jobs:
           }
           Write-Output "::add-mask::$url"
 
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Install dependencies
         run: flutter pub get
 

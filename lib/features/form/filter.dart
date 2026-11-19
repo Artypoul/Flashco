@@ -1,14 +1,17 @@
-import 'package:flashco/common/common.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// What mihomo's regexp2, asked through the core, rejects in each filter, ''
-/// where it accepts one, or null when the core cannot be asked.
-Future<List<String>?> checkFilters(WidgetRef ref, List<String> filters) async {
+/// What mihomo's regexp2, asked through the core, rejects in each filter, by
+/// index, or null when the core cannot be asked.
+Future<Map<int, String>?> checkFilters(
+  WidgetRef ref,
+  List<String> filters,
+) async {
   if (filters.every((filter) => filter.isEmpty)) {
-    return [for (final _ in filters) ''];
+    return const {};
   }
   try {
     return await ref.read(coreHandlerProvider).validateFilters(filters);
@@ -48,9 +51,10 @@ class FilterRegexText extends StatelessWidget {
       regex,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: context.textTheme.bodySmall?.toJetBrainsMono.copyWith(
-        color: context.colorScheme.tertiary,
-      ),
+      style: AppTextStyle.footnote
+          .of(context)
+          .toJetBrainsMono
+          .copyWith(color: context.colorScheme.tertiary),
     );
   }
 }

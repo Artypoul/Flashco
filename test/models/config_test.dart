@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:prism_ui/prism_ui.dart';
 import 'package:test/test.dart';
 
 T roundTrip<T>(
@@ -149,9 +149,8 @@ void main() {
               GeoResource.GEOSITE: 'https://example.com/geosite.dat',
             },
           ).toUpdateParams(
-            bypassPrivateRoute: false,
             authentication: const [],
-            skipCertVerify: false,
+            options: const CoreOptions(testUrl: defaultTestUrl),
           );
 
       final json = jsonDecode(jsonEncode(params)) as Map<String, Object?>;
@@ -163,13 +162,15 @@ void main() {
 
     test('toUpdateParams sends skipCertVerify under skip-cert-verify', () {
       final params = const PatchClashConfig().toUpdateParams(
-        bypassPrivateRoute: false,
         authentication: const [],
-        skipCertVerify: true,
+        options: const CoreOptions(
+          testUrl: defaultTestUrl,
+          skipCertVerify: true,
+        ),
       );
 
       final json = jsonDecode(jsonEncode(params)) as Map<String, Object?>;
-      expect(json['skip-cert-verify'], isTrue);
+      expect((json['options'] as Map)['skip-cert-verify'], isTrue);
     });
   });
 
@@ -210,8 +211,21 @@ void main() {
       });
       expect(alone.dashboardWidgets, [
         DashboardWidget.outboundMode,
-        DashboardWidget.trafficUsage,
+        DashboardWidget.networkSpeed,
       ]);
+    });
+
+    test('legacy empty test URL remains an explicit override', () {
+      final config = Config.realFromJson({
+        'appSettingProps': {'testUrl': ''},
+        'patchClashConfig': <String, Object?>{},
+      });
+      expect(config.appSettingProps.testUrl, isEmpty);
+      expect(config.patchClashConfig.testUrl, isEmpty);
+      expect(
+        config.patchClashConfig.generalOverrideKeys,
+        contains(GeneralOverrideKey.testUrl),
+      );
     });
 
     test('consent saved before the disclaimer was versioned asks again', () {
@@ -327,10 +341,11 @@ void main() {
       expect(props.width, 0);
     });
 
-    test('size extension defaults to 680x580 when empty', () {
+    test('size extension defaults to 1280x880 when empty', () {
       const props = WindowProps();
-      expect(props.size.width, 680);
-      expect(props.size.height, 580);
+      expect(props.savedSize, isNull);
+      expect(props.size.width, 1280);
+      expect(props.size.height, 880);
     });
 
     test('size extension uses actual values', () {
@@ -346,6 +361,8 @@ void main() {
       expect(restored.height, 768);
       expect(restored.top, 100);
       expect(restored.left, 200);
+      expect(restored.size.width, 1024);
+      expect(restored.size.height, 768);
     });
   });
 
@@ -514,9 +531,8 @@ void main() {
       final params = open
           .copyWith(secret: 'abc')
           .toUpdateParams(
-            bypassPrivateRoute: false,
             authentication: const [],
-            skipCertVerify: false,
+            options: const CoreOptions(testUrl: defaultTestUrl),
           );
 
       expect(params.secret, 'abc');
@@ -526,9 +542,8 @@ void main() {
 
   group('PatchClashConfig.setupOnly', () {
     UpdateParams liveParams(PatchClashConfig config) => config.toUpdateParams(
-      bypassPrivateRoute: false,
       authentication: const [],
-      skipCertVerify: false,
+      options: const CoreOptions(testUrl: defaultTestUrl),
     );
 
     test('drops every field the update params patch live', () {
@@ -583,21 +598,21 @@ void main() {
   group('ProxiesStyleProps JSON round-trip', () {
     test('default values', () {
       const props = ProxiesStyleProps();
-      expect(props.type, ProxiesType.tab);
+      expect(props.type, ProxiesType.list);
       expect(props.sortType, ProxiesSortType.none);
       expect(props.layout, ProxiesLayout.standard);
     });
 
     test('round-trip with custom values', () {
       const props = ProxiesStyleProps(
-        type: ProxiesType.list,
+        type: ProxiesType.tab,
         sortType: ProxiesSortType.delay,
       );
       final restored = roundTrip(
         () => props.toJson(),
         ProxiesStyleProps.fromJson,
       );
-      expect(restored.type, ProxiesType.list);
+      expect(restored.type, ProxiesType.tab);
       expect(restored.sortType, ProxiesSortType.delay);
     });
 
@@ -745,6 +760,32 @@ void main() {
       expect(restored.hotKeyActions, isEmpty);
     });
 
+    test('legacy TUN false and empty choices remain explicit', () {
+      final config = Config.realFromJson({
+        'patchClashConfig': {
+          'tun': {
+            'auto-route': false,
+            'strict-route': false,
+            'dns-hijack': <String>[],
+            'route-address': <String>[],
+          },
+        },
+      });
+      final patch = config.patchClashConfig;
+      expect(patch.tun.autoRoute, isFalse);
+      expect(patch.tunOverride.strictRoute, isFalse);
+      expect(patch.tunOverride.dnsHijack, isEmpty);
+      expect(patch.tunOverride.routeAddress, isEmpty);
+      expect(
+        patch.tunOverrideKeys,
+        containsAll([
+          TunOverrideKey.strictRoute,
+          TunOverrideKey.dnsHijack,
+          TunOverrideKey.routeAddress,
+        ]),
+      );
+    });
+
     test('a legacy bypass-private route mode drops the routes it ignored', () {
       final config = Config.realFromJson({
         'themeProps': const ThemeProps().toJson(),
@@ -794,24 +835,24 @@ void main() {
 
     test('drops only the dashboard cards it does not know', () {
       final props = AppSettingProps.safeFromJson({
-        'dashboardWidgets': ['runTime', 'futureCard', 'requests'],
+        'dashboardWidgets': ['profiles', 'futureCard', 'requests'],
         'hideIp': true,
       });
 
       expect(props.dashboardWidgets, [
-        DashboardWidget.runTime,
-        DashboardWidget.requests,
+        DashboardWidget.profiles,
+        DashboardWidget.connectionStats,
       ]);
       expect(props.hideIp, true);
     });
 
-    test('restores the default dashboard when it knows none of the cards', () {
+    test('keeps an empty dashboard when it knows none of the cards', () {
       final props = AppSettingProps.safeFromJson({
         'dashboardWidgets': ['futureCard', 'otherFutureCard'],
         'hideIp': true,
       });
 
-      expect(props.dashboardWidgets, defaultDashboardWidgets);
+      expect(props.dashboardWidgets, isEmpty);
       expect(props.hideIp, true);
     });
 
@@ -819,10 +860,10 @@ void main() {
       expect(
         dashboardWidgetsFromJson([
           'overrideDnsButton',
-          'runTime',
+          'profiles',
           'overrideNtpButton',
         ]),
-        [DashboardWidget.runTime],
+        [DashboardWidget.profiles],
       );
     });
 

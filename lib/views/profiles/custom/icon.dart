@@ -4,13 +4,13 @@ import 'package:flashco/common/common.dart';
 import 'package:flashco/database/database.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/form/form.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const _recommendedKey = 'recommended';
@@ -202,6 +202,8 @@ class _IconPickerViewState extends ConsumerState<IconPickerView> {
       message: TextSpan(
         text: appLocalizations.deleteTip(_iconLabel(context, icon)),
       ),
+      destructive: true,
+      confirmText: appLocalizations.delete,
     );
     if (res != true) {
       return;
@@ -314,7 +316,7 @@ class _IconPickerViewState extends ConsumerState<IconPickerView> {
     final isEmpty = _query.isNotEmpty
         ? searchSlivers.isEmpty
         : source == null && !isLoading;
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.icon,
       searchState: AppBarSearchState(onSearch: _handleSearch),
       iconActions: [
@@ -351,7 +353,7 @@ class _IconPickerViewState extends ConsumerState<IconPickerView> {
                       ? appLocalizations.noSearchResults
                       : appLocalizations.iconSetsEmptyTip,
                   illustration: _query.isNotEmpty
-                      ? NullStatusIllustration.search
+                      ? Illustration.search
                       : NullStatusIllustration.icons,
                 ),
               )
@@ -363,7 +365,7 @@ class _IconPickerViewState extends ConsumerState<IconPickerView> {
               _buildGrid(source, source.icons),
             ],
             SliverToBoxAdapter(
-              child: SizedBox(height: 20 + BottomInsetScope.of(context)),
+              child: SizedBox(height: 20 + context.bottomInset),
             ),
           ],
         ),
@@ -404,8 +406,7 @@ class _CurrentIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final description = _describe(context);
     final subtitle = description.subtitle;
-    return CommonCard(
-      type: CommonCardType.filled,
+    return Card(
       radius: AppCorner.xl,
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -429,7 +430,7 @@ class _CurrentIcon extends StatelessWidget {
                       description.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.bodyLarge,
+                      style: AppTextStyle.body.of(context),
                     ),
                   ),
                   if (subtitle != null && subtitle.isNotEmpty)
@@ -437,9 +438,11 @@ class _CurrentIcon extends StatelessWidget {
                       subtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
+                      style: AppTextStyle.footnote
+                          .of(context)
+                          .copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
+                          ),
                     ),
                 ],
               ),
@@ -462,14 +465,11 @@ class IconGridScrollView extends StatefulWidget {
 }
 
 class _IconGridScrollViewState extends State<IconGridScrollView>
-    with RouteSettledMixin<IconGridScrollView> {
-  @override
-  void didSettleRoute() => setState(() {});
-
+    with ArrivalCacheExtentMixin<IconGridScrollView> {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
-      scrollCacheExtent: arrivalScrollCacheExtent(routeSettled),
+      scrollCacheExtent: arrivalCacheExtent,
       slivers: widget.slivers,
     );
   }
@@ -501,7 +501,7 @@ class SliverIconGrid extends StatelessWidget {
           mainAxisExtent:
               _iconPlateSize +
               _iconLabelGap +
-              globalState.measure.bodySmallHeight,
+              globalState.measure.textHeight(AppTextStyle.footnote),
         ),
         itemCount: icons.length,
         itemBuilder: (context, index) {
@@ -544,40 +544,39 @@ class _IconTile extends StatelessWidget {
         child: Column(
           spacing: _iconLabelGap,
           children: [
-            Material(
-              color: colorScheme.secondaryContainer,
-              shape: isSelected
-                  ? AppShape.md.copyWith(
-                      side: BorderSide(color: colorScheme.primary, width: 2),
-                    )
-                  : AppShape.md,
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                customBorder: AppShape.md,
-                onTap: onPressed,
-                onLongPress: onLongPress,
-                child: SizedBox.square(
-                  dimension: _iconPlateSize,
-                  child: Center(
-                    child: SizedBox.square(
-                      dimension: _iconSize,
-                      child: IconTheme.merge(
-                        data: const IconThemeData(size: _iconSize),
-                        child: CommonTargetIcon(src: icon.url),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                PressSurface(
+                  fill: context.raisedSurfaceLevel.colorOf(colorScheme),
+                  shape: AppShape.md,
+                  clipsChild: true,
+                  onPressed: onPressed,
+                  child: SizedBox.square(
+                    dimension: _iconPlateSize,
+                    child: Center(
+                      child: SizedBox.square(
+                        dimension: _iconSize,
+                        child: IconTheme.merge(
+                          data: const IconThemeData(size: _iconSize),
+                          child: CommonTargetIcon(src: icon.url),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+                if (isSelected)
+                  const Positioned(top: -4, right: -4, child: SelectionBadge()),
+              ],
             ),
             Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: AppTextStyle.footnote
+                  .of(context)
+                  .copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ],
         ),

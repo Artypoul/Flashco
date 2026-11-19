@@ -20,7 +20,7 @@ dialogs, and interaction behavior.
   await, auto-dispose providers need a container-level hold, platform decisions are passed in as parameters).
 - Settings screens are built from the `ConfigToggleItem` family in `lib/widgets/config_item.dart`; the Settings Rows
   section of `.agents/architecture.md` says when a file-local helper or a named widget is warranted.
-- Every icon lives in `lib/icons/`, never the Material `Icons` font: reuse or add a glyph in `AppGlyphs` and show it
+- App-specific glyphs live in `lib/ui/icons/`, alongside shared Prism icons, never the Material `Icons` font: reuse or add a glyph in `AppGlyphs` and show it
   with `GlyphIcon`, or with `AnimatedGlyph` where it fills on selection. Glyphs are outlined, except inside a filled
   button, where they take `fill: 1`. The Icons section of `.agents/architecture.md` covers shape roles, the stroke, the
   fill animation, and when to fill.
@@ -40,7 +40,7 @@ dialogs, and interaction behavior.
 
 ## Corner Radii
 
-All corner radii come from `lib/common/shape.dart`: a token, a derived value, or a named off-scale value passed to its
+All corner radii come from `plugins/prism_ui/lib/shape.dart`, exported by `prism_ui.dart`: a token, a derived value, or a named off-scale value passed to its
 builders. Never write a bare radius literal at a call site.
 
 The scale is picked by the component's **shortest side**. A radius that reads as a soft card at 64 logical pixels tall
@@ -63,10 +63,8 @@ reads as a pill at 24 and as a square at 400, so one radius everywhere is the wr
   section of `.agents/rules.md` explains why and lists the superellipse API per layer.
 - `AppCorner.fit(shortestSide)` snaps to the largest token at or under one third of the shortest side. Use it whenever
   the size comes from a `LayoutBuilder` or scales with text.
-- `ThemeData.withAppShapes` in `lib/common/shape.dart` already applies the scale to card, dialog, bottom sheet, snack
-  bar, chip, menu, input, FAB, navigation indicator, progress, and the filled, text, outlined, elevated, and icon
-  button themes. Do not restate those shapes at call sites, and
-  leave `InputDecoration.border` unset so inputs inherit `AppShape.input`.
+- Prism components provide their own shape defaults using these tokens. Reuse those defaults and the surrounding Prism
+  theme; when a component needs a shape override, use the appropriate `AppShape` token.
 
 `xl` and `lg` exist because one token cannot serve both size classes. A full-bleed surface is wide and short, so its
 corner must be larger than its height alone suggests or it stops reading as a card; everything full-bleed shares `xl`

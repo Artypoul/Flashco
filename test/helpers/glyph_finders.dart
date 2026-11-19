@@ -1,4 +1,4 @@
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 extension GlyphFinders on CommonFinders {

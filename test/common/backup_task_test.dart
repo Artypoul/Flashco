@@ -10,22 +10,10 @@ import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:prism_ui/theme_data.dart' show ThemeMode;
+import 'package:sqlite3/sqlite3.dart' as sqlite;
 
-class _FakePathProvider extends PathProviderPlatform {
-  final String root;
-
-  _FakePathProvider(this.root);
-
-  @override
-  Future<String?> getTemporaryPath() async => root;
-
-  @override
-  Future<String?> getApplicationSupportPath() async => root;
-
-  @override
-  Future<String?> getApplicationCachePath() async => root;
-}
+import '../helpers/app_paths.dart';
 
 /// The public entry points hand their work to a background isolate, which
 /// cannot reach the mocked platform channels, so the tests drive the worker
@@ -40,7 +28,7 @@ void main() {
     // already-existing temp and cache dirs the platform hands out.
     Directory(join(root.path, 'tmp')).createSync(recursive: true);
     Directory(join(root.path, 'archive')).createSync(recursive: true);
-    PathProviderPlatform.instance = _FakePathProvider(root.path);
+    await useAppPaths(root);
   });
 
   tearDownAll(() {
@@ -589,6 +577,114 @@ void main() {
       );
     }
 
+    test('restores a settings v2 and schema 21 Flashco archive', () async {
+      const fallback = FallbackConfig(
+        selector: 'PROXY',
+        name: 'Fallback',
+        url: 'https://example.invalid/204',
+        interval: 10,
+        timeout: 3000,
+        lazy: false,
+        expectedStatus: '204',
+      );
+      const profile = Profile(
+        id: 1,
+        type: ProfileType.url,
+        label: 'Saved subscription',
+        url: 'https://example.invalid/sub',
+        autoUpdateDuration: Duration(hours: 1),
+        selectedMap: {'PROXY': 'Node A'},
+        unfoldSet: {'PROXY'},
+        overrides: ProfileOverrides(fallback: fallback),
+      );
+      const rules = [
+        Rule(
+          id: 31,
+          content: 'first.example',
+          ruleTarget: 'DIRECT',
+          order: 'a0',
+        ),
+        Rule(
+          id: 32,
+          content: 'second.example',
+          ruleTarget: 'REJECT',
+          order: 'a1',
+        ),
+      ];
+      const disabled = [DisabledRule(profileId: 1, ruleId: 32)];
+      final script = Script(
+        id: 2,
+        label: 'Script',
+        lastUpdateTime: DateTime(2026),
+      );
+      final source = db.Database(NativeDatabase(File(databasePath)));
+      await source.restore([profile], [script], rules, disabled, []);
+      await source.close();
+      final raw = sqlite.sqlite3.open(databasePath);
+      expect(
+        raw
+            .select('SELECT "order" FROM rules ORDER BY "order"')
+            .map((row) => row['order']),
+        ['a0', 'a1'],
+      );
+      raw.execute('DROP TABLE ip_qualities');
+      raw.execute('DROP TABLE mitm_modules');
+      raw.execute('PRAGMA user_version = 21');
+      raw.close();
+      writeFile(join(home.path, 'profiles', '1.yaml'), 'proxies: [Node A]');
+      writeFile(join(home.path, 'scripts', '2.js'), 'function main() {}');
+      const config = Config(
+        currentProfileId: 1,
+        appSettingProps: AppSettingProps(locale: 'ru', autoRun: false),
+        themeProps: ThemeProps(
+          themeMode: ThemeMode.dark,
+          primaryColor: 0xff123456,
+          sidebarBlur: true,
+        ),
+        patchClashConfig: PatchClashConfig(tun: Tun(enable: false)),
+      );
+      final archivePath = await backup(
+        configMap: {...config.toJson(), 'version': 2},
+        entries: const ['profiles/1.yaml', 'scripts/2.js'],
+      );
+      final data = await restore(archivePath);
+      expect(data.profiles.single, profile);
+      expect(data.scripts.single, script);
+      expect(data.rules.map((rule) => rule.id), [31, 32]);
+      expect(data.rules.map((rule) => rule.order), ['a0', 'a1']);
+      expect(data.disabledRules, disabled);
+      expect(Config.fromJson(data.configMap!), config);
+      final restoredTheme = Config.fromJson(data.configMap!).themeProps;
+      expect(restoredTheme.themeMode, ThemeMode.dark);
+      expect(restoredTheme.primaryColor, 0xff123456);
+      expect(restoredTheme.sidebarBlur, isTrue);
+      expect(
+        File(join(staging.path, 'profiles', '1.yaml')).readAsStringSync(),
+        'proxies: [Node A]',
+      );
+      expect(
+        File(join(staging.path, 'scripts', '2.js')).readAsStringSync(),
+        'function main() {}',
+      );
+      final restored = db.Database(
+        NativeDatabase(File(join(root.path, 'restored-$uniqueId.sqlite'))),
+      );
+      await restored.restore(
+        data.profiles,
+        data.scripts,
+        data.rules,
+        data.disabledRules,
+        data.proxyGroups,
+      );
+      expect(await restored.profilesDao.query().get(), [profile]);
+      expect(await restored.rulesDao.queryDisabledRuleIds(1).get(), [32]);
+      expect(
+        (await restored.rulesDao.queryGlobalRules().get()).map((r) => r.id),
+        [31, 32],
+      );
+      await restored.close();
+    });
+
     test('the archive carries the database, the config and only the listed '
         'files', () async {
       await seedDatabase();
@@ -636,6 +732,58 @@ void main() {
           ).readAsStringSync(),
         ),
         ['proxies: []', 'body', 'payload: []'],
+      );
+    });
+
+    test('local modules and their attachments are kept, '
+        'and nothing else under mitm', () async {
+      final database = db.Database(NativeDatabase(File(databasePath)));
+      final local = MitmModule(
+        id: 4,
+        name: 'Local',
+        resources: const {'own.json': 'own.json', 'key': '../ca.key'},
+        lastUpdateTime: DateTime(2026),
+      );
+      final remote = local.copyWith(
+        id: 5,
+        url: 'https://a.example.com/m',
+        resources: const {'https://a.example.com/a.js': 'a.js', 'b.js': 'b.js'},
+      );
+      await database.mitmModulesDao.putAll([
+        local.toCompanion(),
+        remote.toCompanion(),
+      ]);
+      await database.close();
+      writeFile(join(home.path, 'mitm', 'modules', '4.txt'), 'local module');
+      writeFile(join(home.path, 'mitm', 'modules', '5.txt'), 'remote module');
+      writeFile(join(home.path, 'mitm', 'resources', 'own.json'), '{}');
+      writeFile(join(home.path, 'mitm', 'resources', 'a.js'), 'a');
+      writeFile(join(home.path, 'mitm', 'resources', 'b.js'), 'b');
+      writeFile(join(home.path, 'mitm', 'ca.key'), 'secret');
+
+      final archivePath = await backup(
+        configMap: const {'version': 1},
+        entries: BackupEntries.of(
+          profileIds: const [],
+          scriptIds: const [],
+          providers: const [],
+          mitmModules: [local, remote],
+        ),
+      );
+      final data = await restore(archivePath);
+
+      expect(data.mitmModules.map((module) => module.id), [4, 5]);
+      expect(BackupEntries.ofData(data), [
+        'mitm/modules/4.txt',
+        'mitm/resources/own.json',
+      ]);
+      expect(
+        BackupEntries.ofData(data).map(
+          (entry) => File(
+            BackupEntries.resolve(staging.path, entry),
+          ).readAsStringSync(),
+        ),
+        ['local module', '{}'],
       );
     });
 

@@ -1,0 +1,1114 @@
+[
+  {
+    "path": "linux/runner/main.cc",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7cfa072d2c8943cb2e4ed980170b077ba5c3fe82"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7cfa072d2c8943cb2e4ed980170b077ba5c3fe82"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7cfa072d2c8943cb2e4ed980170b077ba5c3fe82"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "linux/runner/my_application.cc",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d146c22a76b3f2315e3746dd310f9f95d2e14fe7"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59164941a7d2d54a4dbca59e15f01cbf5b383a54"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d146c22a76b3f2315e3746dd310f9f95d2e14fe7"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "linux/runner/my_application.h",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72271d5e41701cfbffad74d38640bf9cc7c1f7be"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72271d5e41701cfbffad74d38640bf9cc7c1f7be"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72271d5e41701cfbffad74d38640bf9cc7c1f7be"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/.gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "331c32782614a0263872e558982d5d69ef1dc07b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "331c32782614a0263872e558982d5d69ef1dc07b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "331c32782614a0263872e558982d5d69ef1dc07b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Flutter/Flutter-Debug.xcconfig",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2efd0b608ba84712fb3e1d01122468a50c7fba1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2efd0b608ba84712fb3e1d01122468a50c7fba1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2efd0b608ba84712fb3e1d01122468a50c7fba1"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Flutter/Flutter-Release.xcconfig",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2efd0b608ba84712fb3e1d01122468a50c7fba1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2efd0b608ba84712fb3e1d01122468a50c7fba1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2efd0b608ba84712fb3e1d01122468a50c7fba1"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Flutter/GeneratedPluginRegistrant.swift",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f0d7378f4a8aa841563cb17753ce2b2abb1d5fb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f0d7378f4a8aa841563cb17753ce2b2abb1d5fb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f0d7378f4a8aa841563cb17753ce2b2abb1d5fb"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner.xcodeproj/project.pbxproj",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "645231d59ef2bd4d5267fc3cb47dc058f8520bd5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd7c59169f70b8d060ee23b9a67ea929d3d9a883"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "645231d59ef2bd4d5267fc3cb47dc058f8520bd5"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18d981003d68d0546c4804ac2ff47dd97c6e7921"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18d981003d68d0546c4804ac2ff47dd97c6e7921"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18d981003d68d0546c4804ac2ff47dd97c6e7921"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "850b59b401e3790aa2d48b955f618fc3a16168c3"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "b29d0bfffd63bde4eae34bb97cae9d4cae0cb138"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "850b59b401e3790aa2d48b955f618fc3a16168c3"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "macos/Runner.xcworkspace/contents.xcworkspacedata",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d526a16ed0f1cd0c2409d848bf489b93fefa3b2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d526a16ed0f1cd0c2409d848bf489b93fefa3b2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d526a16ed0f1cd0c2409d848bf489b93fefa3b2"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18d981003d68d0546c4804ac2ff47dd97c6e7921"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18d981003d68d0546c4804ac2ff47dd97c6e7921"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18d981003d68d0546c4804ac2ff47dd97c6e7921"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/AppDelegate.swift",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d84e8890db2fa4bbab4598874d08b4772a750e30"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d84e8890db2fa4bbab4598874d08b4772a750e30"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d84e8890db2fa4bbab4598874d08b4772a750e30"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "a2ec33f19f110ebff51a23342d7bc29ec9a1aaa6"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "a2ec33f19f110ebff51a23342d7bc29ec9a1aaa6"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "a2ec33f19f110ebff51a23342d7bc29ec9a1aaa6"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "62f4fbcc3d7ece806363a37403e6ab0437f861b1"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "62f4fbcc3d7ece806363a37403e6ab0437f861b1"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "cf1a4a6fb1daa7cb7b1f400417bdc2b95aa26840"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "cffc437b90e8dd0782a424769f5e859bbd905294"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "cffc437b90e8dd0782a424769f5e859bbd905294"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "5c16cef49bcfede19e58b9599924d69cb6ae1db4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "2c704b603f09a17e1c0a3424028fbcee958a0643"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "2c704b603f09a17e1c0a3424028fbcee958a0643"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "89cec111e04338af22d09f141fbdb7072f15de69"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "c485cc67a4163ee9cb128df2a5ead0e28b9f60dc"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "c485cc67a4163ee9cb128df2a5ead0e28b9f60dc"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "078410a95c0af65bfc756d9e98e7654f6a6f270a"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "09fd5c53f7df7e8471e79ccea41bac7617ca696d"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "09fd5c53f7df7e8471e79ccea41bac7617ca696d"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d76c45c543c3d50de0ba4e70e75a262054dcde68"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "c4321229dc5bb2b5fe71fb88fe5dd9fb5b666921"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "c4321229dc5bb2b5fe71fb88fe5dd9fb5b666921"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "41408383326167bc14a328cdb93f84868a5108d3"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "1502b9c5ae9a3e81e585ef5078a67df697b74afb"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "1502b9c5ae9a3e81e585ef5078a67df697b74afb"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "3184aa90ee14993cfedc3c322109e79dd4d7a988"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "macos/Runner/Assets.xcassets/Contents.json",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "73c00596a7fca3f3d4bdd64053b69d86745f9e10"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "73c00596a7fca3f3d4bdd64053b69d86745f9e10"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "73c00596a7fca3f3d4bdd64053b69d86745f9e10"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Base.lproj/MainMenu.xib",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80e867a4e06b4dc26d0a2b327cbd54041addc50a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80e867a4e06b4dc26d0a2b327cbd54041addc50a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80e867a4e06b4dc26d0a2b327cbd54041addc50a"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Configs/AppInfo.xcconfig",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "776ce24c63aac9f67afb6924fb59baf4f8804db2"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "6ff0981e3a5098ce25170f3e8e86660b86af5920"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "776ce24c63aac9f67afb6924fb59baf4f8804db2"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "macos/Runner/Configs/Debug.xcconfig",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36b0fd9464f45b33f482e64bea579787e142affa"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36b0fd9464f45b33f482e64bea579787e142affa"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36b0fd9464f45b33f482e64bea579787e142affa"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Configs/Release.xcconfig",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a575e413d16f00f287f4d82fc2038fbfa732c2ec"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "afd085f746859037c9a7ba0f1dbf6893dbc706f7"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a575e413d16f00f287f4d82fc2038fbfa732c2ec"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "macos/Runner/Configs/Warnings.xcconfig",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42bcbf4780b187e80025b7917058bcb882012aa1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42bcbf4780b187e80025b7917058bcb882012aa1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42bcbf4780b187e80025b7917058bcb882012aa1"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/DebugProfile.entitlements",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "3264fe0ae20e46d2754f690c923f2a086683442f"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "3264fe0ae20e46d2754f690c923f2a086683442f"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "3264fe0ae20e46d2754f690c923f2a086683442f"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Info.plist",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "837c09dd9df8583b41befea4a602481846994456"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "225756b1e4ee457cbcf7179712daa83945e49e9d"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "837c09dd9df8583b41befea4a602481846994456"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "macos/Runner/MainFlutterWindow.swift",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "adbceb3320bfee0b6a8d4139b2930c1398b45a41"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "adbceb3320bfee0b6a8d4139b2930c1398b45a41"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "adbceb3320bfee0b6a8d4139b2930c1398b45a41"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/Runner/Release.entitlements",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "46ab511bea87257e655327b0e0a3d9d00ac1a233"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "46ab511bea87257e655327b0e0a3d9d00ac1a233"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "46ab511bea87257e655327b0e0a3d9d00ac1a233"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/RunnerTests/RunnerTests.swift",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61f3bd1fc504c3b78271416d8cfd14faa1dae2b4"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61f3bd1fc504c3b78271416d8cfd14faa1dae2b4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61f3bd1fc504c3b78271416d8cfd14faa1dae2b4"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "macos/packaging/dmg/make_config.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1340cad3376467dd6a331fc01f9aae4e65c27c32"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c47d9538a40c5f71abe3e969fb1b60bb2b286db7"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1340cad3376467dd6a331fc01f9aae4e65c27c32"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "opencode.jsonc",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c2509a03c7a6929d8fede86746423d4a3754f5b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c2509a03c7a6929d8fede86746423d4a3754f5b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c2509a03c7a6929d8fede86746423d4a3754f5b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/.gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcc322eca3b64c28d48790b5bb11306f36367b0f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcc322eca3b64c28d48790b5bb11306f36367b0f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcc322eca3b64c28d48790b5bb11306f36367b0f"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/LICENSE",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67d37511a8ee09fd9868c5886e0915cc4d2956b8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67d37511a8ee09fd9868c5886e0915cc4d2956b8"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67d37511a8ee09fd9868c5886e0915cc4d2956b8"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/README.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "befbf7ebe13ac6087a76059e21bde59420528827"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e9ab39aa50183d194158c77584f3e43dae9e8be"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "befbf7ebe13ac6087a76059e21bde59420528827"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "plugins/code_forge/analysis_options.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fca65a01e8ac9faba1e179df1b47946ef936405b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fca65a01e8ac9faba1e179df1b47946ef936405b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fca65a01e8ac9faba1e179df1b47946ef936405b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9541040fee1959f5b3898de3429d18ce16a21119"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9541040fee1959f5b3898de3429d18ce16a21119"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9541040fee1959f5b3898de3429d18ce16a21119"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/clipboard.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbb2b4394dfdc681daafb8d4087a9364bc8108f3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbb2b4394dfdc681daafb8d4087a9364bc8108f3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbb2b4394dfdc681daafb8d4087a9364bc8108f3"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "27950e5107aab1c1508aa91a28b1c11c7cc36429"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ed9a86412bc193f3e2829cca5bb95b56226b467"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "141303d0304a0dbafc7ed7934214ce31250920e2"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/editor_state.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7691aabfb6c7d2d30ab373da70c64c2dfc60fe4c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7691aabfb6c7d2d30ab373da70c64c2dfc60fe4c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16f88fd166edf8662f03d4a7055edb7b94a65c83"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/editor_state_keyboard.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bb05a0d4b49f7c17e71347f06237d69aa9a4dca"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bb05a0d4b49f7c17e71347f06237d69aa9a4dca"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bb05a0d4b49f7c17e71347f06237d69aa9a4dca"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/editor_state_overlays.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6323e279c501216bb74e4cf237e7a9b03fdb2416"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6323e279c501216bb74e4cf237e7a9b03fdb2416"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "229e64cc816e8772282e6fb6432488d51760679c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29dd5b0e06e9f1768b2994afbc000fdab8e95e3e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29dd5b0e06e9f1768b2994afbc000fdab8e95e3e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82027d46b6873b5c9582dec43f4446a4f19bc8d4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer_caret.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8fb57bd38dd12d7ebc5f4b4f8ec8e761780007dc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8fb57bd38dd12d7ebc5f4b4f8ec8e761780007dc"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9710c88b2210fee6571165ed9db9dcc4f9ba89e4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer_folding.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eac0feeb10dcd9e2b23a890e929a3e0fba6408da"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eac0feeb10dcd9e2b23a890e929a3e0fba6408da"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aac5c44792020148a216f9cb75a3e0d004bdf861"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer_gutter.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f4cc334177528ec77786c799a9075a52ae241f76"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f4cc334177528ec77786c799a9075a52ae241f76"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89182607efba34f98e826c5ba1aa94776174a03f"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer_highlights.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05b9256bc067ce9977beda600f0a8a45ae063e1e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05b9256bc067ce9977beda600f0a8a45ae063e1e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a7356ee8fd7b21cf368a16b3c2f0dcb7e315585f"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer_layout.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65011ffcad1a0e5b694b719eb22ab537d8f892fe"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65011ffcad1a0e5b694b719eb22ab537d8f892fe"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "56b4571996776ab0105aff8cdbd1e6ebbfbf9ea6"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/code_area/renderer_pointer.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71fc5bbd488cfa7d23645e014da7cb1674e3d1cb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71fc5bbd488cfa7d23645e014da7cb1674e3d1cb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71fc5bbd488cfa7d23645e014da7cb1674e3d1cb"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/controller.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad5776863a2655e361706c64da7a42ceac22eb5e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad5776863a2655e361706c64da7a42ceac22eb5e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "959ce9c3cdd9ccf281d776e1499b7ead1d9188f4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/controller/completion.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5de883132c4bf685ead319f2f99c5ddad764e429"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5de883132c4bf685ead319f2f99c5ddad764e429"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5de883132c4bf685ead319f2f99c5ddad764e429"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/controller/document.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c81b1049db20528b4a12bc19277a60ea70145582"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/controller/edit_pipeline.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa9b0dc546ac0b63aad2ba110b3a3fdf109c740e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa9b0dc546ac0b63aad2ba110b3a3fdf109c740e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df1bf071fbf31640cd77975cb76f189aeb6126ac"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/code_forge/lib/code_forge/controller/editing.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a826baabbe19b83c5cdd6c97e555fb23f3e68e7b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a826baabbe19b83c5cdd6c97e555fb23f3e68e7b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a826baabbe19b83c5cdd6c97e555fb23f3e68e7b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  }
+]

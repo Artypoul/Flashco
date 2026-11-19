@@ -75,7 +75,7 @@ void main() {
 
   group('latestRelease', () {
     Request requestAnswering(Map<String, ResponseBody Function()> byHost) {
-      return Request()..dio.httpClientAdapter = _HostAdapter(byHost);
+      return Request()..releaseDio.httpClientAdapter = _HostAdapter(byHost);
     }
 
     test('reads the release from the API', () async {
@@ -147,7 +147,7 @@ void main() {
             },
           ),
         });
-        final request = Request()..dio.httpClientAdapter = adapter;
+        final request = Request()..releaseDio.httpClientAdapter = adapter;
 
         expect(await request.checkForUpdate(), {
           'tag_name': 'v1.2.3',
@@ -163,7 +163,7 @@ void main() {
     test('returns no update for the current or an older release', () async {
       for (final tag in ['v1.2.2', 'v1.2.1']) {
         final request = Request()
-          ..dio.httpClientAdapter = _HostAdapter({
+          ..releaseDio.httpClientAdapter = _HostAdapter({
             'api.github.com': () => ResponseBody.fromString(
               '{"tag_name":"$tag"}',
               200,
@@ -179,7 +179,7 @@ void main() {
 
     test('throws when API and release-page fallback both fail', () async {
       final request = Request()
-        ..dio.httpClientAdapter = _HostAdapter({
+        ..releaseDio.httpClientAdapter = _HostAdapter({
           'api.github.com': () => ResponseBody.fromString('{}', 403),
           'github.com': () => ResponseBody.fromString('', 503),
         });

@@ -11,6 +11,7 @@ import com.follow.flashco.common.GlobalState
 import com.follow.flashco.common.intent
 import com.follow.flashco.core.Core
 import com.follow.flashco.service.ManagedService
+import com.follow.flashco.service.NetworkObserver
 import com.follow.flashco.service.ProxyService
 import com.follow.flashco.service.ServiceConfig
 import com.follow.flashco.service.VpnService
@@ -26,6 +27,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object ServiceController {
     private val lock = Mutex()
@@ -53,18 +56,25 @@ object ServiceController {
         }
     }
 
+    // A cancelled Flutter scope must not release the setup lock while Go is still applying.
+    suspend fun invokeSetup(data: String): ByteArray = suspendCoroutine { continuation ->
+        invokeMethod(data) { response -> continuation.resume(response) }
+            .onFailure { error -> continuation.resumeWithException(error) }
+    }
+
     suspend fun quickSetup(
         initParams: String,
         setupParams: String,
     ): Result<String> = runCatching {
-        suspendCancellableCoroutine { continuation ->
+        NetworkObserver.start()
+        suspendCoroutine { continuation ->
             Core.quickSetup(initParams, setupParams) { result ->
                 continuation.resume(result.orEmpty())
             }
         }
     }
 
-    fun setEventListener(callback: ((String?) -> Unit)?): Result<Unit> = runCatching {
+    fun setEventListener(callback: ((ByteArray) -> Unit)?): Result<Unit> = runCatching {
         Core.updateEventListener(callback)
     }
 

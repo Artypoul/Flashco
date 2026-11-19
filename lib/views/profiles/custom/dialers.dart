@@ -1,10 +1,9 @@
 import 'package:flashco/common/common.dart';
-import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/form/form.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CustomProxyDialersView extends ConsumerWidget {
@@ -91,15 +90,23 @@ class CustomProxyDialersView extends ConsumerWidget {
             for (final proxy in all)
               if (named.value.contains(proxy.name)) proxy,
           ];
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.dialerProxy,
       body: NullStatusSwitcher(
         isLoading: proxies == null,
         isEmpty: proxies?.isEmpty ?? true,
         isSearching: false,
-        nullStatus: NullStatus(label: appLocalizations.appProxiesEmpty),
-        child: ListView.builder(
-          padding: EdgeInsets.fromLTRB(16, context.contentTopPadding, 16, 24),
+        nullStatus: NullStatus(
+          label: appLocalizations.appProxiesEmpty,
+          illustration: NullStatusIllustration.data,
+        ),
+        child: PrismListView(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            context.contentTopPadding,
+            16,
+            24 + context.bottomInset,
+          ),
           itemCount: proxies?.length ?? 0,
           itemBuilder: (_, index) {
             final proxy = proxies![index];

@@ -1,7 +1,7 @@
 name: flashco
 description: A multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free.
 publish_to: 'none'
-version: 0.9.0+2026101401
+version: 0.9.3+2026111901
 environment:
   sdk: '>=3.10.0 <4.0.0'
 
@@ -15,7 +15,10 @@ hooks:
 dependencies:
   flutter:
     sdk: flutter
-  material_ui: ^1.5.0
+  flutter_localizations:
+    sdk: flutter
+  prism_ui:
+    path: plugins/prism_ui
   intl: any
   path_provider: ^2.1.6
   path: ^1.9.1
@@ -23,7 +26,8 @@ dependencies:
   shared_preferences_platform_interface: ^2.4.2
   window:
     path: plugins/window
-  dynamic_color: ^2.1.0
+  dynamic_color:
+    path: plugins/dynamic_color
   proxy:
     path: plugins/proxy
   launch_at_startup:
@@ -96,6 +100,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - core/Clash.Meta/component/ca/ca-certificates.crt
     - assets/data/
     - assets/fonts/
     - assets/images/

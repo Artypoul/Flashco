@@ -18,6 +18,8 @@ part 'dialers.dart';
 part 'generated/database.g.dart';
 part 'groups.dart';
 part 'icons.dart';
+part 'ip_qualities.dart';
+part 'mitm_modules.dart';
 part 'profiles.dart';
 part 'rules.dart';
 part 'scripts.dart';
@@ -34,6 +36,8 @@ part 'scripts.dart';
     ClashProviders,
     CustomProxies,
     ProxyDialers,
+    IpQualities,
+    MitmModules,
   ],
   daos: [
     ProfilesDao,
@@ -45,6 +49,8 @@ part 'scripts.dart';
     ClashProvidersDao,
     CustomProxiesDao,
     ProxyDialersDao,
+    IpQualitiesDao,
+    MitmModulesDao,
   ],
 )
 class Database extends _$Database {
@@ -58,7 +64,7 @@ class Database extends _$Database {
   }
 
   @override
-  int get schemaVersion => 21;
+  int get schemaVersion => 23;
 
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
@@ -136,9 +142,88 @@ class Database extends _$Database {
         if (from < 21) {
           await _backfillRussianDirectRules();
         }
+        if (from < 22) {
+          await _ensureDonorTable(m, ipQualities, _ipQualityColumns);
+        }
+        if (from < 23) {
+          if (from >= 22) {
+            await _ensureDonorTable(m, ipQualities, _ipQualityColumns);
+          }
+          await _ensureDonorTable(
+            m,
+            mitmModules,
+            _mitmColumns,
+            legacyColumn: 'update_interval_minutes',
+          );
+        }
       }),
       beforeOpen: (_) => customStatement('PRAGMA foreign_keys = ON'),
     );
+  }
+
+  Future<void> _ensureDonorTable(
+    Migrator m,
+    TableInfo table,
+    Map<String, (String, bool, bool)> expected, {
+    String? legacyColumn,
+  }) async {
+    final name = table.actualTableName;
+    final rows = await customSelect('PRAGMA table_xinfo($name)').get();
+    if (rows.isEmpty) {
+      await m.createTable(table);
+      return;
+    }
+    final columns = {for (final row in rows) row.read<String>('name'): row};
+    final legacy = legacyColumn != null && columns.containsKey(legacyColumn);
+    final allowed = {...expected.keys, if (legacy) legacyColumn};
+    if (columns.length != allowed.length ||
+        !columns.keys.toSet().containsAll(allowed)) {
+      throw StateError('Incompatible $name columns: ${columns.keys.toList()}');
+    }
+    for (final entry in expected.entries) {
+      final row = columns[entry.key]!;
+      final (type, notNull, primaryKey) = entry.value;
+      final defaultValue = row.readNullable<String>('dflt_value');
+      final expectedDefault = name == 'mitm_modules'
+          ? _mitmDefaults[entry.key]
+          : null;
+      if (row.read<String>('type').toUpperCase() != type ||
+          (row.read<int>('notnull') != 0) != notNull ||
+          (row.read<int>('pk') != 0) != primaryKey ||
+          defaultValue != expectedDefault) {
+        throw StateError('Incompatible $name column ${entry.key}');
+      }
+    }
+    if (legacy) {
+      final row = columns[legacyColumn]!;
+      if (row.read<String>('type').toUpperCase() != 'INTEGER' ||
+          row.read<int>('notnull') != 1 ||
+          row.read<int>('pk') != 0 ||
+          row.readNullable<String>('dflt_value') != '1440') {
+        throw StateError('Incompatible $name column $legacyColumn');
+      }
+      final definition = await customSelect(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable.withString(name)],
+      ).getSingle();
+      final sql = definition.read<String>('sql');
+      if (!_knownLegacyMitmDefinitions.contains(_schemaTokens(sql))) {
+        throw StateError(
+          'Cannot migrate $name with unrecognized table definition',
+        );
+      }
+      final objects = await customSelect(
+        'SELECT name FROM sqlite_master WHERE tbl_name = ? '
+        "AND type IN ('trigger', 'index')",
+        variables: [Variable.withString(name)],
+      ).get();
+      if (objects.isNotEmpty) {
+        throw StateError(
+          'Cannot migrate $name with custom indexes or triggers',
+        );
+      }
+      await m.alterTable(TableMigration(table));
+    }
   }
 
   Future<void> _backfillRussianDirectRules() async {
@@ -467,6 +552,7 @@ class Database extends _$Database {
     List<ClashProvider> clashProviders = const [],
     List<CustomProxy> customProxies = const [],
     List<ProxyDialer> proxyDialers = const [],
+    List<MitmModule> mitmModules = const [],
     bool isOverride = false,
   }) async {
     if (profiles.isEmpty &&
@@ -476,7 +562,8 @@ class Database extends _$Database {
         proxyGroups.isEmpty &&
         clashProviders.isEmpty &&
         customProxies.isEmpty &&
-        proxyDialers.isEmpty) {
+        proxyDialers.isEmpty &&
+        mitmModules.isEmpty) {
       return;
     }
     await transaction(() async {
@@ -492,6 +579,7 @@ class Database extends _$Database {
           clashProvidersDao.setAllWithBatch(b, clashProviders);
           // Rewriting profiles or custom proxies cascades into these.
           proxyDialersDao.setAllWithBatch(b, proxyDialers);
+          mitmModulesDao.setAllWithBatch(b, mitmModules);
           return;
         }
         profilesDao.putAllWithBatch(
@@ -504,6 +592,7 @@ class Database extends _$Database {
         customProxiesDao.putAllWithBatch(b, customProxies);
         clashProvidersDao.putAllWithBatch(b, clashProviders);
         proxyDialersDao.putAllWithBatch(b, proxyDialers);
+        mitmModulesDao.putAllWithBatch(b, mitmModules);
       });
       await _purgeOrphans();
     });
@@ -533,6 +622,74 @@ class Database extends _$Database {
     );
   }
 }
+
+// Compare complete SQL tokens so constraints absent from PRAGMA table_info
+// cannot be silently discarded by a table rebuild.
+String _schemaTokens(String sql) {
+  final tokens = RegExp(
+    r"""'[^']*(?:''[^']*)*'|"[^"]+"|[A-Za-z_][A-Za-z_0-9]*|[0-9]+|[^\s]""",
+  );
+  return tokens
+      .allMatches(sql)
+      .map((match) {
+        final token = match.group(0)!;
+        if (token.startsWith("'")) return token;
+        return token.replaceAll('"', '').toLowerCase();
+      })
+      .join(' ');
+}
+
+// Accepted layouts are exact known schemas, normalized only for SQL tokens.
+const _legacyMitmFixtureDefinition =
+    'CREATE TABLE mitm_modules (id INTEGER NOT NULL PRIMARY KEY, '
+    "name TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', url TEXT, "
+    'enabled INTEGER NOT NULL DEFAULT 1, "order" INTEGER, '
+    "arguments TEXT NOT NULL DEFAULT '{}', resources TEXT NOT NULL DEFAULT '{}', "
+    'system TEXT, scripts INTEGER NOT NULL DEFAULT 0, '
+    'last_update_time INTEGER NOT NULL, '
+    'update_interval_minutes INTEGER NOT NULL DEFAULT 1440)';
+
+const _legacyMitmDriftDefinition =
+    'CREATE TABLE "mitm_modules" ("id" INTEGER NOT NULL, "name" TEXT NOT NULL, '
+    '"description" TEXT NOT NULL DEFAULT \'\', "url" TEXT NULL, '
+    '"enabled" INTEGER NOT NULL DEFAULT 1 CHECK ("enabled" IN (0, 1)), '
+    '"order" INTEGER NULL, "arguments" TEXT NOT NULL DEFAULT \'{}\', '
+    '"resources" TEXT NOT NULL DEFAULT \'{}\', "system" TEXT NULL, '
+    '"scripts" INTEGER NOT NULL DEFAULT 0, "last_update_time" INTEGER NOT NULL, '
+    '"update_interval_minutes" INTEGER NOT NULL DEFAULT 1440, PRIMARY KEY ("id"))';
+
+final _knownLegacyMitmDefinitions = [
+  _legacyMitmFixtureDefinition,
+  _legacyMitmDriftDefinition,
+].map(_schemaTokens).toSet();
+
+const _ipQualityColumns = <String, (String, bool, bool)>{
+  'ip': ('TEXT', true, true),
+  'quality': ('TEXT', true, false),
+  'checked_at': ('INTEGER', true, false),
+};
+
+const _mitmDefaults = <String, String>{
+  'description': "''",
+  'enabled': '1',
+  'arguments': "'{}'",
+  'resources': "'{}'",
+  'scripts': '0',
+};
+
+const _mitmColumns = <String, (String, bool, bool)>{
+  'id': ('INTEGER', true, true),
+  'name': ('TEXT', true, false),
+  'description': ('TEXT', true, false),
+  'url': ('TEXT', false, false),
+  'enabled': ('INTEGER', true, false),
+  'order': ('INTEGER', false, false),
+  'arguments': ('TEXT', true, false),
+  'resources': ('TEXT', true, false),
+  'system': ('TEXT', false, false),
+  'scripts': ('INTEGER', true, false),
+  'last_update_time': ('INTEGER', true, false),
+};
 
 String _ruleIdentity(Rule rule) => [
   rule.ruleAction.value,

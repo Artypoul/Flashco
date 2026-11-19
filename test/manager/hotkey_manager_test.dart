@@ -1,11 +1,11 @@
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/manager/hotkey_manager.dart';
+import 'package:flashco/models/common.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
-import 'package:flashco/models/common.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rust_api/rust_api.dart';
 

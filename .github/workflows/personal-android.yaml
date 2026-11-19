@@ -76,6 +76,10 @@ jobs:
           fi
           printf '::add-mask::%s\n' "$BOOTSTRAP_SUBSCRIPTION_URL"
 
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Install dependencies
         run: flutter pub get
 

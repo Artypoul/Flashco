@@ -1,5 +1,4 @@
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/action.dart';
@@ -8,15 +7,18 @@ import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/database.dart';
 import 'package:flashco/providers/state.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/access.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/glyph_finders.dart';
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 Package _package(
   String name, {
@@ -47,6 +49,16 @@ class _TestSystemAction extends SystemAction {
   int requestCount = 0;
   int loadCount = 0;
   List<Package> grantedPackages = const [];
+  Error? chinaPackagesError;
+  List<String> chinaPackages = const [];
+
+  @override
+  Future<List<String>> getChinaPackageNames() async {
+    if (chinaPackagesError case final error?) {
+      throw error;
+    }
+    return chinaPackages;
+  }
 
   @override
   Future<List<Package>> getPackages() async {
@@ -83,6 +95,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late ProviderContainer container;
+  late ProviderSubscription<VpnProps> vpnSubscription;
   late _TestSystemAction systemAction;
 
   setUp(() {
@@ -94,10 +107,14 @@ void main() {
       ],
     );
     globalState.container = container;
+    vpnSubscription = container.listen(vpnSettingProvider, (_, _) {});
     container.read(packagesProvider.notifier).value = _packages;
   });
 
-  tearDown(() => container.dispose());
+  tearDown(() {
+    vpnSubscription.close();
+    container.dispose();
+  });
 
   void seedAccessControl(AccessControlProps props) {
     container.read(vpnSettingProvider.notifier).value = const VpnProps()
@@ -167,6 +184,62 @@ void main() {
 
       expect(find.text('Offline'), findsOneWidget);
       expect(find.text('Settings'), findsNothing);
+
+      await teardownView(tester);
+    });
+
+    testWidgets('the settings sub menu shows system apps from a check and '
+        'stays open', (tester) async {
+      seedAccessControl(const AccessControlProps(enable: true));
+      await pumpAccessView(tester);
+      final l10n = AppLocalizations.current;
+      Finder inMenu(Finder finder) =>
+          find.descendant(of: find.byType(PopupMenu), matching: finder);
+
+      await openBarMenu(tester);
+      await tester.tap(inMenu(find.text(l10n.settings)).last);
+      await tester.pumpAndSettle();
+      expect(inMenu(find.text(l10n.source)), findsOneWidget);
+      await tester.tap(inMenu(find.text(l10n.systemApp)));
+      await tester.pumpAndSettle();
+
+      final state = container.read(accessControlStateProvider);
+      expect(state.isFilterSystemApp, isFalse);
+      expect(state.isFilterNonInternetApp, isTrue);
+      expect(inMenu(find.text(l10n.source)), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.ancestor(
+            of: inMenu(find.text(l10n.systemApp)),
+            matching: find.byType(Row),
+          ),
+          matching: find.byGlyph(AppGlyphs.check),
+        ),
+        findsOneWidget,
+      );
+
+      await teardownView(tester);
+    });
+
+    testWidgets('the settings sub menu switches the mode', (tester) async {
+      seedAccessControl(const AccessControlProps(enable: true));
+      await pumpAccessView(tester);
+      final l10n = AppLocalizations.current;
+      Finder inMenu(Finder finder) =>
+          find.descendant(of: find.byType(PopupMenu), matching: finder);
+
+      await openBarMenu(tester);
+      await tester.tap(inMenu(find.text(l10n.settings)).last);
+      await tester.pumpAndSettle();
+      await tester.tap(inMenu(find.text(l10n.whitelistMode)));
+      await tester.pumpAndSettle();
+
+      expect(
+        container.read(accessControlStateProvider).mode,
+        AccessControlMode.acceptSelected,
+      );
+      await openBarMenu(tester);
+      expect(inMenu(find.text(l10n.whitelistMode)), findsOneWidget);
 
       await teardownView(tester);
     });
@@ -264,20 +337,84 @@ void main() {
       await teardownView(tester);
     });
 
-    testWidgets('the bar menu selects then clears every visible app', (
+    testWidgets('the bar at the foot says access control is off and turns '
+        'it on', (tester) async {
+      seedAccessControl(const AccessControlProps());
+      await pumpAccessView(tester);
+      final l10n = AppLocalizations.current;
+
+      expect(find.text(l10n.accessControlDisabledDesc), findsOneWidget);
+      await tester.tap(find.widgetWithText(TonalButton, l10n.turnOn));
+      await tester.pump();
+
+      expect(container.read(accessControlStateProvider).enable, isTrue);
+      expect(find.text(l10n.accessControlDisabledDesc), findsNothing);
+      expect(find.text(l10n.accessControlNotAllowDesc), findsOneWidget);
+
+      await teardownView(tester);
+    });
+
+    testWidgets('the bar at the foot follows the mode and counts the '
+        'selected apps', (tester) async {
+      seedAccessControl(
+        const AccessControlProps(
+          enable: true,
+          rejectList: ['com.example.browser'],
+        ),
+      );
+      await pumpAccessView(tester);
+      final l10n = AppLocalizations.current;
+
+      expect(find.text(l10n.accessControlNotAllowDesc), findsOneWidget);
+      expect(find.text(l10n.accessControlSelectedCount(1)), findsOneWidget);
+
+      await tester.tap(find.text('Chat'));
+      await tester.pump();
+      expect(find.text(l10n.accessControlSelectedCount(2)), findsOneWidget);
+
+      container.read(queryProvider(QueryTag.access).notifier).value = 'chat';
+      await tester.pump();
+      expect(find.text(l10n.accessControlSelectedCount(2)), findsOneWidget);
+      container.read(queryProvider(QueryTag.access).notifier).value = '';
+      await tester.pump();
+
+      container
+          .read(accessControlStateProvider.notifier)
+          .update(
+            (state) => state.copyWith(mode: AccessControlMode.acceptSelected),
+          );
+      await tester.pump();
+      expect(find.text(l10n.accessControlAllowDesc), findsOneWidget);
+      expect(find.text(l10n.accessControlSelectedCount(0)), findsOneWidget);
+
+      await teardownView(tester);
+    });
+
+    testWidgets('select all stands beside search, then folds for save', (
       tester,
     ) async {
       seedAccessControl(const AccessControlProps(enable: true));
       await pumpAccessView(tester);
 
-      await openBarMenu(tester);
-      await tester.tap(find.text('Select all'));
+      expect(
+        find.ancestor(
+          of: find.byTooltip('Select all'),
+          matching: find.ancestor(
+            of: find.byTooltip('Search'),
+            matching: find.byType(TonalButtonGroup),
+          ),
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(find.byTooltip('Select all'));
       await tester.pumpAndSettle();
       expect(
         [...container.read(accessControlStateProvider).currentList]..sort(),
         ['com.example.browser', 'com.example.chat'],
       );
 
+      expect(find.byTooltip('Save'), findsOneWidget);
+      expect(find.byTooltip('Deselect all'), findsNothing);
       await openBarMenu(tester);
       await tester.tap(find.text('Deselect all'));
       await tester.pumpAndSettle();
@@ -286,29 +423,37 @@ void main() {
       await teardownView(tester);
     });
 
-    testWidgets('the bar menu turns access control off and on', (tester) async {
+    testWidgets('the bar menu turns access control on and off in a section', (
+      tester,
+    ) async {
       seedAccessControl(const AccessControlProps(enable: true));
       await pumpAccessView(tester);
+      final l10n = AppLocalizations.current;
+      Finder inMenu(Finder finder) =>
+          find.descendant(of: find.byType(PopupMenu), matching: finder);
+      Finder checkOn(String label) => inMenu(
+        find.descendant(
+          of: find.ancestor(of: find.text(label), matching: find.byType(Row)),
+          matching: find.byGlyph(AppGlyphs.check),
+        ),
+      );
 
-      Future<void> tapMenuPath(List<String> labels) async {
-        await openBarMenu(tester);
-        for (final label in labels) {
-          await tester.tap(
-            find
-                .descendant(
-                  of: find.byType(CommonPopupMenu),
-                  matching: find.text(label),
-                )
-                .last,
-          );
-          await tester.pumpAndSettle();
-        }
-      }
+      await openBarMenu(tester);
+      expect(inMenu(find.text(l10n.accessControl)), findsOneWidget);
+      expect(inMenu(find.text(l10n.blacklistMode)), findsOneWidget);
+      expect(checkOn(l10n.turnOn), findsOneWidget);
+      expect(checkOn(l10n.turnOff), findsNothing);
 
-      await tapMenuPath(['Access control', 'Turn off']);
+      await tester.tap(inMenu(find.text(l10n.turnOff)));
+      await tester.pumpAndSettle();
       expect(container.read(accessControlStateProvider).enable, isFalse);
 
-      await tapMenuPath(['Access control', 'Turn on']);
+      await openBarMenu(tester);
+      expect(checkOn(l10n.turnOn), findsNothing);
+      expect(checkOn(l10n.turnOff), findsOneWidget);
+
+      await tester.tap(inMenu(find.text(l10n.turnOn)));
+      await tester.pumpAndSettle();
       expect(container.read(accessControlStateProvider).enable, isTrue);
 
       await teardownView(tester);
@@ -377,6 +522,43 @@ void main() {
     await teardownView(tester);
   });
 
+  testWidgets('reads the app list only once its push has settled', (
+    tester,
+  ) async {
+    container.read(packagesProvider.notifier).value = [];
+    systemAction.grantedPackages = _packages;
+    seedAccessControl(const AccessControlProps(enable: true));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: TestApp(
+          child: Builder(
+            builder: (context) => FilledButton(
+              onPressed: () => BaseNavigator.push(context, const AccessView()),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final route = ModalRoute.of(tester.element(find.byType(AccessView)))!;
+
+    expect(route.animation!.isAnimating, isTrue);
+    expect(systemAction.loadCount, 0);
+    expect(find.byType(ActivityIndicator), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+    expect(systemAction.loadCount, 1);
+    await tester.pumpAndSettle();
+    expect(find.text('Chat'), findsOneWidget);
+    expect(find.byType(ActivityIndicator), findsNothing);
+
+    await teardownView(tester);
+  });
+
   group('installed apps permission', () {
     testWidgets('prompts for the permission when the app list is empty', (
       tester,
@@ -392,6 +574,23 @@ void main() {
       expect(find.text('No data'), findsNothing);
       await openBarMenu(tester);
       expect(find.text('Select all'), findsNothing);
+
+      await teardownView(tester);
+    });
+
+    testWidgets('keeps the list and offers the permission when it is denied', (
+      tester,
+    ) async {
+      systemAction.installedAppsPermissionGranted = false;
+      seedAccessControl(const AccessControlProps(enable: true));
+
+      await pumpAccessView(tester);
+      await tester.pumpAndSettle();
+
+      final l10n = AppLocalizations.current;
+      expect(find.text('Browser'), findsOneWidget);
+      expect(find.text(l10n.installedAppsPermissionRequired), findsOneWidget);
+      expect(find.text(l10n.authorize), findsOneWidget);
 
       await teardownView(tester);
     });
@@ -465,13 +664,37 @@ void main() {
       await teardownView(tester);
     });
 
-    testWidgets('drops hidden packages and sorts what it persists', (
+    testWidgets(
+      'leaving without saving restores the saved selection on reentry',
+      (tester) async {
+        const saved = AccessControlProps(
+          enable: true,
+          rejectList: ['com.example.browser'],
+        );
+        seedAccessControl(saved);
+        await pumpAccessView(tester);
+        await tester.tap(find.text('Chat'));
+        await tester.pump();
+        expect(container.read(accessControlStateProvider).rejectList, [
+          'com.example.browser',
+          'com.example.chat',
+        ]);
+
+        await teardownView(tester);
+        expect(container.read(vpnSettingProvider).accessControlProps, saved);
+        await pumpAccessView(tester);
+        expect(container.read(accessControlStateProvider), saved);
+        await teardownView(tester);
+      },
+    );
+
+    testWidgets('keeps hidden packages and sorts what it persists', (
       tester,
     ) async {
       seedAccessControl(
         const AccessControlProps(
           enable: true,
-          rejectList: ['com.android.settings'],
+          rejectList: ['com.android.settings', 'com.gone.app'],
         ),
       );
       await pumpAccessView(tester);
@@ -488,9 +711,155 @@ void main() {
           .read(vpnSettingProvider)
           .accessControlProps
           .rejectList;
-      expect(saved, ['com.example.browser', 'com.example.chat']);
+      expect(saved, [
+        'com.android.settings',
+        'com.example.browser',
+        'com.example.chat',
+        'com.gone.app',
+      ]);
 
       await teardownView(tester);
     });
+  });
+
+  group('intelligent selection', () {
+    Future<void> runIntelligentSelection(WidgetTester tester) async {
+      final l10n = AppLocalizations.current;
+      Finder inMenu(Finder finder) =>
+          find.descendant(of: find.byType(PopupMenu), matching: finder);
+      await openBarMenu(tester);
+      await tester.tap(inMenu(find.text(l10n.action)));
+      await tester.pumpAndSettle();
+      await tester.tap(inMenu(find.text(l10n.intelligentSelected)));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('leaves the lists alone when the scan fails', (tester) async {
+      systemAction.chinaPackagesError = StateError('scan failed');
+      const props = AccessControlProps(
+        enable: true,
+        acceptList: ['com.example.chat'],
+        rejectList: ['com.example.browser'],
+      );
+      seedAccessControl(props);
+      await pumpAccessView(tester);
+
+      await runIntelligentSelection(tester);
+
+      expect(container.read(accessControlStateProvider), props);
+
+      await teardownView(tester);
+    });
+
+    testWidgets('sorts only the visible apps', (tester) async {
+      systemAction.chinaPackages = const [
+        'com.example.chat',
+        'com.android.settings',
+      ];
+      seedAccessControl(
+        const AccessControlProps(
+          enable: true,
+          acceptList: ['com.android.settings', 'com.example.chat'],
+        ),
+      );
+      await pumpAccessView(tester);
+
+      await runIntelligentSelection(tester);
+
+      final state = container.read(accessControlStateProvider);
+      expect(state.acceptList, ['com.android.settings', 'com.example.browser']);
+      expect(state.rejectList, ['com.example.chat']);
+
+      await teardownView(tester);
+    });
+  });
+
+  group('clipboard import', () {
+    Future<void> importText(WidgetTester tester, String text) async {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async => call.method == 'Clipboard.getData'
+            ? <String, Object?>{'text': text}
+            : null,
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
+      final l10n = AppLocalizations.current;
+      Finder inMenu(Finder finder) =>
+          find.descendant(of: find.byType(PopupMenu), matching: finder);
+      await openBarMenu(tester);
+      await tester.tap(inMenu(find.text(l10n.action)));
+      await tester.pumpAndSettle();
+      await tester.tap(inMenu(find.text(l10n.clipboardImport)));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('trims lines and drops what is not a package name', (
+      tester,
+    ) async {
+      seedAccessControl(const AccessControlProps(enable: true));
+      await pumpAccessView(tester);
+
+      await importText(
+        tester,
+        'com.example.chat\r\n  com.example.browser \n\nnot a package\n',
+      );
+
+      expect(container.read(accessControlStateProvider).rejectList, [
+        'com.example.chat',
+        'com.example.browser',
+      ]);
+
+      await teardownView(tester);
+    });
+
+    testWidgets('keeps the list when nothing is a package name', (
+      tester,
+    ) async {
+      seedAccessControl(
+        const AccessControlProps(
+          enable: true,
+          rejectList: ['com.example.chat'],
+        ),
+      );
+      await pumpAccessView(tester);
+
+      await importText(tester, 'hello world');
+
+      expect(container.read(accessControlStateProvider).rejectList, [
+        'com.example.chat',
+      ]);
+
+      await teardownView(tester);
+    });
+  });
+
+  testWidgets('toggling an app rebuilds its row, not the page', (tester) async {
+    seedAccessControl(
+      const AccessControlProps(enable: true, isFilterSystemApp: false),
+    );
+    await pumpAccessView(tester);
+    await tester.tap(find.text('Chat'));
+    await tester.pump();
+
+    final rebuilt = <Type>[];
+    debugOnRebuildDirtyWidget = (element, _) {
+      if (element.widget case AccessView() || PackageListItem()) {
+        rebuilt.add(element.widget.runtimeType);
+      }
+    };
+    try {
+      await tester.tap(find.text('Browser'));
+      await tester.pump();
+    } finally {
+      debugOnRebuildDirtyWidget = null;
+    }
+    expect(rebuilt, [PackageListItem]);
+
+    await teardownView(tester);
   });
 }

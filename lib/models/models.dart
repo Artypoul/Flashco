@@ -7,5 +7,6 @@ export 'core.dart';
 export 'fallback_config.dart';
 export 'ip_quality.dart';
 export 'profile.dart';
+export 'record_filter.dart';
 export 'references.dart';
 export 'state.dart';

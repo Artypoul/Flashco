@@ -2,20 +2,23 @@ import 'package:collection/collection.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/form/form.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart' hide FileInfo;
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// `proxies` names a group's proxies, `use` its providers, `use-position` where
 /// those sit among the proxies, and `filter` what of the providers' proxies it
 /// takes. `exclude-filter` drops whatever matches it, named members too.
+/// The include-all keys take in only the local proxies and providers some group
+/// of the profile names, since the config declares no others.
 enum _MemberKind {
   proxy,
   provider,
+  allProxies,
+  allProviders,
   filter,
   excludeFilter;
 
@@ -24,7 +27,7 @@ enum _MemberKind {
   _MemberKind get run => this == provider ? proxy : this;
 
   (Color, Color) chipColorsOf(ColorScheme colorScheme) => switch (this) {
-    proxy || provider => (
+    proxy || provider || allProxies || allProviders => (
       colorScheme.secondaryContainer,
       colorScheme.onSecondaryContainer,
     ),
@@ -46,17 +49,22 @@ enum _MemberKind {
     provider => ref.watch(
       customProfileProxyProviderIsValidProvider(profileId, name),
     ),
-    filter || excludeFilter => true,
+    allProxies || allProviders || filter || excludeFilter => true,
   };
 
   String invalidMessage(BuildContext context, String name) => switch (this) {
     proxy => context.appLocalizations.invalidProxy(name),
     provider => context.appLocalizations.invalidProxyProvider(name),
-    filter || excludeFilter => '',
+    allProxies || allProviders || filter || excludeFilter => '',
   };
 }
 
 typedef _Member = ({_MemberKind kind, String name});
+
+const _everyName = '*';
+
+List<String> _everyOf(bool? includeAll) =>
+    includeAll == true ? const [_everyName] : const [];
 
 /// The form state of type [M] whose [kinds] of members are listed.
 abstract class _MemberHost<M> {
@@ -166,6 +174,8 @@ class _GroupMembers extends _MemberHost<ProxyGroup> {
   List<String> namesOf(ProxyGroup group, _MemberKind kind) => switch (kind) {
     _MemberKind.proxy => group.proxies ?? const [],
     _MemberKind.provider => group.use ?? const [],
+    _MemberKind.allProxies => _everyOf(group.includeAllProxies),
+    _MemberKind.allProviders => _everyOf(group.includeAllProviders),
     _MemberKind.filter => filterParts(group.filter),
     _MemberKind.excludeFilter => filterParts(group.excludeFilter),
   };
@@ -178,6 +188,12 @@ class _GroupMembers extends _MemberHost<ProxyGroup> {
   ) => switch (kind) {
     _MemberKind.proxy => group.copyWith(proxies: names.isEmpty ? null : names),
     _MemberKind.provider => group.copyWith(use: names.isEmpty ? null : names),
+    _MemberKind.allProxies => group.copyWith(
+      includeAllProxies: names.isEmpty ? null : true,
+    ),
+    _MemberKind.allProviders => group.copyWith(
+      includeAllProviders: names.isEmpty ? null : true,
+    ),
     _MemberKind.filter => group.copyWith(filter: joinFilterParts(names)),
     _MemberKind.excludeFilter => group.copyWith(
       excludeFilter: joinFilterParts(names),
@@ -456,28 +472,46 @@ class _MembersSliverState<M> extends ConsumerState<_MembersSliver<M>>
     Widget itemAt(int index) {
       final member = entries[index];
       final name = member.name;
+      final position = _transitions.positionOf(member);
+      final title = switch (member.kind) {
+        _MemberKind.allProxies => appLocalizations.allReferencedProxies,
+        _MemberKind.allProviders =>
+          appLocalizations.allReferencedProxyProviders,
+        _MemberKind.filter ||
+        _MemberKind.excludeFilter => presets[name] ?? name,
+        _MemberKind.proxy || _MemberKind.provider => name,
+      };
+      final subtitle = switch (member.kind) {
+        _MemberKind.proxy =>
+          groupTypes[name] ??
+              nodeTypes[name] ??
+              (RuleTarget.baseTargets.contains(name)
+                  ? appLocalizations.basicStrategy
+                  : null),
+        _MemberKind.provider => appLocalizations.proxyProviders,
+        _MemberKind.allProxies ||
+        _MemberKind.allProviders => appLocalizations.autoInclude,
+        _MemberKind.filter => appLocalizations.filters,
+        _MemberKind.excludeFilter => appLocalizations.excludeFilter,
+      };
       return EntryTransition(
         key: ValueKey(member),
         animation: _transitions.animationOf(member),
         leaving: _transitions.isLeaving(member),
-        child: ItemPositionProvider(
-          position: _transitions.positionOf(member),
-          child: _MemberRow(
-            member: member,
+        child: MemoBuilder(
+          inputs: [member, index, position, title, subtitle],
+          builder: (_) => ReorderDragStartListener(
             index: index,
-            title: member.kind.isFilter ? presets[name] ?? name : name,
-            subtitle: switch (member.kind) {
-              _MemberKind.proxy =>
-                groupTypes[name] ??
-                    nodeTypes[name] ??
-                    (RuleTarget.baseTargets.contains(name)
-                        ? appLocalizations.basicStrategy
-                        : null),
-              _MemberKind.provider => appLocalizations.proxyProviders,
-              _MemberKind.filter => appLocalizations.filters,
-              _MemberKind.excludeFilter => appLocalizations.excludeFilter,
-            },
-            onRemove: () => _update((state) => state..remove(member)),
+            child: ItemPositionProvider(
+              position: position,
+              child: _MemberRow(
+                member: member,
+                index: index,
+                title: title,
+                subtitle: subtitle,
+                onRemove: () => _update((state) => state..remove(member)),
+              ),
+            ),
           ),
         ),
       );
@@ -488,7 +522,7 @@ class _MembersSliverState<M> extends ConsumerState<_MembersSliver<M>>
         SliverToBoxAdapter(
           child: ListHeader(title: _host.title(appLocalizations)),
         ),
-        SuperSliverReorderableList(
+        SliverPrismReorderableList(
           itemBuilder: (_, index) => itemAt(index),
           itemCount: entries.length,
           proxyDecorator: (child, index, animation) =>
@@ -571,21 +605,24 @@ class _MemberRow extends ConsumerWidget {
   }
 }
 
-typedef _Entry = ({String name, String title, String? subtitle});
+typedef _Entry = ({
+  _MemberKind kind,
+  String name,
+  String title,
+  String? subtitle,
+});
 
-_Entry _named(String name, String? subtitle) =>
-    (name: name, title: name, subtitle: subtitle);
+_Entry _named(_MemberKind kind, String name, String? subtitle) =>
+    (kind: kind, name: name, title: name, subtitle: subtitle);
+
+_Entry _every(_MemberKind kind, String title) =>
+    (kind: kind, name: _everyName, title: title, subtitle: null);
 
 class _Category {
   final String label;
-  final _MemberKind kind;
   final List<_Entry> entries;
 
-  const _Category({
-    required this.label,
-    required this.kind,
-    required this.entries,
-  });
+  const _Category({required this.label, required this.entries});
 }
 
 class _MemberPicker<M> extends ConsumerStatefulWidget {
@@ -646,7 +683,12 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
       return [
         for (final filter in filters)
           if (!filter.isAppliedTo(value))
-            (name: filter.regex, title: filter.label, subtitle: filter.regex),
+            (
+              kind: kind,
+              name: filter.regex,
+              title: filter.label,
+              subtitle: filter.regex,
+            ),
       ];
     }
 
@@ -658,17 +700,18 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
       if (kinds.contains(_MemberKind.filter))
         _Category(
           label: appLocalizations.filters,
-          kind: _MemberKind.filter,
           entries: presetsMissingFrom(_MemberKind.filter),
         ),
       if (kinds.contains(_MemberKind.excludeFilter))
         _Category(
           label: appLocalizations.excludeFilter,
-          kind: _MemberKind.excludeFilter,
           entries: presetsMissingFrom(_MemberKind.excludeFilter),
         ),
     ];
   }
+
+  bool _takesInEvery(_MemberKind kind) =>
+      _host.namesOf(_origin, kind).isNotEmpty;
 
   List<_Category> _proxyCategories(AppLocalizations appLocalizations) {
     final profileId = ProfileIdProvider.of(context)!.profileId;
@@ -679,30 +722,47 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
       ),
     );
     final nodes = _nodeTypes(ref);
+    final hasProviders = ref
+        .watch(appProviderNamesProvider(ProviderKind.proxy))
+        .isNotEmpty;
     return [
       _Category(
         label: appLocalizations.basicStrategy,
-        kind: _MemberKind.proxy,
         entries: [
           for (final target in RuleTarget.baseTargetNames)
-            if (!proxies.contains(target)) _named(target, null),
+            if (!proxies.contains(target))
+              _named(_MemberKind.proxy, target, null),
+        ],
+      ),
+      _Category(
+        label: appLocalizations.autoInclude,
+        entries: [
+          if (nodes.isNotEmpty && !_takesInEvery(_MemberKind.allProxies))
+            _every(
+              _MemberKind.allProxies,
+              appLocalizations.allReferencedProxies,
+            ),
+          if (hasProviders && !_takesInEvery(_MemberKind.allProviders))
+            _every(
+              _MemberKind.allProviders,
+              appLocalizations.allReferencedProxyProviders,
+            ),
         ],
       ),
       _Category(
         label: appLocalizations.localProxies,
-        kind: _MemberKind.proxy,
         entries: [
           for (final MapEntry(key: name, value: description) in nodes.entries)
-            if (!proxies.contains(name)) _named(name, description),
+            if (!proxies.contains(name))
+              _named(_MemberKind.proxy, name, description),
         ],
       ),
       _Category(
         label: appLocalizations.proxyGroup,
-        kind: _MemberKind.proxy,
         entries: [
           for (final item in groups.value)
             if (!proxies.contains(item.name))
-              _named(item.name, item.type.value),
+              _named(_MemberKind.proxy, item.name, item.type.value),
         ],
       ),
     ];
@@ -716,10 +776,10 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
     final providers = _providerTypes(ref, appLocalizations);
     return _Category(
       label: appLocalizations.proxyProviders,
-      kind: _MemberKind.provider,
       entries: [
         for (final name in providerNames)
-          if (!use.contains(name)) _named(name, providers[name]),
+          if (!use.contains(name))
+            _named(_MemberKind.provider, name, providers[name]),
       ],
     );
   }
@@ -731,7 +791,6 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
       for (final category in _categories(appLocalizations))
         _Category(
           label: category.label,
-          kind: category.kind,
           entries: category.entries
               .whereMatches(_query, (entry) => [entry.title, entry.subtitle])
               .toList(),
@@ -741,7 +800,7 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
       0,
       (count, category) => count + category.entries.length,
     );
-    return CommonScaffold(
+    return Scaffold(
       title: _host.addLabel(appLocalizations),
       searchState: _query.isNotEmpty || total >= sheetSearchMinItemCount
           ? AppBarSearchState(onSearch: _handleSearch)
@@ -750,7 +809,10 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
         builder: (context) => NullStatusSwitcher(
           isEmpty: categories.isEmpty,
           isSearching: _query.isNotEmpty,
-          nullStatus: NullStatus(label: appLocalizations.noData),
+          nullStatus: NullStatus(
+            label: appLocalizations.noData,
+            illustration: NullStatusIllustration.data,
+          ),
           child: CustomScrollView(
             slivers: [
               SliverPadding(
@@ -758,7 +820,7 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
                   16,
                   context.contentTopPadding,
                   16,
-                  16 + BottomInsetScope.of(context),
+                  16 + context.bottomInset,
                 ),
                 sliver: SliverMainAxisGroup(
                   slivers: [
@@ -770,7 +832,7 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
                         initiallyExpanded: false,
                         itemCount: category.entries.length,
                         itemBuilder: (_, index) =>
-                            _buildEntry(category.kind, category.entries[index]),
+                            _buildEntry(category.entries[index]),
                       ),
                   ],
                 ),
@@ -782,22 +844,26 @@ class _MemberPickerState<M> extends ConsumerState<_MemberPicker<M>> {
     );
   }
 
-  Widget _buildEntry(_MemberKind kind, _Entry entry) {
+  Widget _buildEntry(_Entry entry) {
+    final kind = entry.kind;
     final member = (kind: kind, name: entry.name);
     final isSelected = _selected.contains(member);
     final subtitle = entry.subtitle;
-    return DecorationListItem(
-      isSelected: isSelected,
-      onPressed: () => _handleToggle(member),
-      title: TooltipText(
-        text: Text(entry.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+    return MemoBuilder(
+      inputs: [entry, isSelected],
+      builder: (_) => DecorationListItem(
+        isSelected: isSelected,
+        onPressed: () => _handleToggle(member),
+        title: TooltipText(
+          text: Text(entry.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+        subtitle: switch (subtitle) {
+          null => null,
+          _ when kind.isFilter => FilterRegexText(subtitle),
+          _ => TooltipLabel(subtitle, maxLines: 1),
+        },
+        trailing: isSelected ? const SelectionCheck() : null,
       ),
-      subtitle: switch (subtitle) {
-        null => null,
-        _ when kind.isFilter => FilterRegexText(subtitle),
-        _ => TooltipLabel(subtitle, maxLines: 1),
-      },
-      trailing: isSelected ? const GlyphIcon(AppGlyphs.check) : null,
     );
   }
 }

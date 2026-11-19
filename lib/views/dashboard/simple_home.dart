@@ -1,12 +1,12 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/core/core.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 import 'dashboard.dart';
 import 'widgets/core_status_button.dart';
@@ -15,10 +15,10 @@ import '../profiles/add.dart';
 class SimpleHomeView extends ConsumerWidget {
   const SimpleHomeView({super.key});
 
-  List<CommonPopupMenuItem> _menuItems(BuildContext context, WidgetRef ref) {
+  List<PopupMenuItem> _menuItems(BuildContext context, WidgetRef ref) {
     final currentItems = ref.read(currentNavigationItemsStateProvider).value;
     return [
-      CommonPopupMenuItem(
+      PopupMenuItem(
         label: context.appLocalizations.controlPanel,
         glyph: AppGlyphs.dashboard,
         onPressed: () =>
@@ -26,7 +26,7 @@ class SimpleHomeView extends ConsumerWidget {
       ),
       for (final item in ref.watch(navigationItemsStateProvider).value)
         if (item.label != PageLabel.dashboard && item.modes.isNotEmpty)
-          CommonPopupMenuItem(
+          PopupMenuItem(
             label: item.label.label,
             glyph: item.glyph,
             onPressed: () {
@@ -67,7 +67,7 @@ class SimpleHomeView extends ConsumerWidget {
             : labels.disconnected,
     };
     final canToggle = hasProfiles || running;
-    return CommonScaffold(
+    return Scaffold(
       title: appName,
       actions: [
         if (coreLib == null && coreStatus != CoreStatus.connected)
@@ -80,7 +80,7 @@ class SimpleHomeView extends ConsumerWidget {
             24,
             context.contentTopPadding,
             24,
-            24 + BottomInsetScope.of(context),
+            24 + context.bottomInset,
           );
           return SingleChildScrollView(
             padding: padding,
@@ -104,9 +104,9 @@ class SimpleHomeView extends ConsumerWidget {
                           toggled: running,
                           child: ElasticButton(
                             enabled: canToggle,
-                            child: IconButton.filledTonal(
+                            child: IconButton.filled(
                               tooltip: running ? labels.stop : labels.launch,
-                              style: IconButton.styleFrom(
+                              style: ButtonStyle.from(
                                 backgroundColor: running
                                     ? scheme.primaryContainer
                                     : Color.alphaBlend(
@@ -152,9 +152,9 @@ class SimpleHomeView extends ConsumerWidget {
                             child: Text(
                               status,
                               textAlign: TextAlign.center,
-                              style: context.textTheme.bodyLarge?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
+                              style: AppTextStyle.body
+                                  .of(context)
+                                  .copyWith(color: scheme.onSurfaceVariant),
                             ),
                           ),
                         ],
@@ -172,8 +172,9 @@ class SimpleHomeView extends ConsumerWidget {
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: context.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
+                                style: AppTextStyle.headline.of(
+                                  context,
+                                  emphasized: true,
                                 ),
                               ),
                             ),
@@ -181,12 +182,14 @@ class SimpleHomeView extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                       ],
-                      TextButton.icon(
-                        onPressed: () => showAddProfilePage(context),
-                        icon: const GlyphIcon(AppGlyphs.add, size: 20),
-                        label: Text(
-                          labels.addConfiguration,
-                          textAlign: TextAlign.center,
+                      AddProfileMenu(
+                        builder: (open) => TextButton.icon(
+                          onPressed: open,
+                          icon: const GlyphIcon(AppGlyphs.add, size: 20),
+                          label: Text(
+                            labels.addConfiguration,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ],

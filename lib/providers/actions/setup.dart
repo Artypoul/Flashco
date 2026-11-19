@@ -2,17 +2,31 @@ part of '../action.dart';
 
 enum _SetupTaskResult { completed, handoffToCoreRestart, failed }
 
-typedef _SetupInputs = (SetupState, PatchClashConfig, NetworkProps);
+typedef _SetupInputs = (
+  SetupState,
+  PatchClashConfig,
+  NetworkProps,
+  SetupParams,
+);
+
+typedef BuiltProfile = ({
+  String yaml,
+  String md5,
+  ConfigCounts counts,
+  SetupBase? base,
+});
 
 class _RunRequest {
   final bool running;
   final bool initialize;
   final DateTime? previousStartTime;
+  final bool forceApply;
 
   const _RunRequest({
     required this.running,
     required this.initialize,
     required this.previousStartTime,
+    required this.forceApply,
   });
 }
 
@@ -27,6 +41,7 @@ class SetupAction extends _$SetupAction {
   DateTime? _startTime;
   _SetupInputs? _appliedInputs;
   var _pendingForceApply = false;
+  var _lastPushDuration = Duration.zero;
 
   Object? get runRequestToken => _latestRunRequest;
 
@@ -48,15 +63,13 @@ class SetupAction extends _$SetupAction {
           !ref.read(safeModeProvider) &&
           ref.read(appSettingProvider).showTrayTitle);
 
-  SetupParams get _setupParams {
-    final selectedMap = ref.read(selectedMapProvider);
-    final appSetting = ref.read(appSettingProvider);
-    return SetupParams(
-      selectedMap: selectedMap,
-      testUrl: appSetting.testUrl,
-      skipCertVerify: !appSetting.checkCertificate,
-    );
-  }
+  SetupParams get _setupParams => SetupParams(
+    selectedMap: ref.read(selectedMapProvider),
+    options: ref.read(coreOptionsProvider),
+  );
+
+  SetupParams get _appliedParams =>
+      _setupParams.copyWith(selectedMap: const {});
 
   Future<bool> fullSetup() async {
     if (!ref.read(initProvider)) return true;
@@ -126,26 +139,39 @@ class SetupAction extends _$SetupAction {
               startTime.millisecondsSinceEpoch;
   }
 
-  Future<void> _updateStartTime() async {
-    _startTime = await service?.getRunTime();
-  }
+  @protected
+  Future<DateTime?> serviceStartTime() async => service?.getRunTime();
 
   Future<void> initStatus() async {
     if (!globalState.needInitStatus) {
       return;
     }
-    if (system.isAndroid) {
-      await _updateStartTime();
-    }
+    final token = _latestRunRequest;
+    final startTime = await serviceStartTime();
+    if (!identical(token, _latestRunRequest)) return;
+    final isServiceRunning = startTime != null && startTime.isBeforeNow;
+    final digest = isServiceRunning
+        ? await preferences.getAppliedConfigMd5()
+        : null;
+    if (!identical(token, _latestRunRequest)) return;
+    _startTime = startTime;
+    if (isServiceRunning) globalState.lastConfigMd5 = digest;
     final shouldRun = _isRunning || ref.read(appSettingProvider).autoRun;
     if (shouldRun) {
-      await setRunning(true, initialize: true);
+      await _setRunning(true, initialize: true, forceApply: !isServiceRunning);
     } else {
       await globalState.safeRun(() => applyProfile(force: true));
     }
   }
 
-  Future<bool> setRunning(bool running, {bool initialize = false}) {
+  Future<bool> setRunning(bool running, {bool initialize = false}) =>
+      _setRunning(running, initialize: initialize, forceApply: true);
+
+  Future<bool> _setRunning(
+    bool running, {
+    required bool initialize,
+    required bool forceApply,
+  }) {
     if (running && !initialize && !ref.read(initProvider)) {
       return Future.value(true);
     }
@@ -154,6 +180,7 @@ class SetupAction extends _$SetupAction {
       running: running,
       initialize: running && initialize,
       previousStartTime: _startTime,
+      forceApply: forceApply,
     );
     _latestRunRequest = request;
     _setLocalRunning(running);
@@ -167,7 +194,7 @@ class SetupAction extends _$SetupAction {
     if (request.initialize) {
       var applied = false;
       try {
-        applied = await applyProfile(force: true);
+        applied = await applyProfile(force: request.forceApply);
       } catch (_) {
         applied = false;
       }
@@ -180,7 +207,13 @@ class SetupAction extends _$SetupAction {
       }
       try {
         await _setCoreRunning(request);
-      } catch (_) {
+      } catch (error) {
+        if (isUnansweredCoreError(error)) {
+          if (_isCurrent(request)) {
+            await globalState.safeRun(() => setRunning(false));
+          }
+          return false;
+        }
         _rollbackRunning(request);
         rethrow;
       }
@@ -189,11 +222,15 @@ class SetupAction extends _$SetupAction {
 
     try {
       await _setCoreRunning(request);
-    } catch (_) {
+    } catch (error) {
+      if (!_isCurrent(request) && isUnansweredCoreError(error)) {
+        return true;
+      }
       _rollbackRunning(request);
       rethrow;
     }
-    if (_isCurrent(request)) {
+    final applied = await inputsApplied();
+    if (_isCurrent(request) && !applied) {
       applyProfileDebounce(force: true, silence: true);
     }
     return true;
@@ -202,17 +239,27 @@ class SetupAction extends _$SetupAction {
   Future<bool> _stop(_RunRequest request) async {
     try {
       await _setCoreRunning(request);
-    } catch (_) {
-      _rollbackRunning(request);
+    } catch (error) {
+      if (isUnansweredCoreError(error)) {
+        if (!_isCurrent(request)) return true;
+        _clearStoppedState();
+      } else {
+        _rollbackRunning(request);
+      }
       rethrow;
     }
     if (!_isCurrent(request)) {
       return true;
     }
+    _clearStoppedState();
+    return true;
+  }
+
+  void _clearStoppedState() {
+    ref.read(runningVpnOptionsProvider.notifier).value = null;
     resetCoreTraffic();
     ref.read(trafficsProvider.notifier).clear();
     ref.read(totalTrafficProvider.notifier).value = const Traffic();
-    return true;
   }
 
   Future<void> _setCoreRunning(_RunRequest request) {
@@ -232,10 +279,9 @@ class SetupAction extends _$SetupAction {
 
   Future<void> _setListening(bool running, {_RunRequest? request}) async {
     final vpnOptions = await ref.read(vpnOptionsProvider.future);
-    if (request != null && request.initialize && !_isCurrent(request)) {
-      return;
-    }
+    if (request != null && !_isCurrent(request)) return;
     await setCoreRunning(running);
+    if (request != null && !_isCurrent(request)) return;
     ref.read(runningVpnOptionsProvider.notifier).value = running
         ? vpnOptions
         : null;
@@ -276,8 +322,13 @@ class SetupAction extends _$SetupAction {
   }
 
   @protected
-  Future<bool> setCoreRunning(bool running) {
-    return running ? _core.startListener() : _core.stopListener();
+  Future<bool> setCoreRunning(bool running) async {
+    if (running) {
+      await _core.startListener();
+    } else {
+      await _core.stopListener();
+    }
+    return true;
   }
 
   @protected
@@ -299,24 +350,40 @@ class SetupAction extends _$SetupAction {
         return;
       }
       final networkSetting = ref.read(networkSettingProvider);
-      final message = await _core.updateConfig(
+      await _core.updateConfig(
         _effectivePatchConfig(patchConfig).toUpdateParams(
-          bypassPrivateRoute: networkSetting.bypassPrivateRoute,
           authentication: networkSetting.authentication.credentials,
-          skipCertVerify: !ref.read(appSettingProvider).checkCertificate,
+          options: ref.read(coreOptionsProvider),
         ),
       );
-      if (message.isNotEmpty) throw MessageException(message);
     });
   }
 
+  @protected
+  Duration get minApplyDebounce => const Duration(seconds: 2);
+
+  /// A push held up by a rule-set download or a Core timeout says little
+  /// about the load, yet would hold back every apply after it.
+  @protected
+  Duration get maxApplyDebounce => const Duration(seconds: 10);
+
   void applyProfileDebounce({bool silence = false, bool force = false}) {
     _pendingForceApply |= force;
-    debouncer.call(FunctionTag.applyProfile, (silence) {
-      final force = _pendingForceApply;
-      _pendingForceApply = false;
-      applyProfile(silence: silence, force: force);
-    }, args: [silence]);
+    debouncer.call(
+      FunctionTag.applyProfile,
+      (silence) {
+        final force = _pendingForceApply;
+        _pendingForceApply = false;
+        applyProfile(silence: silence, force: force);
+      },
+      args: [silence],
+      duration: Duration(
+        microseconds: _lastPushDuration.inMicroseconds.clamp(
+          minApplyDebounce.inMicroseconds,
+          maxApplyDebounce.inMicroseconds,
+        ),
+      ),
+    );
   }
 
   void changeMode(Mode mode) {
@@ -334,13 +401,23 @@ class SetupAction extends _$SetupAction {
   /// already runs is not rebuilt, which on a large profile takes a while.
   void autoApplyProfile() {
     runAfterFrame(() async {
-      if (!await _inputsApplied()) {
+      if (!await inputsApplied()) {
         await applyProfile();
       }
     });
   }
 
-  Future<bool> _inputsApplied() async {
+  void applyIfGlobalRulesUsed() {
+    final profile = ref.read(currentProfileProvider);
+    if (profile == null ||
+        profile.type == ProfileType.custom ||
+        profile.extendType != ExtendType.standard) {
+      return;
+    }
+    applyProfileDebounce(silence: true);
+  }
+
+  Future<bool> inputsApplied() async {
     final applied = _appliedInputs;
     if (applied == null) {
       return false;
@@ -357,6 +434,7 @@ class SetupAction extends _$SetupAction {
           setupState,
           _effectivePatchConfig(ref.read(patchClashConfigProvider)),
           ref.read(networkSettingProvider),
+          _appliedParams,
         );
   }
 
@@ -411,12 +489,14 @@ class SetupAction extends _$SetupAction {
     }
   }
 
-  Future<({String yaml, String md5})> getProfile({
+  Future<BuiltProfile> getProfile({
     required SetupState setupState,
     required PatchClashConfig patchConfig,
   }) async {
     final profileId = setupState.profileId;
-    if (profileId == null) return (yaml: '', md5: '');
+    if (profileId == null) {
+      return (yaml: '', md5: '', counts: configCountsOf(const {}), base: null);
+    }
     final defaultUA = globalState.packageInfo.ua;
     final networkSetting = ref.read(
       networkSettingProvider.select(
@@ -429,6 +509,21 @@ class SetupAction extends _$SetupAction {
     );
     final appendSystemDns = networkSetting.appendSystemDns;
     final isCustom = setupState.profileType == ProfileType.custom;
+    final scriptContent =
+        !isCustom && setupState.extendType == ExtendType.script
+        ? await setupState.script?.content
+        : null;
+    final hasScript = scriptContent?.isNotEmpty == true;
+    final fallback = setupState.extendType == ExtendType.standard
+        ? setupState.overrides.fallback
+        : null;
+    final profileBase =
+        !isCustom &&
+            !hasScript &&
+            fallback == null &&
+            !realitySupportX25519Mlkem768
+        ? await _core.getProfileBase(profileId)
+        : null;
     Map<String, dynamic> rawConfig = isCustom
         ? {
             'proxies': appProxiesPayload(
@@ -437,11 +532,8 @@ class SetupAction extends _$SetupAction {
               groups: setupState.proxyGroups,
             ),
           }
-        : await _core.getConfig(profileId);
-    final fallback = setupState.overrides.fallback;
-    if (!isCustom &&
-        setupState.extendType == ExtendType.standard &&
-        fallback != null) {
+        : profileBase?.base.config ?? await _core.readConfig(profileId);
+    if (!isCustom && !hasScript && fallback != null) {
       final applied = applyProfileFallback(rawConfig, fallback);
       if (applied.name != fallback.name) {
         throw const FormatException('Saved fallback group name is now in use');
@@ -450,25 +542,16 @@ class SetupAction extends _$SetupAction {
     }
     final proxyGroups = isCustom ? setupState.proxyGroups : <ProxyGroup>[];
     final rules = isCustom ? setupState.rules : <Rule>[];
-    final scriptContent =
-        !isCustom && setupState.extendType == ExtendType.script
-        ? await setupState.script?.content
-        : null;
-    if (scriptContent?.isNotEmpty == true) {
+    if (hasScript) {
       rawConfig = await handleEvaluate(scriptContent!, rawConfig);
     }
-    final realPatchConfig = patchConfig.copyWith(
-      tun: patchConfig.tun.getRealTun(
-        bypassPrivateRoute: networkSetting.bypassPrivateRoute,
-      ),
-    );
     final directory = await appPath.profilesPath;
     final injected = await _resolveInjectedProviders(
       setupState,
       proxyGroups: proxyGroups,
       rules: rules,
     );
-    final res = makeRealProfileTask(
+    final res = await makeRealProfileTask(
       MakeRealProfileState(
         rules: rules,
         proxyGroups: proxyGroups,
@@ -477,18 +560,37 @@ class SetupAction extends _$SetupAction {
         profilesPath: directory,
         profileId: profileId,
         rawConfig: rawConfig,
-        realPatchConfig: realPatchConfig,
+        realPatchConfig: patchConfig,
         overrides: setupState.overrides,
+        bypassPrivateRoute: networkSetting.bypassPrivateRoute,
         keepEmptyDnsOverrides: setupState.profileType != ProfileType.custom,
         appendSystemDns: appendSystemDns,
         addedRules: setupState.addedRules,
         defaultUA: defaultUA,
         authentication: networkSetting.authentication.credentials,
-        matchTarget: setupState.matchTarget,
+        matchTarget:
+            profileBase == null ||
+                setupState.matchTarget?.trim().isNotEmpty == true
+            ? setupState.matchTarget
+            : lastMatchTarget(profileBase.base.matchRules),
         safeMode: ref.read(safeModeProvider),
+        mitmModules: setupState.mitmModules,
       ),
     );
-    return res;
+    if (profileBase == null) {
+      return (yaml: res.yaml, md5: res.md5, counts: res.counts, base: null);
+    }
+    final (:base, :path) = profileBase;
+    return (
+      yaml: res.yaml,
+      md5: '${res.md5}${base.digest}'.toMd5(),
+      counts: (
+        groups: res.counts.groups + base.proxyGroups,
+        proxies: res.counts.proxies + base.proxies,
+        rules: res.counts.rules + base.rules,
+      ),
+      base: SetupBase(path: path, overlay: res.yaml),
+    );
   }
 
   /// Only what the custom profile actually references is injected, so an
@@ -549,9 +651,9 @@ class SetupAction extends _$SetupAction {
         setupState: setupState,
         patchConfig: patchClashConfig,
       );
-      return res.yaml;
+      return res.base == null ? res.yaml : await _core.buildProfile(res.base!);
     } catch (e) {
-      dialogs.showNotifier(e.toString(), level: MessageLevel.error);
+      dialogs.showBanner(e.toString(), level: BannerLevel.error);
     }
     return '';
   }
@@ -610,9 +712,9 @@ class SetupAction extends _$SetupAction {
         ref
             .read(patchClashConfigProvider.notifier)
             .update((state) => state.copyWith.tun(enable: false));
-        dialogs.showNotifier(
+        dialogs.showBanner(
           currentAppLocalizations.tunAuthorizationFailed,
-          level: MessageLevel.error,
+          level: BannerLevel.error,
         );
         return false;
     }
@@ -661,6 +763,7 @@ class SetupAction extends _$SetupAction {
       }
       return _SetupTaskResult.handoffToCoreRestart;
     }
+    final pushWatch = Stopwatch()..start();
     final realPatchConfig = _effectivePatchConfig(patchConfig);
     final networkSetting = ref.read(networkSettingProvider);
     SetupState? setupState;
@@ -675,22 +778,33 @@ class SetupAction extends _$SetupAction {
         state,
         realPatchConfig,
         networkSetting,
+        _appliedParams,
       ),
       _ => null,
     };
+    final setupParams = _setupParams.copyWith(base: realProfile?.base);
     final yamlString = realProfile?.yaml ?? '';
     final yamlMd5 = realProfile?.md5 ?? '';
     if (!profileFailed && yamlMd5 == globalState.lastConfigMd5 && !force) {
       _appliedInputs = inputs;
+      globalState.lastConfigCounts = realProfile.counts;
+      await preloadInvoke?.call();
       return _SetupTaskResult.completed;
     }
     // Go answers a config it rejects by running its built-in default, which
     // has no proxies, so until this push succeeds no applied config is known.
+    if (system.isAndroid) {
+      await preferences.saveAppliedConfigMd5(null);
+    }
     _appliedInputs = null;
     globalState.lastConfigMd5 = null;
+    globalState.lastConfigCounts = null;
     if (system.isAndroid) {
       await ref.read(vpnOptionsProvider.future);
-      await preferences.saveShareState(ref.read(sharedStateProvider));
+      await preferences.saveShareState(
+        ref.read(sharedStateProvider).copyWith(setupParams: setupParams),
+        preserveSetupBase: false,
+      );
     }
     // Recaptured so _start's catch can roll back after safeRun swallows it.
     (Object, StackTrace)? handoffFailure;
@@ -698,19 +812,33 @@ class SetupAction extends _$SetupAction {
     await globalState.loadingRun(
       () async {
         try {
-          final configFilePath = await appPath.configFilePath;
-          await File(configFilePath).writeAsStringAtomically(yamlString);
+          if (setupParams.base == null) {
+            final configFilePath = await appPath.configFilePath;
+            await File(configFilePath).writeAsStringAtomically(yamlString);
+          }
           final profileId = profile?.id;
           if (profileId != null) {
-            await appPath.ensureProviderDirs(profileId);
+            // An elevated Core may own these directories; it can reclaim
+            // them when it applies the config under its own permissions.
+            try {
+              await appPath.ensureProviderDirs(profileId);
+            } on FileSystemException catch (error) {
+              commonPrint.log(
+                'provider directories unavailable: ${compactError(error)}',
+                logLevel: LogLevel.warning,
+              );
+            }
           }
-          final message = await _core.setupConfig(
-            params: _setupParams,
-            preloadInvoke: preloadInvoke,
-          );
-          if (message.isNotEmpty) {
+          try {
+            await _core.setupConfig(
+              params: setupParams,
+              preloadInvoke: preloadInvoke,
+            );
+          } on CoreMethodException catch (error) {
+            if (error.code != 'config_rejected') rethrow;
+            globalState.lastConfigCounts = configCountsOf(const {});
             await globalState.safeRun(() => onUpdated?.call());
-            throw MessageException(message);
+            throw MessageException(error.message);
           }
         } catch (e, s) {
           setupFailed = true;
@@ -719,13 +847,19 @@ class SetupAction extends _$SetupAction {
           }
           rethrow;
         }
+        if (system.isAndroid && !profileFailed) {
+          await preferences.saveAppliedConfigMd5(yamlMd5);
+        }
         globalState.lastConfigMd5 = yamlMd5;
+        globalState.lastConfigCounts =
+            realProfile?.counts ?? configCountsOf(const {});
         _appliedInputs = inputs;
         await onUpdated?.call();
       },
       silence: true,
       tag: !silence ? LoadingTag.proxies : null,
     );
+    _lastPushDuration = pushWatch.elapsed;
     if (handoffFailure != null) {
       Error.throwWithStackTrace(handoffFailure!.$1, handoffFailure!.$2);
     }

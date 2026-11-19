@@ -3,7 +3,7 @@ import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 
 String compactError(Object error) {
   if (error is DioException) {

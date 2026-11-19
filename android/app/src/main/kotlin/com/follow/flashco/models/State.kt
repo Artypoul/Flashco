@@ -1,7 +1,7 @@
 package com.follow.flashco.models
 
 import com.follow.flashco.service.models.VpnOptions
-import com.google.gson.annotations.SerializedName
+import com.google.gson.JsonObject
 
 data class SharedState(
     val startTip: String = "Starting VPN...",
@@ -13,14 +13,5 @@ data class SharedState(
     val onlyStatisticsProxy: Boolean = false,
     val showStopAction: Boolean = true,
     val vpnOptions: VpnOptions? = null,
-    val setupParams: SetupParams? = null,
-)
-
-data class SetupParams(
-    @SerializedName("test-url")
-    val testUrl: String,
-    @SerializedName("selected-map")
-    val selectedMap: Map<String, String>,
-    @SerializedName("skip-cert-verify")
-    val skipCertVerify: Boolean = false,
+    val setupParams: JsonObject? = null,
 )

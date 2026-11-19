@@ -1,6 +1,7 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/widgets.dart';
 
 extension IpTypeLabel on IpType {
   String label(BuildContext context) {

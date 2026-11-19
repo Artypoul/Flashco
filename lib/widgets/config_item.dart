@@ -2,13 +2,10 @@ import 'dart:io';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/l10n/l10n.dart';
-import 'package:flutter/foundation.dart' show listEquals;
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/list_item.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
-
-import 'input.dart';
-import 'list.dart';
 
 export 'package:riverpod/misc.dart' show ProviderListenable;
 
@@ -123,7 +120,6 @@ class ConfigToggleItem extends _ConfigItem<bool> {
     required super.selector,
     required super.title,
     required super.onChanged,
-    super.subtitle,
     super.leading,
   });
 
@@ -137,7 +133,6 @@ class ConfigToggleItem extends _ConfigItem<bool> {
     return ListItem.toggle(
       leading: leading,
       title: Text(title(appLocalizations)),
-      subtitle: buildSubtitle(appLocalizations),
       value: value,
       onChanged: (value) => onChanged(ref, value),
     );
@@ -169,17 +164,11 @@ class ConfigOptionsItem<T> extends _ConfigItem<T> {
     return ListItem<T>.options(
       leading: leading,
       title: Text(title(appLocalizations)),
-      subtitle: Text(subtitle?.call(appLocalizations) ?? textBuilder(value)),
-      dialogTitle: title(appLocalizations),
+      subtitle: buildSubtitle(appLocalizations),
       options: options,
       value: value,
       textBuilder: textBuilder,
-      onChanged: (value) {
-        if (value == null) {
-          return;
-        }
-        onChanged(ref, value);
-      },
+      onChanged: (value) => onChanged(ref, value),
     );
   }
 }
@@ -194,9 +183,7 @@ class ConfigTextItem extends _ConfigItem<String> {
     this.keyboardType,
     this.validator,
     this.normalize,
-    this.showValueAsSubtitle = true,
     this.allowEmpty = false,
-    super.subtitle,
     super.leading,
   });
 
@@ -204,7 +191,6 @@ class ConfigTextItem extends _ConfigItem<String> {
   final TextInputType? keyboardType;
   final ConfigValidator? validator;
   final String Function(String value)? normalize;
-  final bool showValueAsSubtitle;
   final bool allowEmpty;
 
   String? _normalize(String? value) {
@@ -226,9 +212,7 @@ class ConfigTextItem extends _ConfigItem<String> {
     return ListItem.input(
       leading: leading,
       title: Text(label),
-      subtitle: showValueAsSubtitle && value.isNotEmpty
-          ? Text(value)
-          : buildSubtitle(appLocalizations),
+      subtitle: value.isEmpty ? null : Text(value),
       dialogTitle: label,
       value: value,
       maxLength: maxLength,
@@ -246,59 +230,6 @@ class ConfigTextItem extends _ConfigItem<String> {
           return;
         }
         onChanged(ref, normalized);
-      },
-    );
-  }
-}
-
-class ConfigListEditItem extends _ConfigItem<List<String>> {
-  const ConfigListEditItem({
-    super.key,
-    required super.selector,
-    required super.title,
-    required super.onChanged,
-    this.itemMaxLength,
-    this.itemValidator,
-    super.subtitle,
-    super.leading,
-  });
-
-  final int? itemMaxLength;
-  final ConfigValidator? itemValidator;
-
-  @override
-  Widget buildItem(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations appLocalizations,
-    List<String> value,
-  ) {
-    final label = title(appLocalizations);
-    final itemValidator = this.itemValidator;
-    return ListItem.open(
-      leading: leading,
-      title: Text(label),
-      subtitle:
-          buildSubtitle(appLocalizations) ??
-          Text(
-            value.isEmpty
-                ? appLocalizations.none
-                : appLocalizations.itemsCount(value.length),
-          ),
-      widget: ListEditView(
-        title: label,
-        items: value,
-        itemMaxLength: itemMaxLength,
-        itemValidator: itemValidator == null
-            ? null
-            : (item) => itemValidator(item, appLocalizations),
-        titleBuilder: (item) => Text(item),
-      ),
-      onChanged: (items) {
-        final next = List<String>.from(items as List);
-        if (!listEquals(next, value)) {
-          onChanged(ref, next);
-        }
       },
     );
   }

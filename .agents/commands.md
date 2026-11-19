@@ -2,11 +2,13 @@
 
 ## Building
 
-Update submodules first. The ClashMeta Go core lives in `core/Clash.Meta/`.
+Update submodules recursively first: the ClashMeta Go core lives in `core/Clash.Meta/` and the pinned Prism UI package in `plugins/prism_ui/`. The Flutter path dependency requires Prism before `flutter pub get`.
 
 ```bash
 git submodule update --init --recursive
 ```
+
+Native and metadata workflow jobs fetch the pinned CA bundle using `bash .github/scripts/fetch-ca.sh`. It downloads to a temporary file, checks the pinned SHA-256 and only then installs it in the Core checkout. This expected bundle changes a tracked submodule file locally; release and candidate integrity checks allow only the verified file at the recorded Core gitlink. Never bypass the hash or treat other submodule dirt as clean.
 
 Full package build, including Go core, Flutter, and packaging, runs through `setup.dart`:
 
@@ -49,8 +51,8 @@ hooks:
       build_assets: true   # false does the same for the Rust library
 ```
 
-CI flips `setup` to `false` with `yq` before `dart run tool/changelog.dart` and
-`flutter test`, and restores the file afterwards; no test loads the Go core. `rust_api`
+CI flips `setup` to `false` in its disposable checkout before `dart run tool/changelog.dart` and
+`flutter test`; no test loads the Go core. `rust_api`
 stays on there because the editor tests in `test/plugins/code_forge/` load the Rust
 library the hook builds; the release-notes job, which runs no tests, flips both.
 Never commit `false`: a build with it set stages whatever `libclash/` already
@@ -67,7 +69,7 @@ Use the default Flutter SDK directly:
 
 ```bash
 flutter pub get
-flutter run
+flutter run --dart-define=SAFE_MODE=true
 flutter test
 ```
 
@@ -76,7 +78,7 @@ Use `flutter test`, not `dart test`, because models pull in Flutter types.
 A development build takes over the host exactly like a release: it creates the TUN device, sets the system proxy, on
 macOS rewrites the system DNS, registers itself as the login item, and on Windows and Linux starts its Core through the
 shared privileged Helper, which stops the Core an installed Flashco is running. Only the data directory is kept apart,
-and only for some builds: a macOS debug build is `com.follow.clash.debug` and an Android debug build `com.follow.clash.dev`,
+and only for some builds: a macOS debug build is `com.follow.flashco.debug` and an Android debug build `com.follow.flashco.dev`,
 while profile and release builds, and every build on Windows and Linux, share the directory and preferences of the
 installed app. Safe mode keeps all of the host changes off and never opens the Core's listeners or external
 controller, so it does not compete with the installed app for the mixed, DNS, RESTful API and other loopback ports:
@@ -231,7 +233,7 @@ The changelog is derived from Conventional Commits by `tool/changelog.dart` and 
 that decide the wording.
 
 The app ships no changelog of its own. `render release` appends the released version as JSON inside an HTML comment
-(`<!-- flclash:changelog:json … -->`), so the release body GitHub already returns to `checkForUpdate` carries the
+(`<!-- flashco:changelog:json … -->`), so the release body GitHub already returns to `checkForUpdate` carries the
 notes shown in the update dialog. `parseReleaseChangelog` reads that block and falls back to the English
 bullets when a release predates it.
 
@@ -243,33 +245,7 @@ dart run tool/changelog.dart render release --out release.md
 dart run tool/changelog.dart render telegram --out telegram.md
 ```
 
-Releasing a stable version, in order:
-
-```bash
-tool/bump_version.sh all
-dart run tool/changelog.dart release --version 0.8.96
-git commit -am "chore(release): v0.8.96"
-git tag v0.8.96
-git push origin main && git push origin v0.8.96
-```
-
-Push the tag by name. Every release tag here is lightweight, and `--follow-tags` carries annotated tags only: it skips a
-lightweight one silently, so the branch lands, the tag does not, and the release workflow never fires.
-
-`tool/release.sh` drives both paths so the ordering below cannot be got wrong by hand. It resolves the version (bumping
-the patch when pubspec still names an already tagged one), prints the notes the tag would ship, and only pushes with
-`--push`:
-
-```bash
-tool/release.sh pre --dry-run     # plan and notes, changes nothing
-tool/release.sh pre --push        # bump, tag vX.Y.Z-pre.N, push
-tool/release.sh stable --push     # changelog, chore(release) commit, tag, push
-```
-
-The release commit comes before the tag on purpose: the generated wording is reviewable in the diff before it ships, and
-the tag is what `render release` reads. CI never writes back to the repository; it only runs `verify`. Wording in
-`changelog.json` may be edited by hand as long as no derivable entry disappears and every entry still points at a commit
-inside that version's range.
+The Flashco signed release uses the existing `.github/workflows/release.yaml`, dispatched manually from `main` with the approved release tag after separately authorized merge and tag selection. Its preflight checks source SHA, published history and release inputs; the Android signing environment checks the approved certificate. It creates a draft, not an automatically published release. Verify the actual signed universal APK and Windows EXE/ZIP, manifest and SHA256SUMS against the exact run and source before any separately authorized publication. Candidate artifacts in `build.yaml` are non-release tests, and personal workflows remain manual; none substitutes for the signed release or device update/restore checks. The version and build number must advance according to `tool/release_preflight.dart` and previously distributed packages. Do not use a donor tag-push recipe as a Flashco release procedure.
 
 Entries at or below `v0.8.96` are frozen: they predate the pipeline, live under the `<!-- changelog:frozen -->` marker
 in `CHANGELOG.md`, and are never regenerated.
@@ -331,16 +307,7 @@ dart run tool/check_coverage.dart coverage/lcov.info 75
 
 Run `flutter analyze` before committing; CI fails on anything it reports.
 
-Release builds run only for `v*` tag pushes; pull requests trigger nothing.
-Root analysis excludes `plugins/**`, and root tests do not discover nested
-plugin packages, so parallel jobs validate the rest from their own package
-directories: `plugins` (local Flutter packages and the setup build tool), `go`
-(the Core wrapper, plus an NDK-backed vet of the Android files), `android`
-(JVM unit tests for `:common`, `:service` and `:app`, with the Flutter compile
-tasks excluded so no native build hook runs), `rust` (both crates), and a
-Windows runner for the helper's `windows-service` feature. A `desktop` job also
-compiles a debug build per desktop platform. Release builds run only in the
-public repository and start once every job except `desktop` passes.
+The validation workflow runs on branch pushes and manual dispatch; a PR is checked through its branch push. Root analysis excludes `plugins/**`, so parallel jobs validate local Flutter packages, the Core wrapper and NDK-backed vet, Android JVM checks, Rust crates and Windows helper features. A desktop job compiles debug builds. The candidate matrix in the same workflow builds the first-run/REALITY Android, synthetic embedded-subscription Android and synthetic embedded-subscription Windows variants for the checked-out SHA after required checks; artifact creation is not proof of signed release or device readiness. The separate signed release remains manual and `main`-gated as described above.
 
 `bash tool/check_plugins.sh` is that plugin gate, and CI runs the same script.
 It discovers every `plugins/*/pubspec.yaml`, analyzes each package, and runs

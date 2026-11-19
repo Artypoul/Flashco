@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flashco/core/controller.dart';
 import 'package:flashco/core/interface.dart';
+import 'package:flashco/core/method.dart';
 import 'package:flashco/database/database.dart' as db;
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/l10n/l10n.dart';
@@ -30,7 +31,12 @@ void main() {
     when(() => core.updateGeoData(any())).thenAnswer((invocation) async {
       final name = invocation.positionalArguments.single as String;
       final count = requests[name] = (requests[name] ?? 0) + 1;
-      return count == 1 ? '' : 'geo update already in progress';
+      if (count > 1) {
+        throw const CoreMethodException(
+          code: 'core_error',
+          message: 'geo update already in progress',
+        );
+      }
     });
     container = ProviderContainer(
       overrides: [

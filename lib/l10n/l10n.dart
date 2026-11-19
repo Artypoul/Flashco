@@ -7461,6 +7461,2289 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Spanish`
+  String get es {
+    return Intl.message('Spanish', name: 'es', desc: '', args: []);
+  }
+
+  /// `French`
+  String get fr {
+    return Intl.message('French', name: 'fr', desc: '', args: []);
+  }
+
+  /// `Korean`
+  String get ko {
+    return Intl.message('Korean', name: 'ko', desc: '', args: []);
+  }
+
+  /// `Runtime config`
+  String get runtimeConfig {
+    return Intl.message(
+      'Runtime config',
+      name: 'runtimeConfig',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send from phone`
+  String get sendFromPhone {
+    return Intl.message(
+      'Send from phone',
+      name: 'sendFromPhone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan the code with your phone's camera and paste the link on the page that opens. Both devices need to be on the same network.`
+  String get sendFromPhoneTip {
+    return Intl.message(
+      'Scan the code with your phone\'s camera and paste the link on the page that opens. Both devices need to be on the same network.',
+      name: 'sendFromPhoneTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This device is not connected to a local network`
+  String get sendFromPhoneNoNetwork {
+    return Intl.message(
+      'This device is not connected to a local network',
+      name: 'sendFromPhoneNoNetwork',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Receiving a link from your phone needs the Nearby devices permission, which lets Flashco reach the local network. Turn it on in the app's settings.`
+  String get sendFromPhonePermissionDenied {
+    return Intl.message(
+      'Receiving a link from your phone needs the Nearby devices permission, which lets Flashco reach the local network. Turn it on in the app\'s settings.',
+      name: 'sendFromPhonePermissionDenied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send a link to Flashco`
+  String get sendFromPhonePageTitle {
+    return Intl.message(
+      'Send a link to Flashco',
+      name: 'sendFromPhonePageTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Subscription link or proxy share link`
+  String get sendFromPhonePageHint {
+    return Intl.message(
+      'Subscription link or proxy share link',
+      name: 'sendFromPhonePageHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send`
+  String get send {
+    return Intl.message('Send', name: 'send', desc: '', args: []);
+  }
+
+  /// `Sent. Confirm the import on the other device.`
+  String get sendFromPhonePageSent {
+    return Intl.message(
+      'Sent. Confirm the import on the other device.',
+      name: 'sendFromPhonePageSent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import the link from your phone?`
+  String get sendFromPhoneConfirmTitle {
+    return Intl.message(
+      'Import the link from your phone?',
+      name: 'sendFromPhoneConfirmTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan with Flashco on another device to import this profile.`
+  String get shareQrcodeTip {
+    return Intl.message(
+      'Scan with Flashco on another device to import this profile.',
+      name: 'shareQrcodeTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This link is too long for a QR code. Use Copy link instead.`
+  String get qrcodeTooLongTip {
+    return Intl.message(
+      'This link is too long for a QR code. Use Copy link instead.',
+      name: 'qrcodeTooLongTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, other{{count} selected}}`
+  String accessControlSelectedCount(num count) {
+    return Intl.plural(
+      count,
+      other: '$count selected',
+      name: 'accessControlSelectedCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Delay test timeout`
+  String get delayTestTimeout {
+    return Intl.message(
+      'Delay test timeout',
+      name: 'delayTestTimeout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Compact`
+  String get compact {
+    return Intl.message('Compact', name: 'compact', desc: '', args: []);
+  }
+
+  /// `Sidebar`
+  String get sidebar {
+    return Intl.message('Sidebar', name: 'sidebar', desc: '', args: []);
+  }
+
+  /// `Background blur`
+  String get backgroundBlur {
+    return Intl.message(
+      'Background blur',
+      name: 'backgroundBlur',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Liquid Glass`
+  String get liquidGlass {
+    return Intl.message(
+      'Liquid Glass',
+      name: 'liquidGlass',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No package names found in the clipboard`
+  String get clipboardNoPackageNames {
+    return Intl.message(
+      'No package names found in the clipboard',
+      name: 'clipboardNoPackageNames',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ultra`
+  String get ultra {
+    return Intl.message('Ultra', name: 'ultra', desc: '', args: []);
+  }
+
+  /// `Restate the statement`
+  String get disclaimerRestateTitle {
+    return Intl.message(
+      'Restate the statement',
+      name: 'disclaimerRestateTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To confirm you understand, enter the following statement in full in the field below:`
+  String get disclaimerRestateTip {
+    return Intl.message(
+      'To confirm you understand, enter the following statement in full in the field below:',
+      name: 'disclaimerRestateTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter the statement above`
+  String get disclaimerRestateHint {
+    return Intl.message(
+      'Enter the statement above',
+      name: 'disclaimerRestateHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Does not match the statement`
+  String get disclaimerRestateMismatch {
+    return Intl.message(
+      'Does not match the statement',
+      name: 'disclaimerRestateMismatch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm the statement`
+  String get disclaimerAcknowledgeTitle {
+    return Intl.message(
+      'Confirm the statement',
+      name: 'disclaimerAcknowledgeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To confirm you understand, read the following statement and check the box below:`
+  String get disclaimerAcknowledgeTip {
+    return Intl.message(
+      'To confirm you understand, read the following statement and check the box below:',
+      name: 'disclaimerAcknowledgeTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `I have read and understand this statement`
+  String get disclaimerAcknowledgeLabel {
+    return Intl.message(
+      'I have read and understand this statement',
+      name: 'disclaimerAcknowledgeLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Group by`
+  String get groupBy {
+    return Intl.message('Group by', name: 'groupBy', desc: '', args: []);
+  }
+
+  /// `Dialog`
+  String get dialog {
+    return Intl.message('Dialog', name: 'dialog', desc: '', args: []);
+  }
+
+  /// `Apply now`
+  String get applyNow {
+    return Intl.message('Apply now', name: 'applyNow', desc: '', args: []);
+  }
+
+  /// `Applied`
+  String get applied {
+    return Intl.message('Applied', name: 'applied', desc: '', args: []);
+  }
+
+  /// `Custom color`
+  String get customColor {
+    return Intl.message(
+      'Custom color',
+      name: 'customColor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Color style`
+  String get colorStyle {
+    return Intl.message('Color style', name: 'colorStyle', desc: '', args: []);
+  }
+
+  /// `Grid`
+  String get grid {
+    return Intl.message('Grid', name: 'grid', desc: '', args: []);
+  }
+
+  /// `Spectrum`
+  String get spectrum {
+    return Intl.message('Spectrum', name: 'spectrum', desc: '', args: []);
+  }
+
+  /// `Sliders`
+  String get sliders {
+    return Intl.message('Sliders', name: 'sliders', desc: '', args: []);
+  }
+
+  /// `Hue`
+  String get hue {
+    return Intl.message('Hue', name: 'hue', desc: '', args: []);
+  }
+
+  /// `Saturation`
+  String get saturation {
+    return Intl.message('Saturation', name: 'saturation', desc: '', args: []);
+  }
+
+  /// `Brightness`
+  String get brightness {
+    return Intl.message('Brightness', name: 'brightness', desc: '', args: []);
+  }
+
+  /// `Hex`
+  String get hex {
+    return Intl.message('Hex', name: 'hex', desc: '', args: []);
+  }
+
+  /// `Vivid`
+  String get vividStyle {
+    return Intl.message('Vivid', name: 'vividStyle', desc: '', args: []);
+  }
+
+  /// `Tinted`
+  String get tintedStyle {
+    return Intl.message('Tinted', name: 'tintedStyle', desc: '', args: []);
+  }
+
+  /// `Soft`
+  String get softStyle {
+    return Intl.message('Soft', name: 'softStyle', desc: '', args: []);
+  }
+
+  /// `Custom`
+  String get customResources {
+    return Intl.message('Custom', name: 'customResources', desc: '', args: []);
+  }
+
+  /// `Monochrome icon`
+  String get monochromeIcon {
+    return Intl.message(
+      'Monochrome icon',
+      name: 'monochromeIcon',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `minutes`
+  String get minutes {
+    return Intl.message('minutes', name: 'minutes', desc: '', args: []);
+  }
+
+  /// `{count, plural, =1{1 proxy group} other{{label} proxy groups}}`
+  String proxyGroupsCount(num count, Object label) {
+    return Intl.plural(
+      count,
+      one: '1 proxy group',
+      other: '$label proxy groups',
+      name: 'proxyGroupsCount',
+      desc: '',
+      args: [count, label],
+    );
+  }
+
+  /// `Match case`
+  String get matchCase {
+    return Intl.message('Match case', name: 'matchCase', desc: '', args: []);
+  }
+
+  /// `TCP congestion control works only with the mips stack.`
+  String get congestionControllerDesc {
+    return Intl.message(
+      'TCP congestion control works only with the mips stack.',
+      name: 'congestionControllerDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Included interfaces`
+  String get includeInterface {
+    return Intl.message(
+      'Included interfaces',
+      name: 'includeInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only traffic arriving on included interfaces goes through TUN, and excluded interfaces no longer apply.`
+  String get includeInterfaceDesc {
+    return Intl.message(
+      'Only traffic arriving on included interfaces goes through TUN, and excluded interfaces no longer apply.',
+      name: 'includeInterfaceDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Included user IDs`
+  String get includeUid {
+    return Intl.message(
+      'Included user IDs',
+      name: 'includeUid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Excluded user IDs`
+  String get excludeUid {
+    return Intl.message(
+      'Excluded user IDs',
+      name: 'excludeUid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Excluded source ports`
+  String get excludeSrcPort {
+    return Intl.message(
+      'Excluded source ports',
+      name: 'excludeSrcPort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Excluded destination ports`
+  String get excludeDstPort {
+    return Intl.message(
+      'Excluded destination ports',
+      name: 'excludeDstPort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UDP timeout`
+  String get udpTimeout {
+    return Intl.message('UDP timeout', name: 'udpTimeout', desc: '', args: []);
+  }
+
+  /// `The UDP timeout is in seconds and works only with the gvisor, system and mixed stacks.`
+  String get udpTimeoutDesc {
+    return Intl.message(
+      'The UDP timeout is in seconds and works only with the gvisor, system and mixed stacks.',
+      name: 'udpTimeoutDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Without this entry, TUN hijacks every DNS query to port 53 (any:53).`
+  String get dnsHijackDesc {
+    return Intl.message(
+      'Without this entry, TUN hijacks every DNS query to port 53 (any:53).',
+      name: 'dnsHijackDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Entries added here replace the TUN settings of every profile; anything not added keeps the profile's own setting. Entries a custom profile adds itself take precedence.`
+  String get tunOverrideDesc {
+    return Intl.message(
+      'Entries added here replace the TUN settings of every profile; anything not added keeps the profile\'s own setting. Entries a custom profile adds itself take precedence.',
+      name: 'tunOverrideDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Entries added here replace the setting of every profile; anything not added keeps the profile's own setting, or the core default when the profile has none.`
+  String get generalOverrideDesc {
+    return Intl.message(
+      'Entries added here replace the setting of every profile; anything not added keeps the profile\'s own setting, or the core default when the profile has none.',
+      name: 'generalOverrideDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Applies to this profile only and takes precedence over the TUN override entries in the network settings.`
+  String get profileTunSettingsDesc {
+    return Intl.message(
+      'Applies to this profile only and takes precedence over the TUN override entries in the network settings.',
+      name: 'profileTunSettingsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Plugin path`
+  String get pluginPath {
+    return Intl.message('Plugin path', name: 'pluginPath', desc: '', args: []);
+  }
+
+  /// `Plugin username`
+  String get pluginUsername {
+    return Intl.message(
+      'Plugin username',
+      name: 'pluginUsername',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Plugin password`
+  String get pluginPassword {
+    return Intl.message(
+      'Plugin password',
+      name: 'pluginPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Plugin cipher`
+  String get pluginCipher {
+    return Intl.message(
+      'Plugin cipher',
+      name: 'pluginCipher',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Request headers`
+  String get requestHeaders {
+    return Intl.message(
+      'Request headers',
+      name: 'requestHeaders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{transport} Headers`
+  String transportHeaders(Object transport) {
+    return Intl.message(
+      '$transport Headers',
+      name: 'transportHeaders',
+      desc: '',
+      args: [transport],
+    );
+  }
+
+  /// `Holds the start button and can't be removed`
+  String get currentOutboundDesc {
+    return Intl.message(
+      'Holds the start button and can\'t be removed',
+      name: 'currentOutboundDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Running`
+  String get running {
+    return Intl.message('Running', name: 'running', desc: '', args: []);
+  }
+
+  /// `Root`
+  String get root {
+    return Intl.message('Root', name: 'root', desc: '', args: []);
+  }
+
+  /// `Not running`
+  String get notRunning {
+    return Intl.message('Not running', name: 'notRunning', desc: '', args: []);
+  }
+
+  /// `Peak {value}`
+  String trafficPeak(Object value) {
+    return Intl.message(
+      'Peak $value',
+      name: 'trafficPeak',
+      desc: '',
+      args: [value],
+    );
+  }
+
+  /// `Total {value}`
+  String trafficTotal(Object value) {
+    return Intl.message(
+      'Total $value',
+      name: 'trafficTotal',
+      desc: '',
+      args: [value],
+    );
+  }
+
+  /// `Quality`
+  String get ipQualityShort {
+    return Intl.message('Quality', name: 'ipQualityShort', desc: '', args: []);
+  }
+
+  /// `Unknown type`
+  String get ipTypeUnknown {
+    return Intl.message(
+      'Unknown type',
+      name: 'ipTypeUnknown',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap the icon to retry`
+  String get tapIconToRetry {
+    return Intl.message(
+      'Tap the icon to retry',
+      name: 'tapIconToRetry',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Traffic takeover`
+  String get networkTakeover {
+    return Intl.message(
+      'Traffic takeover',
+      name: 'networkTakeover',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Port {port}`
+  String portValue(Object port) {
+    return Intl.message(
+      'Port $port',
+      name: 'portValue',
+      desc: '',
+      args: [port],
+    );
+  }
+
+  /// `{count, plural, =1{1 issue} other{{count} issues}}`
+  String serviceAbnormalCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 issue',
+      other: '$count issues',
+      name: 'serviceAbnormalCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `All available`
+  String get serviceAllAvailable {
+    return Intl.message(
+      'All available',
+      name: 'serviceAllAvailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Shown on the dashboard`
+  String get serviceShownOnDashboard {
+    return Intl.message(
+      'Shown on the dashboard',
+      name: 'serviceShownOnDashboard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} timed out`
+  String groupTimeoutCount(Object count) {
+    return Intl.message(
+      '$count timed out',
+      name: 'groupTimeoutCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `groups`
+  String get groupCountUnit {
+    return Intl.message('groups', name: 'groupCountUnit', desc: '', args: []);
+  }
+
+  /// `{count, plural, =1{1 group} other{{count} groups}}`
+  String groupCount(num count) {
+    return Intl.plural(
+      count,
+      one: '1 group',
+      other: '$count groups',
+      name: 'groupCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Groups show up here once the core starts`
+  String get proxyGroupsAfterStart {
+    return Intl.message(
+      'Groups show up here once the core starts',
+      name: 'proxyGroupsAfterStart',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `used`
+  String get usedShort {
+    return Intl.message('used', name: 'usedShort', desc: '', args: []);
+  }
+
+  /// `Updated {time}`
+  String profileUpdatedAt(Object time) {
+    return Intl.message(
+      'Updated $time',
+      name: 'profileUpdatedAt',
+      desc: '',
+      args: [time],
+    );
+  }
+
+  /// `Expires {date}, {days, plural, =1{1 day} other{{days} days}} left`
+  String profileExpiresIn(Object date, num days) {
+    return Intl.message(
+      'Expires $date, ${Intl.plural(days, one: '1 day', other: '$days days')} left',
+      name: 'profileExpiresIn',
+      desc: '',
+      args: [date, days],
+    );
+  }
+
+  /// `{days, plural, =1{1 day left} other{{days} days left}}`
+  String profileDaysLeft(num days) {
+    return Intl.plural(
+      days,
+      one: '1 day left',
+      other: '$days days left',
+      name: 'profileDaysLeft',
+      desc: '',
+      args: [days],
+    );
+  }
+
+  /// `Target`
+  String get target {
+    return Intl.message('Target', name: 'target', desc: '', args: []);
+  }
+
+  /// `Exit`
+  String get outboundExit {
+    return Intl.message('Exit', name: 'outboundExit', desc: '', args: []);
+  }
+
+  /// `Duration`
+  String get duration {
+    return Intl.message('Duration', name: 'duration', desc: '', args: []);
+  }
+
+  /// `Traffic`
+  String get traffic {
+    return Intl.message('Traffic', name: 'traffic', desc: '', args: []);
+  }
+
+  /// `Downloaded`
+  String get totalDownload {
+    return Intl.message(
+      'Downloaded',
+      name: 'totalDownload',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Uploaded`
+  String get totalUpload {
+    return Intl.message('Uploaded', name: 'totalUpload', desc: '', args: []);
+  }
+
+  /// `From`
+  String get initiatorShort {
+    return Intl.message('From', name: 'initiatorShort', desc: '', args: []);
+  }
+
+  /// `Result`
+  String get result {
+    return Intl.message('Result', name: 'result', desc: '', args: []);
+  }
+
+  /// `Took`
+  String get elapsed {
+    return Intl.message('Took', name: 'elapsed', desc: '', args: []);
+  }
+
+  /// `Connection stats`
+  String get connectionStats {
+    return Intl.message(
+      'Connection stats',
+      name: 'connectionStats',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Live connections, recent requests and DNS queries`
+  String get connectionStatsDesc {
+    return Intl.message(
+      'Live connections, recent requests and DNS queries',
+      name: 'connectionStatsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Memory the app and the core use`
+  String get memoryInfoDesc {
+    return Intl.message(
+      'Memory the app and the core use',
+      name: 'memoryInfoDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit dashboard`
+  String get editDashboard {
+    return Intl.message(
+      'Edit dashboard',
+      name: 'editDashboard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Done`
+  String get done {
+    return Intl.message('Done', name: 'done', desc: '', args: []);
+  }
+
+  /// `Available to add`
+  String get dashboardAddableSection {
+    return Intl.message(
+      'Available to add',
+      name: 'dashboardAddableSection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =1{1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules} other{{label} SUB-RULE rules were dropped, since custom profiles do not support sub-rules}}`
+  String customImportDroppedSubRules(num count, Object label) {
+    return Intl.plural(
+      count,
+      one:
+          '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
+      other:
+          '$label SUB-RULE rules were dropped, since custom profiles do not support sub-rules',
+      name: 'customImportDroppedSubRules',
+      desc: '',
+      args: [count, label],
+    );
+  }
+
+  /// `Auto-include`
+  String get autoInclude {
+    return Intl.message(
+      'Auto-include',
+      name: 'autoInclude',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All referenced proxies`
+  String get allReferencedProxies {
+    return Intl.message(
+      'All referenced proxies',
+      name: 'allReferencedProxies',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All referenced proxy providers`
+  String get allReferencedProxyProviders {
+    return Intl.message(
+      'All referenced proxy providers',
+      name: 'allReferencedProxyProviders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clear DNS cache`
+  String get clearDnsCache {
+    return Intl.message(
+      'Clear DNS cache',
+      name: 'clearDnsCache',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DNS cache cleared`
+  String get dnsCacheCleared {
+    return Intl.message(
+      'DNS cache cleared',
+      name: 'dnsCacheCleared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to clear DNS cache`
+  String get clearDnsCacheFailed {
+    return Intl.message(
+      'Failed to clear DNS cache',
+      name: 'clearDnsCacheFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select`
+  String get select {
+    return Intl.message('Select', name: 'select', desc: '', args: []);
+  }
+
+  /// `Preferred`
+  String get preferred {
+    return Intl.message('Preferred', name: 'preferred', desc: '', args: []);
+  }
+
+  /// `Add to local proxies`
+  String get addToLocalProxies {
+    return Intl.message(
+      'Add to local proxies',
+      name: 'addToLocalProxies',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Added {name} to local proxies`
+  String addedToLocalProxies(Object name) {
+    return Intl.message(
+      'Added $name to local proxies',
+      name: 'addedToLocalProxies',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `{name} is already in local proxies`
+  String alreadyInLocalProxies(Object name) {
+    return Intl.message(
+      '$name is already in local proxies',
+      name: 'alreadyInLocalProxies',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `MITM`
+  String get mitm {
+    return Intl.message('MITM', name: 'mitm', desc: '', args: []);
+  }
+
+  /// `HTTPS decryption`
+  String get httpsDecryption {
+    return Intl.message(
+      'HTTPS decryption',
+      name: 'httpsDecryption',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `HTTP capture`
+  String get httpCapture {
+    return Intl.message(
+      'HTTP capture',
+      name: 'httpCapture',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Records requests to the hosts listed under Hostname, to view in connection details. Records stay in memory only.`
+  String get httpCaptureDesc {
+    return Intl.message(
+      'Records requests to the hosts listed under Hostname, to view in connection details. Records stay in memory only.',
+      name: 'httpCaptureDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No host is listed, so nothing is recorded. Add hosts under Hostname on the MITM page, or from the details of a connection.`
+  String get httpCaptureNoHosts {
+    return Intl.message(
+      'No host is listed, so nothing is recorded. Add hosts under Hostname on the MITM page, or from the details of a connection.',
+      name: 'httpCaptureNoHosts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Maximum records`
+  String get httpCaptureLimit {
+    return Intl.message(
+      'Maximum records',
+      name: 'httpCaptureLimit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The oldest records go first once this many are kept or they fill {memory} of memory. Each body keeps its first {body}.`
+  String httpCaptureLimitDesc(Object memory, Object body) {
+    return Intl.message(
+      'The oldest records go first once this many are kept or they fill $memory of memory. Each body keeps its first $body.',
+      name: 'httpCaptureLimitDesc',
+      desc: '',
+      args: [memory, body],
+    );
+  }
+
+  /// `HTTP requests`
+  String get httpRequests {
+    return Intl.message(
+      'HTTP requests',
+      name: 'httpRequests',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Requests made before capture was on, or since cleared, are not listed.`
+  String get httpRequestsMissing {
+    return Intl.message(
+      'Requests made before capture was on, or since cleared, are not listed.',
+      name: 'httpRequestsMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This request is no longer kept`
+  String get httpRequestCleared {
+    return Intl.message(
+      'This request is no longer kept',
+      name: 'httpRequestCleared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Capture is off`
+  String get httpCaptureOff {
+    return Intl.message(
+      'Capture is off',
+      name: 'httpCaptureOff',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `In progress`
+  String get inProgress {
+    return Intl.message('In progress', name: 'inProgress', desc: '', args: []);
+  }
+
+  /// `Method`
+  String get method {
+    return Intl.message('Method', name: 'method', desc: '', args: []);
+  }
+
+  /// `Original URL`
+  String get originalUrl {
+    return Intl.message(
+      'Original URL',
+      name: 'originalUrl',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Time to first byte`
+  String get timeToFirstByte {
+    return Intl.message(
+      'Time to first byte',
+      name: 'timeToFirstByte',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Request body`
+  String get requestBody {
+    return Intl.message(
+      'Request body',
+      name: 'requestBody',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Response`
+  String get response {
+    return Intl.message('Response', name: 'response', desc: '', args: []);
+  }
+
+  /// `Response body`
+  String get responseBody {
+    return Intl.message(
+      'Response body',
+      name: 'responseBody',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Response headers`
+  String get responseHeaders {
+    return Intl.message(
+      'Response headers',
+      name: 'responseHeaders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Matched rules`
+  String get matchedRules {
+    return Intl.message(
+      'Matched rules',
+      name: 'matchedRules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Overview`
+  String get overview {
+    return Intl.message('Overview', name: 'overview', desc: '', args: []);
+  }
+
+  /// `View all`
+  String get viewAll {
+    return Intl.message('View all', name: 'viewAll', desc: '', args: []);
+  }
+
+  /// `Copy as Base64`
+  String get copyAsBase64 {
+    return Intl.message(
+      'Copy as Base64',
+      name: 'copyAsBase64',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy as cURL`
+  String get copyAsCurl {
+    return Intl.message('Copy as cURL', name: 'copyAsCurl', desc: '', args: []);
+  }
+
+  /// `Close connection`
+  String get closeConnection {
+    return Intl.message(
+      'Close connection',
+      name: 'closeConnection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy host`
+  String get copyHost {
+    return Intl.message('Copy host', name: 'copyHost', desc: '', args: []);
+  }
+
+  /// `Copy destination`
+  String get copyDestination {
+    return Intl.message(
+      'Copy destination',
+      name: 'copyDestination',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy request`
+  String get copyRequest {
+    return Intl.message(
+      'Copy request',
+      name: 'copyRequest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy response`
+  String get copyResponse {
+    return Intl.message(
+      'Copy response',
+      name: 'copyResponse',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy response body`
+  String get copyResponseBody {
+    return Intl.message(
+      'Copy response body',
+      name: 'copyResponseBody',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Read as Protobuf without its schema: field numbers only, and the types are guesses.`
+  String get httpBodyProtobufGuess {
+    return Intl.message(
+      'Read as Protobuf without its schema: field numbers only, and the types are guesses.',
+      name: 'httpBodyProtobufGuess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export HAR`
+  String get exportHar {
+    return Intl.message('Export HAR', name: 'exportHar', desc: '', args: []);
+  }
+
+  /// `Add a reject rule`
+  String get mitmAddRejectRule {
+    return Intl.message(
+      'Add a reject rule',
+      name: 'mitmAddRejectRule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a map local rule`
+  String get mitmAddMapLocalRule {
+    return Intl.message(
+      'Add a map local rule',
+      name: 'mitmAddMapLocalRule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Contains private data`
+  String get httpExportPrivateTitle {
+    return Intl.message(
+      'Contains private data',
+      name: 'httpExportPrivateTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A request can carry cookies, tokens, passwords and form contents. Check what you share, and with whom.`
+  String get httpExportPrivate {
+    return Intl.message(
+      'A request can carry cookies, tokens, passwords and form contents. Check what you share, and with whom.',
+      name: 'httpExportPrivate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This module is a Stash override, so the rule was copied for you to add by hand.`
+  String get mitmRuleCopiedForStash {
+    return Intl.message(
+      'This module is a Stash override, so the rule was copied for you to add by hand.',
+      name: 'mitmRuleCopiedForStash',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Binary data`
+  String get binaryData {
+    return Intl.message('Binary data', name: 'binaryData', desc: '', args: []);
+  }
+
+  /// `Not recorded while memory was short.`
+  String get httpBodyNotKept {
+    return Intl.message(
+      'Not recorded while memory was short.',
+      name: 'httpBodyNotKept',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only the start of this body was recorded.`
+  String get httpBodyTruncated {
+    return Intl.message(
+      'Only the start of this body was recorded.',
+      name: 'httpBodyTruncated',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not decode {encoding}, so this is the data as it was sent.`
+  String httpBodyUndecoded(Object encoding) {
+    return Intl.message(
+      'Could not decode $encoding, so this is the data as it was sent.',
+      name: 'httpBodyUndecoded',
+      desc: '',
+      args: [encoding],
+    );
+  }
+
+  /// `Flashco will be able to read everything sent to the decrypted hosts, cookies and passwords included. Turn this on only for hosts you mean to rewrite.`
+  String get mitmEnableTip {
+    return Intl.message(
+      'Flashco will be able to read everything sent to the decrypted hosts, cookies and passwords included. Turn this on only for hosts you mean to rewrite.',
+      name: 'mitmEnableTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Certificate`
+  String get certificate {
+    return Intl.message('Certificate', name: 'certificate', desc: '', args: []);
+  }
+
+  /// `Generate certificate`
+  String get generateCertificate {
+    return Intl.message(
+      'Generate certificate',
+      name: 'generateCertificate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Regenerate certificate`
+  String get regenerateCertificate {
+    return Intl.message(
+      'Regenerate certificate',
+      name: 'regenerateCertificate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The new certificate replaces the current one, which Flashco takes out of this device's trusted roots where it can. Every other device that trusts the current one has to install the new one.`
+  String get regenerateCertificateTip {
+    return Intl.message(
+      'The new certificate replaces the current one, which Flashco takes out of this device\'s trusted roots where it can. Every other device that trusts the current one has to install the new one.',
+      name: 'regenerateCertificateTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export certificate`
+  String get exportCertificate {
+    return Intl.message(
+      'Export certificate',
+      name: 'exportCertificate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Install to system`
+  String get installCertificate {
+    return Intl.message(
+      'Install to system',
+      name: 'installCertificate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Certificate installed`
+  String get installCertificateSuccess {
+    return Intl.message(
+      'Certificate installed',
+      name: 'installCertificateSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Valid until {date}`
+  String validUntil(Object date) {
+    return Intl.message(
+      'Valid until $date',
+      name: 'validUntil',
+      desc: '',
+      args: [date],
+    );
+  }
+
+  /// `Export it and trust it on the devices you want to decrypt.`
+  String get mitmCertificateExportTip {
+    return Intl.message(
+      'Export it and trust it on the devices you want to decrypt.',
+      name: 'mitmCertificateExportTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Trusted`
+  String get mitmTrustReady {
+    return Intl.message('Trusted', name: 'mitmTrustReady', desc: '', args: []);
+  }
+
+  /// `Not fully trusted`
+  String get mitmTrustUntrusted {
+    return Intl.message(
+      'Not fully trusted',
+      name: 'mitmTrustUntrusted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not installed`
+  String get mitmTrustNotInstalled {
+    return Intl.message(
+      'Not installed',
+      name: 'mitmTrustNotInstalled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checking…`
+  String get mitmTrustChecking {
+    return Intl.message(
+      'Checking…',
+      name: 'mitmTrustChecking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Trust certificate`
+  String get trustCertificate {
+    return Intl.message(
+      'Trust certificate',
+      name: 'trustCertificate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only apps that trust user certificates, mostly browsers, are decrypted.`
+  String get mitmCertificateAndroidReadyTip {
+    return Intl.message(
+      'Only apps that trust user certificates, mostly browsers, are decrypted.',
+      name: 'mitmCertificateAndroidReadyTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Flatpak browsers need the exported certificate imported by hand.`
+  String get mitmCertificateLinuxTip {
+    return Intl.message(
+      'Flatpak browsers need the exported certificate imported by hand.',
+      name: 'mitmCertificateLinuxTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chrome and Firefox keep their own certificate stores, which need certutil: {command}`
+  String mitmCertutilMissing(Object command) {
+    return Intl.message(
+      'Chrome and Firefox keep their own certificate stores, which need certutil: $command',
+      name: 'mitmCertutilMissing',
+      desc: '',
+      args: [command],
+    );
+  }
+
+  /// `Not yet in: {stores}`
+  String mitmMissingStores(Object stores) {
+    return Intl.message(
+      'Not yet in: $stores',
+      name: 'mitmMissingStores',
+      desc: '',
+      args: [stores],
+    );
+  }
+
+  /// `Adding the certificate to the system's trusted roots failed`
+  String get mitmSystemStoreFailed {
+    return Intl.message(
+      'Adding the certificate to the system\'s trusted roots failed',
+      name: 'mitmSystemStoreFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No Magisk, KernelSU or APatch was found to keep the certificate. Install it again after the device restarts.`
+  String get mitmRootUntilReboot {
+    return Intl.message(
+      'No Magisk, KernelSU or APatch was found to keep the certificate. Install it again after the device restarts.',
+      name: 'mitmRootUntilReboot',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The certificate takes effect after the device restarts.`
+  String get mitmRootPendingReboot {
+    return Intl.message(
+      'The certificate takes effect after the device restarts.',
+      name: 'mitmRootPendingReboot',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Root was found, so the certificate goes into the system's trusted certificates as a FlClash MITM CA module for Magisk, KernelSU or APatch. Every app on this device will then trust it, and anyone holding its private key could decrypt this device's HTTPS traffic. To undo it, regenerate the certificate or remove the module in the root manager and restart. If root is denied, it is installed as a user certificate instead.`
+  String get mitmInstallSystemCaTip {
+    return Intl.message(
+      'Root was found, so the certificate goes into the system\'s trusted certificates as a FlClash MITM CA module for Magisk, KernelSU or APatch. Every app on this device will then trust it, and anyone holding its private key could decrypt this device\'s HTTPS traffic. To undo it, regenerate the certificate or remove the module in the root manager and restart. If root is denied, it is installed as a user certificate instead.',
+      name: 'mitmInstallSystemCaTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No root was found, so the certificate can only be installed as a user certificate. Only apps that trust user certificates, mostly browsers, are decrypted; other apps fail on the hosts you list, so leave those hosts out. On Android 11 and later you finish the install yourself in system settings.`
+  String get mitmInstallUserCaTip {
+    return Intl.message(
+      'No root was found, so the certificate can only be installed as a user certificate. Only apps that trust user certificates, mostly browsers, are decrypted; other apps fail on the hosts you list, so leave those hosts out. On Android 11 and later you finish the install yourself in system settings.',
+      name: 'mitmInstallUserCaTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saved {fileName} to Downloads. Install it in Settings under Security › Encryption & credentials › Install a certificate › CA certificate.`
+  String mitmCertificateSavedTip(Object fileName) {
+    return Intl.message(
+      'Saved $fileName to Downloads. Install it in Settings under Security › Encryption & credentials › Install a certificate › CA certificate.',
+      name: 'mitmCertificateSavedTip',
+      desc: '',
+      args: [fileName],
+    );
+  }
+
+  /// `Open settings`
+  String get openSettings {
+    return Intl.message(
+      'Open settings',
+      name: 'openSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove the old certificate, {name}, in Settings under Security › Encryption & credentials › Trusted credentials › User, then install the new one.`
+  String mitmRemoveOldCertificateTip(Object name) {
+    return Intl.message(
+      'Remove the old certificate, $name, in Settings under Security › Encryption & credentials › Trusted credentials › User, then install the new one.',
+      name: 'mitmRemoveOldCertificateTip',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `The old certificate, {name}, could not be removed. Remove it from the trusted roots yourself.`
+  String mitmOldCertificateLeftTip(Object name) {
+    return Intl.message(
+      'The old certificate, $name, could not be removed. Remove it from the trusted roots yourself.',
+      name: 'mitmOldCertificateLeftTip',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `The old certificate, {name}, is still among the system's trusted CAs. Allow Flashco root access in your root manager and regenerate, or remove the FlClash MITM CA module there and restart.`
+  String mitmOldSystemCertificateLeftTip(Object name) {
+    return Intl.message(
+      'The old certificate, $name, is still among the system\'s trusted CAs. Allow Flashco root access in your root manager and regenerate, or remove the FlClash MITM CA module there and restart.',
+      name: 'mitmOldSystemCertificateLeftTip',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Decrypt this host`
+  String get mitmDecryptHost {
+    return Intl.message(
+      'Decrypt this host',
+      name: 'mitmDecryptHost',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add {host} to the hostname list? Flashco can then read what is sent to it, cookies and passwords included.`
+  String mitmDecryptHostTip(Object host) {
+    return Intl.message(
+      'Add $host to the hostname list? Flashco can then read what is sent to it, cookies and passwords included.',
+      name: 'mitmDecryptHostTip',
+      desc: '',
+      args: [host],
+    );
+  }
+
+  /// `The client refused the certificate. Install the CA, or exclude this host if the app pins its certificate.`
+  String get mitmClientRefusedCertificate {
+    return Intl.message(
+      'The client refused the certificate. Install the CA, or exclude this host if the app pins its certificate.',
+      name: 'mitmClientRefusedCertificate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exclude from decryption`
+  String get mitmExcludeHost {
+    return Intl.message(
+      'Exclude from decryption',
+      name: 'mitmExcludeHost',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add -{host} to the top of the hostname list? The host is then never decrypted.`
+  String mitmExcludeHostTip(Object host) {
+    return Intl.message(
+      'Add -$host to the top of the hostname list? The host is then never decrypted.',
+      name: 'mitmExcludeHostTip',
+      desc: '',
+      args: [host],
+    );
+  }
+
+  /// `URL rewrite`
+  String get urlRewrite {
+    return Intl.message('URL rewrite', name: 'urlRewrite', desc: '', args: []);
+  }
+
+  /// `Header rewrite`
+  String get headerRewrite {
+    return Intl.message(
+      'Header rewrite',
+      name: 'headerRewrite',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Body rewrite`
+  String get bodyRewrite {
+    return Intl.message(
+      'Body rewrite',
+      name: 'bodyRewrite',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Map local`
+  String get mapLocal {
+    return Intl.message('Map local', name: 'mapLocal', desc: '', args: []);
+  }
+
+  /// `A leading - excludes a host, and the first match decides.`
+  String get mitmHostnameDesc {
+    return Intl.message(
+      'A leading - excludes a host, and the first match decides.',
+      name: 'mitmHostnameDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Modules`
+  String get mitmModules {
+    return Intl.message('Modules', name: 'mitmModules', desc: '', args: []);
+  }
+
+  /// `Module`
+  String get mitmModule {
+    return Intl.message('Module', name: 'mitmModule', desc: '', args: []);
+  }
+
+  /// `This is not a Surge module, a Loon plugin, a Quantumult X snippet or a Stash override`
+  String get mitmModuleInvalid {
+    return Intl.message(
+      'This is not a Surge module, a Loon plugin, a Quantumult X snippet or a Stash override',
+      name: 'mitmModuleInvalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Arguments`
+  String get arguments {
+    return Intl.message('Arguments', name: 'arguments', desc: '', args: []);
+  }
+
+  /// `Routing rules`
+  String get mitmRoutingRules {
+    return Intl.message(
+      'Routing rules',
+      name: 'mitmRoutingRules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ignored lines`
+  String get mitmIgnoredLines {
+    return Intl.message(
+      'Ignored lines',
+      name: 'mitmIgnoredLines',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Routing rules go in front of the profile’s own.`
+  String get mitmModuleRulesDesc {
+    return Intl.message(
+      'Routing rules go in front of the profile’s own.',
+      name: 'mitmModuleRulesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Written for {system}; some lines may not match apps on this device.`
+  String mitmModuleSystemTip(Object system) {
+    return Intl.message(
+      'Written for $system; some lines may not match apps on this device.',
+      name: 'mitmModuleSystemTip',
+      desc: '',
+      args: [system],
+    );
+  }
+
+  /// `The [{section}] section is not supported`
+  String mitmSkipSection(Object section) {
+    return Intl.message(
+      'The [$section] section is not supported',
+      name: 'mitmSkipSection',
+      desc: '',
+      args: [section],
+    );
+  }
+
+  /// `This setting is not supported`
+  String get mitmSkipSetting {
+    return Intl.message(
+      'This setting is not supported',
+      name: 'mitmSkipSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This script type is not supported`
+  String get mitmSkipScriptType {
+    return Intl.message(
+      'This script type is not supported',
+      name: 'mitmSkipScriptType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This rule type is not supported`
+  String get mitmSkipRule {
+    return Intl.message(
+      'This rule type is not supported',
+      name: 'mitmSkipRule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only the DIRECT and REJECT policies are supported`
+  String get mitmSkipPolicy {
+    return Intl.message(
+      'Only the DIRECT and REJECT policies are supported',
+      name: 'mitmSkipPolicy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `jq rewrites are not supported`
+  String get mitmSkipJq {
+    return Intl.message(
+      'jq rewrites are not supported',
+      name: 'mitmSkipJq',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `JSON body rewrites are not supported`
+  String get mitmSkipJsonBody {
+    return Intl.message(
+      'JSON body rewrites are not supported',
+      name: 'mitmSkipJsonBody',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rewriting all headers as one text is not supported`
+  String get mitmSkipRawHeader {
+    return Intl.message(
+      'Rewriting all headers as one text is not supported',
+      name: 'mitmSkipRawHeader',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Conditional rewrites are not supported`
+  String get mitmSkipConditional {
+    return Intl.message(
+      'Conditional rewrites are not supported',
+      name: 'mitmSkipConditional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The file this line names is not attached; use a URL or attach it`
+  String get mitmSkipRelativeData {
+    return Intl.message(
+      'The file this line names is not attached; use a URL or attach it',
+      name: 'mitmSkipRelativeData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Its file has not been downloaded`
+  String get mitmSkipNotDownloaded {
+    return Intl.message(
+      'Its file has not been downloaded',
+      name: 'mitmSkipNotDownloaded',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This line cannot be read`
+  String get mitmSkipUnreadable {
+    return Intl.message(
+      'This line cannot be read',
+      name: 'mitmSkipUnreadable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a local file`
+  String get mitmAddLocalFile {
+    return Intl.message(
+      'Add a local file',
+      name: 'mitmAddLocalFile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New module`
+  String get mitmNewModule {
+    return Intl.message(
+      'New module',
+      name: 'mitmNewModule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Attachments`
+  String get mitmAttachments {
+    return Intl.message(
+      'Attachments',
+      name: 'mitmAttachments',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Lines refer to attachments by file name, as in script-path=a.js.`
+  String get mitmAttachmentsDesc {
+    return Intl.message(
+      'Lines refer to attachments by file name, as in script-path=a.js.',
+      name: 'mitmAttachmentsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The file is larger than {size} MB`
+  String mitmFileTooLarge(Object size) {
+    return Intl.message(
+      'The file is larger than $size MB',
+      name: 'mitmFileTooLarge',
+      desc: '',
+      args: [size],
+    );
+  }
+
+  /// `Turned off by an argument`
+  String get mitmSkipDisabled {
+    return Intl.message(
+      'Turned off by an argument',
+      name: 'mitmSkipDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This event is not supported`
+  String get mitmSkipEvent {
+    return Intl.message(
+      'This event is not supported',
+      name: 'mitmSkipEvent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Run now`
+  String get mitmRunScript {
+    return Intl.message('Run now', name: 'mitmRunScript', desc: '', args: []);
+  }
+
+  /// `The script finished without output`
+  String get mitmScriptNoOutput {
+    return Intl.message(
+      'The script finished without output',
+      name: 'mitmScriptNoOutput',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Run this module's scripts?`
+  String get mitmScriptRiskTitle {
+    return Intl.message(
+      'Run this module\'s scripts?',
+      name: 'mitmScriptRiskTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Its scripts read and change the traffic of the hosts they match, cookies and tokens included, and can send requests of their own. Turn it on only if you trust where it comes from.`
+  String get mitmScriptRisk {
+    return Intl.message(
+      'Its scripts read and change the traffic of the hosts they match, cookies and tokens included, and can send requests of their own. Turn it on only if you trust where it comes from.',
+      name: 'mitmScriptRisk',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{name} changed its scripts and was turned off`
+  String mitmModuleScriptsChanged(Object name) {
+    return Intl.message(
+      '$name changed its scripts and was turned off',
+      name: 'mitmModuleScriptsChanged',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Skip server certificate verification`
+  String get skipServerCertVerify {
+    return Intl.message(
+      'Skip server certificate verification',
+      name: 'skipServerCertVerify',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Block QUIC`
+  String get blockQuic {
+    return Intl.message('Block QUIC', name: 'blockQuic', desc: '', args: []);
+  }
+
+  /// `HTTP/2`
+  String get http2 {
+    return Intl.message('HTTP/2', name: 'http2', desc: '', args: []);
+  }
+
+  /// `Decrypt without local trust`
+  String get decryptUntrusted {
+    return Intl.message(
+      'Decrypt without local trust',
+      name: 'decryptUntrusted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{invalid} of {total} invalid`
+  String invalidOfCount(Object invalid, Object total) {
+    return Intl.message(
+      '$invalid of $total invalid',
+      name: 'invalidOfCount',
+      desc: '',
+      args: [invalid, total],
+    );
+  }
+
+  /// `One item per line`
+  String get batchLineInputTip {
+    return Intl.message(
+      'One item per line',
+      name: 'batchLineInputTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Downloading update`
+  String get downloadingUpdate {
+    return Intl.message(
+      'Downloading update',
+      name: 'downloadingUpdate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update failed`
+  String get updateFailed {
+    return Intl.message(
+      'Update failed',
+      name: 'updateFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update download test`
+  String get updateDownloadTest {
+    return Intl.message(
+      'Update download test',
+      name: 'updateDownloadTest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Downloading the update. Follow its progress on the dashboard.`
+  String get updateDownloadStarted {
+    return Intl.message(
+      'Downloading the update. Follow its progress on the dashboard.',
+      name: 'updateDownloadStarted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update ready`
+  String get updateReady {
+    return Intl.message(
+      'Update ready',
+      name: 'updateReady',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The update has downloaded. Tap to install it.`
+  String get updateReadyTip {
+    return Intl.message(
+      'The update has downloaded. Tap to install it.',
+      name: 'updateReadyTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Stop downloading the update?`
+  String get stopUpdateDownloadTip {
+    return Intl.message(
+      'Stop downloading the update?',
+      name: 'stopUpdateDownloadTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The update could not be installed. You can download it from the release page instead.`
+  String get updateInstallFailed {
+    return Intl.message(
+      'The update could not be installed. You can download it from the release page instead.',
+      name: 'updateInstallFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The downloaded update could not be verified.`
+  String get updateNotVerified {
+    return Intl.message(
+      'The downloaded update could not be verified.',
+      name: 'updateNotVerified',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Flashco closes to install the update and opens again when it is done.`
+  String get updateRestartTip {
+    return Intl.message(
+      'Flashco closes to install the update and opens again when it is done.',
+      name: 'updateRestartTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The update could not be downloaded.`
+  String get updateDownloadFailed {
+    return Intl.message(
+      'The update could not be downloaded.',
+      name: 'updateDownloadFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Resolves the hostnames of the other DNS servers. Use IP addresses only.`
+  String get defaultNameserverDesc {
+    return Intl.message(
+      'Resolves the hostnames of the other DNS servers. Use IP addresses only.',
+      name: 'defaultNameserverDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The default DNS servers, such as 223.5.5.5, tls://1.1.1.1 or https://dns.google/dns-query.`
+  String get nameserverDesc {
+    return Intl.message(
+      'The default DNS servers, such as 223.5.5.5, tls://1.1.1.1 or https://dns.google/dns-query.',
+      name: 'nameserverDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Used instead of Nameserver when the fallback filter treats its answer as polluted.`
+  String get fallbackDesc {
+    return Intl.message(
+      'Used instead of Nameserver when the fallback filter treats its answer as polluted.',
+      name: 'fallbackDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Resolves proxy server hostnames only.`
+  String get proxyServerNameserverDesc {
+    return Intl.message(
+      'Resolves proxy server hostnames only.',
+      name: 'proxyServerNameserverDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Matching proxy server hostnames use the DNS server given here instead of Proxy Server Nameserver.`
+  String get proxyServerNameserverPolicyDesc {
+    return Intl.message(
+      'Matching proxy server hostnames use the DNS server given here instead of Proxy Server Nameserver.',
+      name: 'proxyServerNameserverPolicyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Resolves domains for connections that go direct.`
+  String get directNameserverDesc {
+    return Intl.message(
+      'Resolves domains for connections that go direct.',
+      name: 'directNameserverDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Matching domains use the DNS server given here instead of Nameserver and Fallback.`
+  String get nameserverPolicyDesc {
+    return Intl.message(
+      'Matching domains use the DNS server given here instead of Nameserver and Fallback.',
+      name: 'nameserverPolicyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `These domains get real IPs instead of Fake-IPs. In whitelist mode, only they get Fake-IPs.`
+  String get fakeipFilterDesc {
+    return Intl.message(
+      'These domains get real IPs instead of Fake-IPs. In whitelist mode, only they get Fake-IPs.',
+      name: 'fakeipFilterDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Domains in these GeoSite categories are resolved by Fallback directly.`
+  String get fallbackFilterGeositeDesc {
+    return Intl.message(
+      'Domains in these GeoSite categories are resolved by Fallback directly.',
+      name: 'fallbackFilterGeositeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `When Nameserver returns an IP in these ranges, the Fallback answer is used.`
+  String get fallbackFilterIpcidrDesc {
+    return Intl.message(
+      'When Nameserver returns an IP in these ranges, the Fallback answer is used.',
+      name: 'fallbackFilterIpcidrDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `These domains are resolved by Fallback directly.`
+  String get fallbackFilterDomainDesc {
+    return Intl.message(
+      'These domains are resolved by Fallback directly.',
+      name: 'fallbackFilterDomainDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
@@ -7469,7 +9752,10 @@ class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
   List<Locale> get supportedLocales {
     return const <Locale>[
       Locale.fromSubtags(languageCode: 'en'),
+      Locale.fromSubtags(languageCode: 'es'),
+      Locale.fromSubtags(languageCode: 'fr'),
       Locale.fromSubtags(languageCode: 'ja'),
+      Locale.fromSubtags(languageCode: 'ko'),
       Locale.fromSubtags(languageCode: 'ru'),
       Locale.fromSubtags(languageCode: 'zh', countryCode: 'CN'),
     ];

@@ -1,15 +1,56 @@
-import 'dart:math';
-
 import 'package:flashco/common/common.dart';
-import 'package:flashco/common/theme.dart';
 import 'package:flashco/providers/action.dart';
+import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/state.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flashco/ui/ui.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/state.dart';
+
+/// A rebuilt ThemeData never equals the last, and ThemeCrossFade fades on that.
+final _appThemes = <Brightness, ({Object inputs, ThemeData theme})>{};
+
+ThemeData watchAppTheme(WidgetRef ref, Brightness brightness) {
+  final locale = ref.watch(appSettingProvider.select((state) => state.locale));
+  final fontFamily = ref.watch(
+    themeSettingProvider.select((state) => state.fontFamily),
+  );
+  final colorScheme = ref.watch(genColorSchemeProvider(brightness));
+  final locales = [
+    ?getLocaleForString(locale),
+    ...WidgetsBinding.instance.platformDispatcher.locales,
+  ];
+  final inputs = (
+    platform: defaultTargetPlatform,
+    fontFamily: fontFamily,
+    colorScheme: colorScheme,
+    locales: locales.join(','),
+  );
+  if (_appThemes[brightness] case (
+    inputs: final cached,
+    :final theme,
+  ) when cached == inputs) {
+    return theme;
+  }
+  final theme = ThemeData(
+    colorScheme: colorScheme,
+    fontFamily: fontFamily,
+    fontFamilyFallback: appFontFamilyFallback(
+      platform: defaultTargetPlatform,
+      locales: locales,
+      fontFamily: fontFamily,
+    ),
+    elevatedColorScheme: brightness == Brightness.dark
+        ? colorScheme.elevated
+        : null,
+  );
+  _appThemes[brightness] = (inputs: inputs, theme: theme);
+  return theme;
+}
 
 class ThemeManager extends ConsumerWidget {
   final Widget child;
@@ -33,7 +74,9 @@ class ThemeManager extends ConsumerWidget {
             systemNavigationBarIconBrightness: iconBrightness,
             systemNavigationBarColor: Colors.transparent,
             systemNavigationBarDividerColor: Colors.transparent,
-            systemNavigationBarContrastEnforced: false,
+            // Pages scroll under the navigation bar. Android scrims only a
+            // three-button bar for it; the gesture handle stays clear.
+            systemNavigationBarContrastEnforced: true,
           ),
           sized: false,
           child: child,
@@ -44,39 +87,53 @@ class ThemeManager extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final textScale = ref.read(
-      themeSettingProvider.select((state) => state.textScale),
-    );
-    final double textScaleFactor = max(
-      min(
-        textScale.enable ? textScale.scale : systemTextScaleOf(context),
-        maxTextScale,
-      ),
-      minTextScale,
-    );
-
-    globalState.measure = Measure.of(context, textScaleFactor);
-    globalState.theme = CommonTheme.of(context, textScaleFactor);
-    return _AppMediaQuery(
-      textScaler: TextScaler.linear(textScaleFactor),
-      child: LayoutBuilder(
-        builder: (_, constraints) {
-          ref
-              .read(themeActionProvider.notifier)
-              .updateViewSize(
-                Size(constraints.maxWidth, constraints.maxHeight),
-              );
-          return _buildSystemUi(child);
-        },
+    globalState.measure = MeasureScope.of(context);
+    return AppViewScope(
+      child: _AppMediaQuery(
+        // Every rebuild outside a nearer LayoutBuilder, a route transition's
+        // on each of its frames, relays this one out; the boundaries keep
+        // that from repainting the app from the root.
+        child: RepaintBoundary(
+          child: LayoutBuilder(
+            builder: (_, constraints) {
+              ref
+                  .read(themeActionProvider.notifier)
+                  .updateViewSize(
+                    Size(constraints.maxWidth, constraints.maxHeight),
+                  );
+              return RepaintBoundary(child: _buildSystemUi(child));
+            },
+          ),
+        ),
       ),
     );
   }
 }
 
-class _AppMediaQuery extends StatelessWidget {
-  const _AppMediaQuery({required this.textScaler, required this.child});
+class AppViewScope extends ConsumerWidget {
+  const AppViewScope({super.key, required this.child});
 
-  final TextScaler textScaler;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isMobile = ref.watch(isMobileViewProvider);
+    return ViewScope(
+      size: ref.watch(viewSizeProvider),
+      isMobile: isMobile,
+      windowControls: windowControlsOverPage(
+        isMacOS: system.isMacOS,
+        version: ref.watch(versionProvider),
+        isMobileView: isMobile,
+      ),
+      child: child,
+    );
+  }
+}
+
+class _AppMediaQuery extends StatelessWidget {
+  const _AppMediaQuery({required this.child});
+
   final Widget child;
 
   @override
@@ -85,7 +142,6 @@ class _AppMediaQuery extends StatelessWidget {
     final padding = data.padding;
     return MediaQuery(
       data: data.copyWith(
-        textScaler: textScaler,
         padding: padding.copyWith(
           top: padding.top > data.size.height * 0.3 ? 20.0 : padding.top,
         ),

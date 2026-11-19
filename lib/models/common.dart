@@ -5,11 +5,12 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/glyph.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:prism_ui/icons/glyph.dart';
 
 import 'clash_config.dart';
+import 'record_filter.dart';
 
 part 'generated/common.freezed.dart';
 
@@ -21,7 +22,6 @@ abstract class NavigationItem with _$NavigationItem {
     required Glyph glyph,
     required PageLabel label,
     required WidgetBuilder builder,
-    @Default(true) bool keep,
     String? path,
     @Default([NavigationItemMode.mobile, NavigationItemMode.desktop])
     List<NavigationItemMode> modes,
@@ -61,22 +61,27 @@ extension PackagesExt on List<Package> {
     required bool isFilterNonInternetApp,
   }) {
     final pinned = pinedList.toSet();
-    return whereVisible(
+    final first = <Package>[];
+    final rest = <Package>[];
+    for (final package in whereVisible(
       isFilterSystemApp: isFilterSystemApp,
       isFilterNonInternetApp: isFilterNonInternetApp,
-    ).sorted((a, b) {
-      final isSelectA = pinned.contains(a.packageName);
-      final isSelectB = pinned.contains(b.packageName);
-
-      if (isSelectA != isSelectB) {
-        return isSelectA ? -1 : 1;
-      }
-      return switch (sortType) {
-        AccessSortType.none => 0,
-        AccessSortType.name => a.label.compareTo(b.label),
-        AccessSortType.time => b.lastUpdateTime.compareTo(a.lastUpdateTime),
-      };
-    });
+    )) {
+      (pinned.contains(package.packageName) ? first : rest).add(package);
+    }
+    final compare = switch (sortType) {
+      AccessSortType.none => null,
+      AccessSortType.name => (Package a, Package b) => a.label.compareTo(
+        b.label,
+      ),
+      AccessSortType.time =>
+        (Package a, Package b) => b.lastUpdateTime.compareTo(a.lastUpdateTime),
+    };
+    if (compare != null) {
+      first.sort(compare);
+      rest.sort(compare);
+    }
+    return first..addAll(rest);
   }
 }
 
@@ -100,6 +105,8 @@ abstract class Metadata with _$Metadata {
     @Default('') String sourceIPASN,
     @Default('') String specialRules,
     @Default('') String specialProxy,
+    @Default(false) bool mitm,
+    @Default(false) bool mitmRefused,
   }) = _Metadata;
 
   factory Metadata.fromJson(Map<String, Object?> json) =>
@@ -125,6 +132,20 @@ abstract class TrackerInfo with _$TrackerInfo {
       _$TrackerInfoFromJson(json);
 }
 
+/// Reads the Core's `getConnections` answer.
+List<TrackerInfo> trackerInfosOf(Object? data) {
+  final connections = data is Map ? data['connections'] : null;
+  if (connections is! List) {
+    return const [];
+  }
+  return [
+    for (final item in connections.whereType<Map>())
+      TrackerInfo.fromJson(Map<String, Object?>.from(item)),
+  ];
+}
+
+typedef RequestTraffic = ({int upload, int download});
+
 extension TrackerInfoExt on TrackerInfo {
   String get title {
     final host = metadata.host;
@@ -142,6 +163,8 @@ extension TrackerInfoExt on TrackerInfo {
     }
     return process.trim();
   }
+
+  String get ruleText => rulePayload.isNotEmpty ? '$rule($rulePayload)' : rule;
 
   List<String> get searchFields => [
     metadata.network,
@@ -182,11 +205,25 @@ abstract class Log with _$Log {
   factory Log.fromJson(Map<String, Object?> json) => _$LogFromJson(json);
 }
 
+final _logPayloads = Expando<LogPayload>();
+
+extension LogExt on Log {
+  LogPayload get parsed => _logPayloads[this] ??= LogPayload.parse(payload);
+}
+
+final logFacets = <RecordFacet<Log>>[
+  RecordFacet(
+    RecordFacetKind.level,
+    (log) => [log.logLevel.name],
+    offered: true,
+    order: [for (final level in LogLevel.values) level.name],
+  ),
+];
+
 @freezed
 abstract class LogsState with _$LogsState {
   const factory LogsState({
     @Default([]) List<Log> logs,
-    @Default([]) List<String> keywords,
     @Default('') String query,
     @Default(true) bool autoScrollToEnd,
   }) = _LogsState;
@@ -195,17 +232,14 @@ abstract class LogsState with _$LogsState {
 final _logSearchTexts = Expando<String>();
 
 extension LogsStateExt on LogsState {
-  bool get isSearching => keywords.isNotEmpty || SearchQuery(query).isNotEmpty;
+  bool get isSearching => SearchQuery(query).isNotEmpty;
 
   List<Log> get list {
     final searchQuery = SearchQuery(query);
-    if (keywords.isEmpty && searchQuery.isEmpty) {
+    if (searchQuery.isEmpty) {
       return logs;
     }
     return logs
-        .where(
-          (log) => keywords.every((keyword) => keyword == log.logLevel.name),
-        )
         .whereMatches(
           searchQuery,
           (log) => [log.payload, log.logLevel.name],
@@ -215,11 +249,35 @@ extension LogsStateExt on LogsState {
   }
 }
 
+final trackerInfoFacets = <RecordFacet<TrackerInfo>>[
+  RecordFacet(
+    RecordFacetKind.network,
+    (info) => [info.metadata.network],
+    offered: true,
+    order: const ['tcp', 'udp'],
+    labelOf: (value) => value.toUpperCase(),
+  ),
+  RecordFacet(RecordFacetKind.rule, (info) => [info.rule], offered: true),
+  RecordFacet(
+    RecordFacetKind.mitm,
+    (info) => [if (info.metadata.mitm) 'MITM'],
+    offered: true,
+  ),
+  RecordFacet(RecordFacetKind.app, (info) => [info.metadata.process]),
+  RecordFacet(RecordFacetKind.proxy, (info) => info.chains),
+];
+
+final trackerInfoGroupers = <RecordGrouper<TrackerInfo>>[
+  RecordGrouper(RecordGrouping.app, (info) => info.metadata.process),
+  RecordGrouper(RecordGrouping.host, (info) => info.title),
+  RecordGrouper(RecordGrouping.rule, (info) => info.ruleText),
+  RecordGrouper(RecordGrouping.exit, (info) => info.chains.firstOrNull ?? ''),
+];
+
 @freezed
 abstract class TrackerInfosState with _$TrackerInfosState {
   const factory TrackerInfosState({
     @Default([]) List<TrackerInfo> trackerInfos,
-    @Default([]) List<String> keywords,
     @Default('') String query,
     @Default(true) bool autoScrollToEnd,
   }) = _TrackerInfosState;
@@ -228,21 +286,14 @@ abstract class TrackerInfosState with _$TrackerInfosState {
 final _trackerInfoSearchTexts = Expando<String>();
 
 extension TrackerInfosStateExt on TrackerInfosState {
-  bool get isSearching => keywords.isNotEmpty || SearchQuery(query).isNotEmpty;
+  bool get isSearching => SearchQuery(query).isNotEmpty;
 
   List<TrackerInfo> get list {
     final searchQuery = SearchQuery(query);
-    if (keywords.isEmpty && searchQuery.isEmpty) {
+    if (searchQuery.isEmpty) {
       return trackerInfos;
     }
     return trackerInfos
-        .where(
-          (trackerInfo) => keywords.every(
-            (keyword) =>
-                keyword == trackerInfo.metadata.process ||
-                trackerInfo.chains.contains(keyword),
-          ),
-        )
         .whereMatches(
           searchQuery,
           (trackerInfo) => trackerInfo.searchFields,
@@ -277,14 +328,21 @@ extension DnsQueryExt on DnsQuery {
 
   bool get isFailed => error.isNotEmpty || hasFailureRcode;
 
-  List<String> get tags => [type, ...resultTags];
+  String get summary => error.isNotEmpty ? error : answers.join(', ');
 
-  List<String> get resultTags {
+  List<String> get tags => [
+    type,
+    for (final filter in resultFilters) filter.value,
+  ];
+
+  List<RecordFilter> get resultFilters {
     final initiator = this.initiator;
     return [
-      if (initiator != null) initiator.label,
-      if (cached) currentAppLocalizations.cache,
-      if (hasFailureRcode) rcode,
+      if (initiator != null)
+        RecordFilter(RecordFacetKind.initiator, initiator.label),
+      if (cached)
+        RecordFilter(RecordFacetKind.cache, currentAppLocalizations.cache),
+      if (hasFailureRcode) RecordFilter(RecordFacetKind.rcode, rcode),
     ];
   }
 
@@ -302,22 +360,37 @@ extension DnsQueryExt on DnsQuery {
 abstract class DnsQueriesState with _$DnsQueriesState {
   const factory DnsQueriesState({
     @Default([]) List<DnsQuery> dnsQueries,
-    @Default([]) List<String> keywords,
     @Default('') String query,
     @Default(true) bool autoScrollToEnd,
   }) = _DnsQueriesState;
 }
 
+final dnsQueryFacets = <RecordFacet<DnsQuery>>[
+  RecordFacet(RecordFacetKind.type, (query) => [query.type], offered: true),
+  for (final kind in const [
+    RecordFacetKind.initiator,
+    RecordFacetKind.cache,
+    RecordFacetKind.rcode,
+  ])
+    RecordFacet(
+      kind,
+      (query) => [
+        for (final filter in query.resultFilters)
+          if (filter.kind == kind) filter.value,
+      ],
+      offered: true,
+    ),
+];
+
 extension DnsQueriesStateExt on DnsQueriesState {
-  bool get isSearching => keywords.isNotEmpty || SearchQuery(query).isNotEmpty;
+  bool get isSearching => SearchQuery(query).isNotEmpty;
 
   List<DnsQuery> get list {
     final searchQuery = SearchQuery(query);
-    if (keywords.isEmpty && searchQuery.isEmpty) {
+    if (searchQuery.isEmpty) {
       return dnsQueries;
     }
     return dnsQueries
-        .where((dnsQuery) => keywords.every(dnsQuery.tags.contains))
         .whereMatches(searchQuery, (dnsQuery) => dnsQuery.searchFields)
         .toList();
   }
@@ -439,6 +512,19 @@ extension FileInfoFileExt on File {
     return FileInfo(size: size, lastModified: lastModified);
   }
 
+  /// One stat call, for reading many files in a batch.
+  FileInfo? getFileInfoSync() {
+    final stat = statSync();
+    if (stat.type != FileSystemEntityType.file) {
+      return null;
+    }
+    final modified = stat.modified;
+    return FileInfo(
+      size: stat.size,
+      lastModified: modified.year > 1970 ? modified : null,
+    );
+  }
+
   Future<DateTime?> _getValidLastModified() async {
     try {
       final value = await lastModified();
@@ -450,17 +536,6 @@ extension FileInfoFileExt on File {
 }
 
 @freezed
-abstract class VersionInfo with _$VersionInfo {
-  const factory VersionInfo({
-    @Default('') String clashName,
-    @Default('') String version,
-  }) = _VersionInfo;
-
-  factory VersionInfo.fromJson(Map<String, Object?> json) =>
-      _$VersionInfoFromJson(json);
-}
-
-@freezed
 abstract class Traffic with _$Traffic {
   const factory Traffic({@Default(0) num up, @Default(0) num down}) = _Traffic;
 
@@ -469,10 +544,6 @@ abstract class Traffic with _$Traffic {
 }
 
 extension TrafficExt on Traffic {
-  String get speedText {
-    return '↑ ${up.traffic.show}/s   ↓ ${down.traffic.show}/s';
-  }
-
   String get trayTitle {
     return '${up.shortTraffic.show}/s\n${down.shortTraffic.show}/s';
   }
@@ -505,11 +576,13 @@ abstract class Group with _$Group {
   factory Group.fromJson(Map<String, Object?> json) => _$GroupFromJson(json);
 }
 
+final _groupsByName = Expando<Map<String, Group>>();
+
 extension GroupsExt on List<Group> {
-  Group? getGroup(String groupName) {
-    final index = indexWhere((element) => element.name == groupName);
-    return index != -1 ? this[index] : null;
-  }
+  /// Indexed once per list, so a list must not change after its first lookup.
+  Group? getGroup(String groupName) => (_groupsByName[this] ??= {
+    for (final group in this) group.name: group,
+  })[groupName];
 }
 
 extension GroupExt on Group {
@@ -519,46 +592,12 @@ extension GroupExt on Group {
     if (type.isComputedSelected) {
       return realNow.isNotEmpty ? realNow : proxyName;
     }
-    return proxyName.isNotEmpty ? proxyName : realNow;
+    return proxyName.isNotEmpty && _isMember(proxyName) ? proxyName : realNow;
   }
-}
 
-@freezed
-abstract class ColorSchemes with _$ColorSchemes {
-  const factory ColorSchemes({
-    ColorScheme? lightColorScheme,
-    ColorScheme? darkColorScheme,
-  }) = _ColorSchemes;
-}
-
-extension ColorSchemesExt on ColorSchemes {
-  ColorScheme getColorSchemeForBrightness(
-    Brightness brightness,
-    DynamicSchemeVariant schemeVariant,
-  ) {
-    if (brightness == Brightness.dark) {
-      return darkColorScheme != null
-          ? ColorScheme.fromSeed(
-              seedColor: darkColorScheme!.primary,
-              brightness: Brightness.dark,
-              dynamicSchemeVariant: schemeVariant,
-            )
-          : ColorScheme.fromSeed(
-              seedColor: const Color(defaultPrimaryColor),
-              brightness: Brightness.dark,
-              dynamicSchemeVariant: schemeVariant,
-            );
-    }
-    return lightColorScheme != null
-        ? ColorScheme.fromSeed(
-            seedColor: lightColorScheme!.primary,
-            dynamicSchemeVariant: schemeVariant,
-          )
-        : ColorScheme.fromSeed(
-            seedColor: const Color(defaultPrimaryColor),
-            dynamicSchemeVariant: schemeVariant,
-          );
-  }
+  /// A saved pick outlives a subscription update that renames or drops it.
+  bool _isMember(String proxyName) =>
+      all.isEmpty || all.any((proxy) => proxy.name == proxyName);
 }
 
 @freezed
@@ -606,14 +645,6 @@ abstract class IpInfo with _$IpInfo {
         ip: ip,
         countryCode: countryCode,
       ),
-      _ => throw const FormatException('invalid json'),
-    };
-  }
-
-  static IpInfo fromIpAPIJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {'query': final String ip, 'countryCode': final String countryCode} =>
-        IpInfo(ip: ip, countryCode: countryCode),
       _ => throw const FormatException('invalid json'),
     };
   }
@@ -780,15 +811,33 @@ extension ScriptExt on Script {
     final response = await request.getTextResponseForUrl(url!);
     return save(response.data ?? '');
   }
+}
 
-  Future<Script> saveWithPath(String copyPath) async {
-    final file = File(await path);
-    if (!await file.exists()) {
-      await file.create(recursive: true);
-    }
-    await File(copyPath).copy(copyPath);
-    return copyWith(lastUpdateTime: DateTime.now());
-  }
+@freezed
+abstract class MitmModule with _$MitmModule {
+  const factory MitmModule({
+    required int id,
+    required String name,
+    @Default('') String description,
+    String? url,
+    @Default(true) bool enabled,
+    int? order,
+    @Default({}) Map<String, String> arguments,
+    @Default({}) Map<String, String> resources,
+    String? system,
+
+    /// Its scripts FlClash runs, which turning it on asks about first.
+    @Default(0) int scripts,
+    required DateTime lastUpdateTime,
+  }) = _MitmModule;
+}
+
+extension MitmModuleExt on MitmModule {
+  bool get isRemote => url != null;
+
+  String get fileName => '$id.txt';
+
+  String get updatingKey => 'mitm_module_$id';
 }
 
 @freezed
@@ -835,8 +884,6 @@ extension ClashProviderExt on ClashProvider {
   Future<String> get corePath => isCompiled ? compiledPath : path;
 
   Future<FileInfo?> get fileInfo async => File(await path).getFileInfo();
-
-  Future<String?> get content async => readTextFileTask(await path);
 
   ClashProvider withInfo(RuleSetInfo info) {
     return copyWith(behavior: info.behavior, format: info.format);
@@ -927,9 +974,6 @@ extension IconSetIconsExt on List<IconSetIcon> {
 
   List<ScoredIcon> scoreFor(String name) =>
       scoredBy(matchIconNames([for (final icon in this) icon.name], name));
-
-  List<IconSetIcon> recommendFor(String name, {int limit = 24}) =>
-      rankIconMatches(scoreFor(name), limit: limit);
 }
 
 @freezed
@@ -1026,17 +1070,4 @@ abstract class UpdatingMessage with _$UpdatingMessage {
     required String label,
     required String message,
   }) = _UpdatingMessage;
-}
-
-@freezed
-abstract class IconButtonData with _$IconButtonData {
-  const factory IconButtonData({
-    required Glyph glyph,
-    required VoidCallback? onPressed,
-    String? tooltip,
-    @Default(false) bool isLoading,
-
-    /// Non-null makes the button a toggle that shows this state.
-    bool? isSelected,
-  }) = _IconButtonData;
 }

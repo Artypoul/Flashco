@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -14,7 +14,7 @@ Future<void> showNestedFormSheet<T>({
   required T Function(WidgetRef ref) currentOf,
   required WidgetBuilder formBuilder,
 }) {
-  return showSheet(
+  return showFormSheet(
     context: context,
     props: nestedPagedSheetProps,
     builder: (_) {
@@ -88,9 +88,7 @@ class _NestedFormSheetState<T> extends ConsumerState<NestedFormSheet<T>> {
 
   Future<void> _handleExit() async {
     if (_changed) {
-      final res = await dialogs.showMessage(
-        message: TextSpan(text: context.appLocalizations.saveChanges),
-      );
+      final res = await dialogs.showSaveChanges();
       if (res == null || !mounted) {
         return;
       }

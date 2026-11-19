@@ -107,15 +107,16 @@ void main() {
       expect(clashConfig.proxyProviders, ['provider']);
       expect(clashConfig.ruleProviders, ['ruleSet']);
       expect(clashConfig.subRules, ['nested']);
-      expect(clashConfig.proxyTypeMap, {
-        'Alpha': 'ss',
-        'Beta': 'vmess',
-        'Auto': 'url-test',
-      });
+      expect(
+        {for (final p in clashConfig.proxies) p.name: p.type},
+        {'Alpha': 'ss', 'Beta': 'vmess'},
+      );
+      expect(clashConfig.proxyGroups.single.name, 'Auto');
+      expect(clashConfig.proxyGroups.single.type.value, 'url-test');
     },
   );
 
-  test('buildClashConfig indexes group types by their clash value', () {
+  test('buildClashConfig parses proxy and group types', () {
     final clashConfig = buildClashConfig(<String, dynamic>{
       'proxies': [
         {'name': 'Alpha', 'type': 'ss'},
@@ -129,7 +130,10 @@ void main() {
       ],
     });
 
-    expect(clashConfig.proxyTypeMap, {'Alpha': 'ss', 'Fallback': 'fallback'});
+    expect(clashConfig.proxies.single.name, 'Alpha');
+    expect(clashConfig.proxies.single.type, 'ss');
+    expect(clashConfig.proxyGroups.single.name, 'Fallback');
+    expect(clashConfig.proxyGroups.single.type.value, 'fallback');
     expect(clashConfig.rules, isEmpty);
   });
 
@@ -721,8 +725,9 @@ void main() {
   group('makeRealProfileTask network settings', () {
     Future<YamlMap> runWith(
       PatchClashConfig realPatchConfig,
-      Map<String, dynamic> rawConfig,
-    ) async {
+      Map<String, dynamic> rawConfig, {
+      ProfileOverrides overrides = const ProfileOverrides(),
+    }) async {
       final result = await makeRealProfileTask(
         MakeRealProfileState(
           profilesPath: '/profiles',
@@ -731,6 +736,7 @@ void main() {
             await encodeJSONTask(rawConfig),
           ),
           realPatchConfig: realPatchConfig,
+          overrides: overrides,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],
@@ -741,18 +747,50 @@ void main() {
       return loadYaml(result.yaml) as YamlMap;
     }
 
-    test('tun settings replace the profile ones and leave the rest', () async {
-      final config = await runWith(
-        const PatchClashConfig(tun: Tun(mtu: 1400, strictRoute: true)),
-        {
-          'tun': {'mtu': 9000, 'strict-route': false, 'udp-timeout': 60},
+    test(
+      'tun takes stack from settings and other values from profile',
+      () async {
+        final config = await runWith(
+          const PatchClashConfig(tun: Tun(stack: TunStack.gvisor, mtu: 1400)),
+          {
+            'tun': {'mtu': 9000, 'strict-route': false, 'udp-timeout': 60},
+          },
+        );
+        final tun = config['tun'] as YamlMap;
+
+        expect(tun['stack'], 'gvisor');
+        expect(tun['mtu'], 9000);
+        expect(tun['strict-route'], false);
+        expect(tun.containsKey('congestion-controller'), isFalse);
+        expect(tun['udp-timeout'], 60);
+      },
+    );
+
+    test('saved legacy TUN selections reach the final profile', () async {
+      final patch = Config.realFromJson({
+        'patchClashConfig': {
+          'tun': {'mtu': 1400, 'strict-route': false, 'dns-hijack': <String>[]},
         },
+      }).patchClashConfig;
+      final config = await runWith(
+        patch,
+        {
+          'tun': {
+            'mtu': 9000,
+            'strict-route': true,
+            'dns-hijack': ['any:53'],
+            'udp-timeout': 60,
+          },
+        },
+        overrides: ProfileOverrides(
+          tun: patch.tunOverride,
+          tunOverrideKeys: patch.tunOverrideKeys,
+        ),
       );
       final tun = config['tun'] as YamlMap;
-
       expect(tun['mtu'], 1400);
-      expect(tun['strict-route'], true);
-      expect(tun['congestion-controller'], 'cubic');
+      expect(tun['strict-route'], false);
+      expect(tun['dns-hijack'], isEmpty);
       expect(tun['udp-timeout'], 60);
     });
 

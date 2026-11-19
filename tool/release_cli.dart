@@ -36,6 +36,85 @@ class ReleaseCommandResult {
   final String stderr;
 }
 
+const verifiedCaDigest =
+    'a41b5d356aea97a529fe27e0f7316d2f9d946d75927476cf9cf1b90637d00505';
+
+/// Validates the checked-out source and the sole permitted CA bundle change.
+Future<bool> verifySourceCheckout({
+  required ReleaseCommandRunner runner,
+  required String sourceSha,
+  bool requireCa = false,
+  File? caFile,
+  String expectedCaDigest = verifiedCaDigest,
+  void Function(String)? onFailure,
+}) async {
+  bool fail(String reason) {
+    onFailure?.call(reason);
+    return false;
+  }
+
+  final head = await runner('git', ['rev-parse', 'HEAD']);
+  if (head.exitCode != 0 ||
+      head.stdout.trim().toLowerCase() != sourceSha.toLowerCase()) {
+    return fail(
+      'HEAD mismatch or git failure: ${head.stdout.trim()} ${head.stderr.trim()}',
+    );
+  }
+  final status = await runner('git', [
+    'status',
+    '--porcelain',
+    '--untracked-files=no',
+  ]);
+  if (status.exitCode != 0) {
+    return fail('Root git status failed: ${status.stderr.trim()}');
+  }
+  final changed = status.stdout.trimRight();
+  if (changed.isEmpty) {
+    return requireCa
+        ? fail('Expected verified CA change is absent from root status.')
+        : true;
+  }
+  if (changed != ' M core/Clash.Meta' && changed != ' m core/Clash.Meta') {
+    return fail('Unexpected root git status:\n$changed');
+  }
+  final recorded = await runner('git', ['rev-parse', 'HEAD:core/Clash.Meta']);
+  final actual = await runner('git', [
+    '-C',
+    'core/Clash.Meta',
+    'rev-parse',
+    'HEAD',
+  ]);
+  if (recorded.exitCode != 0 ||
+      actual.exitCode != 0 ||
+      recorded.stdout.trim() != actual.stdout.trim()) {
+    return fail(
+      'Core gitlink mismatch or git failure: recorded=${recorded.stdout.trim()}, actual=${actual.stdout.trim()}, errors=${recorded.stderr.trim()} ${actual.stderr.trim()}',
+    );
+  }
+  final nested = await runner('git', [
+    '-C',
+    'core/Clash.Meta',
+    'status',
+    '--porcelain',
+    '--untracked-files=no',
+  ]);
+  if (nested.exitCode != 0 ||
+      nested.stdout.trimRight() != ' M component/ca/ca-certificates.crt') {
+    return fail(
+      'Unexpected Core git status: ${nested.stdout.trimRight()} ${nested.stderr.trim()}',
+    );
+  }
+  final ca = caFile ?? File('core/Clash.Meta/component/ca/ca-certificates.crt');
+  if (!await ca.exists()) return fail('Verified CA file is missing.');
+  final actualCaDigest = (await sha256.bind(ca.openRead()).first).toString();
+  if (actualCaDigest != expectedCaDigest) {
+    return fail(
+      'Verified CA digest mismatch: actual=$actualCaDigest, expected=$expectedCaDigest',
+    );
+  }
+  return true;
+}
+
 class _FileContentIdentity {
   const _FileContentIdentity(this.sha256, this.size);
 
@@ -306,12 +385,10 @@ class ReleaseCli {
         'Bundle checkout version does not match release preflight.',
       );
     }
-    final status = await _runner('git', [
-      'status',
-      '--porcelain',
-      '--untracked-files=no',
-    ]);
-    if (status.exitCode != 0 || status.stdout.trim().isNotEmpty) {
+    if (!await verifySourceCheckout(
+      runner: _runner,
+      sourceSha: context.sourceSha,
+    )) {
       throw const ReleasePreflightException(
         'Bundle checkout contains modified tracked source files.',
       );

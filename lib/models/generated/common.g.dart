@@ -48,6 +48,8 @@ _Metadata _$MetadataFromJson(Map<String, dynamic> json) => _Metadata(
   sourceIPASN: json['sourceIPASN'] as String? ?? '',
   specialRules: json['specialRules'] as String? ?? '',
   specialProxy: json['specialProxy'] as String? ?? '',
+  mitm: json['mitm'] as bool? ?? false,
+  mitmRefused: json['mitmRefused'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$MetadataToJson(_Metadata instance) => <String, dynamic>{
@@ -68,6 +70,8 @@ Map<String, dynamic> _$MetadataToJson(_Metadata instance) => <String, dynamic>{
   'sourceIPASN': instance.sourceIPASN,
   'specialRules': instance.specialRules,
   'specialProxy': instance.specialProxy,
+  'mitm': instance.mitm,
+  'mitmRefused': instance.mitmRefused,
 };
 
 const _$DnsModeEnumMap = {
@@ -180,17 +184,6 @@ Map<String, dynamic> _$DAVPropsToJson(_DAVProps instance) => <String, dynamic>{
   'password': _encodeDavPassword(instance.password),
   'fileName': instance.fileName,
 };
-
-_VersionInfo _$VersionInfoFromJson(Map<String, dynamic> json) => _VersionInfo(
-  clashName: json['clashName'] as String? ?? '',
-  version: json['version'] as String? ?? '',
-);
-
-Map<String, dynamic> _$VersionInfoToJson(_VersionInfo instance) =>
-    <String, dynamic>{
-      'clashName': instance.clashName,
-      'version': instance.version,
-    };
 
 _Traffic _$TrafficFromJson(Map<String, dynamic> json) =>
     _Traffic(up: json['up'] as num? ?? 0, down: json['down'] as num? ?? 0);

@@ -87,7 +87,7 @@ class ProfilesAction extends _$ProfilesAction {
           await _withAgeSecretKey(Profile.normal(url: url), _download),
         );
         if (fallback == null) return imported;
-        final rawConfig = await _core.getConfig(imported.id);
+        final rawConfig = await _core.readConfig(imported.id);
         final applied = applyProfileFallback(rawConfig, fallback);
         return imported.copyWith(
           overrides: imported.overrides.copyWith(
@@ -165,7 +165,7 @@ class ProfilesAction extends _$ProfilesAction {
     }
   }
 
-  Future<String> validateConfigWithData(String data) async {
+  Future<String?> validateConfigWithData(List<int> data) async {
     return _core.validateConfigWithData(data);
   }
 
@@ -195,12 +195,7 @@ class ProfilesAction extends _$ProfilesAction {
   Future<Profile> _withImportDefaults(Profile profile) async {
     final selectedMap = await globalState.safeRun(() async {
       final groups = await _core.getProfileGroupReferences(profile.id);
-      return {
-        for (final mode in [Mode.rule, Mode.global])
-          if (fastestChoice(groups, mode) case final choice?)
-            choice.selector.name: choice.automatic.name,
-        ...profile.selectedMap,
-      };
+      return importDefaultSelections(groups, profile.selectedMap);
     });
     return profile.copyWith(selectedMap: selectedMap ?? profile.selectedMap);
   }
@@ -663,10 +658,7 @@ class ProfilesAction extends _$ProfilesAction {
       await profileFile.safeDelete(recursive: true);
     }
     try {
-      final error = await _core.clearEffect(profileId);
-      if (error.isNotEmpty) {
-        commonPrint.log(error, logLevel: LogLevel.warning);
-      }
+      await _core.clearEffect(profileId);
     } catch (error) {
       commonPrint.log(
         'clearEffect($profileId) failed: $error',

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flashco/common/migration.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 void main() {
   group('Migration', () {
@@ -292,6 +293,44 @@ void main() {
       ]);
     });
 
+    group('Flashco theme upgrade policy', () {
+      for (final marker in [0, 1, 4, 99]) {
+        test('preserves saved choices with donor marker $marker', () async {
+          final configMap = _createConfigMap();
+          (configMap['themeProps']! as Map<String, Object?>)
+            ..['primaryColor'] = 0xFF123456
+            ..['primaryColors'] = [0xFF795548, 0xFF123456]
+            ..['themeMode'] = 'dark'
+            ..['sidebarBlur'] = true;
+          final store = _FakeMigrationStore(
+            configMap: configMap,
+            version: Migration.currentVersion,
+            upgradeVersion: marker,
+          );
+          final config = await Migration(store: store).run();
+          expect(config.themeProps.primaryColor, 0xFF123456);
+          expect(config.themeProps.primaryColors, [0xFF795548, 0xFF123456]);
+          expect(config.themeProps.themeMode, ThemeMode.dark);
+          expect(config.themeProps.sidebarBlur, isTrue);
+          expect(store.upgradeVersion, marker);
+          expect(store.events, ['getConfigMap', 'getVersion']);
+        });
+      }
+
+      test('preserves an explicitly disabled sidebar blur', () async {
+        final configMap = _createConfigMap();
+        (configMap['themeProps']! as Map<String, Object?>)['sidebarBlur'] =
+            false;
+        final store = _FakeMigrationStore(
+          configMap: configMap,
+          version: Migration.currentVersion,
+        );
+        final config = await Migration(store: store).run();
+        expect(config.themeProps.sidebarBlur, isFalse);
+        expect(store.events, ['getConfigMap', 'getVersion']);
+      });
+    });
+
     test('keeps what it can read of a damaged current config', () async {
       final configMap = _createConfigMap()
         ..['currentProfileId'] = 7
@@ -351,6 +390,7 @@ class _FakeMigrationStore implements MigrationStore {
   final List<String> events = [];
 
   int version;
+  int upgradeVersion;
   Config? savedConfig;
   MigrationData? restoredData;
   bool didClearClashConfig = false;
@@ -358,6 +398,7 @@ class _FakeMigrationStore implements MigrationStore {
   _FakeMigrationStore({
     required this.configMap,
     required this.version,
+    this.upgradeVersion = 0,
     this.clashConfigMap,
     this.configSaveResult = true,
     this.available = true,

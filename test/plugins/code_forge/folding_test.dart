@@ -1,7 +1,7 @@
 import 'package:code_forge/code_forge.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support.dart';
@@ -21,6 +21,24 @@ String _document(int blocks) =>
     ['proxies:', for (var i = 0; i < blocks; i++) _block(i)].join('\n');
 
 int _optsLine(int block) => 1 + block * _blockLines + 3;
+
+Future<void> _waitForFolds(
+  WidgetTester tester,
+  CodeForgeController controller,
+) async {
+  for (var attempt = 0; attempt < 250; attempt++) {
+    if (controller.debugFoldComputationCurrent) return;
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 20)),
+    );
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  if (controller.debugFoldComputationCurrent) return;
+  fail(
+    'Fold computation did not finish for document version '
+    '${controller.contentVersion}',
+  );
+}
 
 void main() {
   setUpAll(initEditorNative);
@@ -106,8 +124,7 @@ void main() {
     Future<List<(int, int)>> foldsOf(String text) async {
       final controller = CodeForgeController()..text = text;
       await pumpEditor(tester, controller);
-      await tester.pump(const Duration(milliseconds: 400));
-      await settle(tester);
+      await _waitForFolds(tester, controller);
       final folds = <(int, int)>[];
       for (var line = 0; line < lines.length; line++) {
         controller.toggleFold(line);
@@ -140,8 +157,7 @@ void main() {
     final text = '${_document(1700)}\nrules:\n  - MATCH,DIRECT';
     final controller = CodeForgeController()..text = text;
     await pumpEditor(tester, controller);
-    await tester.pump(const Duration(milliseconds: 400));
-    await settle(tester);
+    await _waitForFolds(tester, controller);
 
     controller.toggleFold(0);
     await settle(tester);
@@ -155,9 +171,7 @@ void main() {
     await pumpEditor(tester, controller);
     await tester.pump(const Duration(milliseconds: 400));
     controller.replaceRange(0, 0, '#\n#\n');
-    await settle(tester);
-    await tester.pump(const Duration(milliseconds: 400));
-    await settle(tester);
+    await _waitForFolds(tester, controller);
 
     controller.toggleFold(0);
     await settle(tester);
@@ -355,8 +369,7 @@ void main() {
     Future<CodeForgeController> pump(WidgetTester tester) async {
       final controller = CodeForgeController()..text = _document(1700);
       await pumpEditor(tester, controller);
-      await tester.pump(const Duration(milliseconds: 400));
-      await settle(tester);
+      await _waitForFolds(tester, controller);
       return controller;
     }
 
@@ -366,9 +379,8 @@ void main() {
     ) async {
       final end = controller.getLineStartOffset(_optsLine(0) + 2) - 1;
       controller.replaceRange(end, end, ' }');
-      await settle(tester);
-      await tester.pump(const Duration(milliseconds: 400));
-      await settle(tester);
+      expect(controller.debugFoldComputationCurrent, isFalse);
+      await _waitForFolds(tester, controller);
     }
 
     testWidgets('unfolds a fold an edit ended on an earlier line', (
@@ -415,9 +427,7 @@ void main() {
       expect(controller.getFoldStartForLine(line), line - 1);
 
       controller.replaceRange(above, above, '    udp: true\n');
-      await settle(tester);
-      await tester.pump(const Duration(milliseconds: 400));
-      await settle(tester);
+      await _waitForFolds(tester, controller);
       expect(controller.getFoldStartForLine(line + 1), line);
       expect(controller.isLineInFoldedRegion(line + 3), isFalse);
     });
@@ -429,13 +439,13 @@ void main() {
       final inner = _optsLine(0);
       controller.toggleFold(inner);
       await settle(tester);
+      expect(controller.getFoldStartForLine(inner + 2), inner);
       controller.toggleFold(0);
       await settle(tester);
 
       controller.replaceRange(0, 0, '# top\n');
-      await settle(tester);
-      await tester.pump(const Duration(milliseconds: 400));
-      await settle(tester);
+      expect(controller.debugFoldComputationCurrent, isFalse);
+      await _waitForFolds(tester, controller);
       expect(controller.getFoldStartForLine(inner + 1), 1);
       controller.toggleFold(1);
       await settle(tester);
@@ -559,7 +569,7 @@ void main() {
       finder.isRegex = true;
       finder.find(r'\d');
       finder.replaceInputController.text = '9';
-      finder.replaceAll();
+      await finder.replaceAll();
       await tester.pump(const Duration(milliseconds: 300));
       await settle(tester);
       expect(visibleText(controller), 'z: 9\na:\nc: 9');
@@ -600,7 +610,7 @@ void main() {
 
     finder.find('vmess');
     finder.replaceInputController.text = 'trojan';
-    finder.replaceAll();
+    await finder.replaceAll();
     await settle(tester);
     expect(controller.getFoldStartForLine(line + 2), line);
 
@@ -608,7 +618,7 @@ void main() {
     finder.find(r'^  - name: node [14]\n(.*\n){5}');
     expect(finder.matchCount, 2);
     finder.replaceInputController.text = '';
-    finder.replaceAll();
+    await finder.replaceAll();
     await tester.pump(const Duration(milliseconds: 300));
     await settle(tester);
     expect(controller.lineCount, 1 + 4 * _blockLines);

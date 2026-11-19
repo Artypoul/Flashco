@@ -1,17 +1,18 @@
 import 'package:drift/native.dart';
 import 'package:flashco/database/database.dart' hide IconSets;
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/profiles/custom/icon.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/glyph_finders.dart';
 import '../helpers/test_app.dart';
+import 'package:prism_ui/prism_ui.dart';
 
 class _TestIconSets extends IconSets {
   _TestIconSets(this.initial);
@@ -74,7 +75,7 @@ Future<_PopResult> _pumpPicker(
           builder: (context) => TextButton(
             onPressed: () async {
               result.value = await Navigator.of(context).push<String>(
-                MaterialPageRoute(
+                HostPageRoute(
                   builder: (_) =>
                       IconPickerView(value: value, groupName: groupName),
                 ),
@@ -172,22 +173,28 @@ void main() {
     expect(result.value, '');
   });
 
-  testWidgets('every icon sits on the same plate, only the chosen one is '
-      'outlined, and names stay unframed below', (tester) async {
+  testWidgets('every icon sits on the same plate, only the chosen one carries '
+      'the check badge, and names stay unframed below', (tester) async {
     await _pumpPicker(tester, iconSets: [_regions], value: _japan.url);
 
     Finder plateOf(String label) => find.descendant(
       of: find.byTooltip(label).last,
-      matching: find.byType(Material),
+      matching: find.byType(CardSurface),
     );
     BorderSide sideOf(String label) =>
-        (tester.widget<Material>(plateOf(label)).shape! as OutlinedBorder).side;
+        tester.widget<CardSurface>(plateOf(label)).side;
     Color? colorOf(String label) =>
-        tester.widget<Material>(plateOf(label)).color;
+        tester.widget<CardSurface>(plateOf(label)).fill;
+    Finder badgeOf(String label) => find.descendant(
+      of: find.byTooltip(label).last,
+      matching: find.byType(SelectionBadge),
+    );
 
+    expect(colorOf('Japan'), colorOf('Hong Kong'));
     expect(colorOf('Hong Kong'), isNot(Colors.transparent));
-    expect(colorOf('Hong Kong'), colorOf('Japan'));
-    expect(sideOf('Japan').style, BorderStyle.solid);
+    expect(badgeOf('Japan'), findsOneWidget);
+    expect(badgeOf('Hong Kong'), findsNothing);
+    expect(sideOf('Japan'), BorderSide.none);
     expect(sideOf('Hong Kong'), BorderSide.none);
     expect(
       tester.getTopLeft(find.text('Hong Kong')).dy,
@@ -315,7 +322,7 @@ void main() {
 
     await tester.longPress(find.text('Proxy'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Confirm'));
+    await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
 
     expect(find.text('Proxy'), findsNothing);
@@ -358,7 +365,7 @@ void main() {
         child: Builder(
           builder: (context) => TextButton(
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
+              HostPageRoute<void>(
                 builder: (_) => IconGridScrollView(
                   slivers: [
                     SliverFixedExtentList.builder(

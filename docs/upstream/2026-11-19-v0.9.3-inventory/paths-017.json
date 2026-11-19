@@ -1,0 +1,1126 @@
+[
+  {
+    "path": "plugins/rust_api/LICENSE",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba75c69f7f2175380928fff6693b797e2373e603"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba75c69f7f2175380928fff6693b797e2373e603"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba75c69f7f2175380928fff6693b797e2373e603"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/README.md",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ceefae1e251db3456a066ae81f0959761f588347"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f72d3421bb0fb99f76a0ebe29b0552a3e1ec484"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ceefae1e251db3456a066ae81f0959761f588347"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "plugins/rust_api/analysis_options.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "510247314c33b85a7e6302031951dee5aab08ac9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "510247314c33b85a7e6302031951dee5aab08ac9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "510247314c33b85a7e6302031951dee5aab08ac9"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/flutter_rust_bridge.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e15ed9167d9a9d638884c2970a1b448057f13730"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e15ed9167d9a9d638884c2970a1b448057f13730"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e15ed9167d9a9d638884c2970a1b448057f13730"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/hook/build.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9780ef0acd362ea8831ea1786dcbd36e631e58d8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7827b3cb45356a667965c79d11c52bac0791d2c7"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9780ef0acd362ea8831ea1786dcbd36e631e58d8"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "plugins/rust_api/lib/editor.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d70dfd8b0d43500f3b105562bd1673cbae2faab"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d70dfd8b0d43500f3b105562bd1673cbae2faab"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d70dfd8b0d43500f3b105562bd1673cbae2faab"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/lib/rust_api.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "556350c364f94ace301ce09f533ab8192514bf8a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "556350c364f94ace301ce09f533ab8192514bf8a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1cd7a7a8282090f150c5274bd4143176dcb57b8"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/api/charset.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "163103f79df181414e6283162a1f4a2ebf1e39ae"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/api/editor.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da8ba606efbf204b464b48f4ca6a760187161fe5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da8ba606efbf204b464b48f4ca6a760187161fe5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a89ed2d49de2a121adc22190bb4957ff90ccf4f8"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/api/hotkey.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "591386d7111fe23cdeb61aa914d505d857a94b12"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "591386d7111fe23cdeb61aa914d505d857a94b12"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "591386d7111fe23cdeb61aa914d505d857a94b12"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/api/ipc.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82c7d24f7bc5f11cfa2b5992a70f07aa799db7bd"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82c7d24f7bc5f11cfa2b5992a70f07aa799db7bd"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82c7d24f7bc5f11cfa2b5992a70f07aa799db7bd"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/api/script.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9e52d883a6b43b4fb9c8f9a8d767c95900cd9b1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9e52d883a6b43b4fb9c8f9a8d767c95900cd9b1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9e52d883a6b43b4fb9c8f9a8d767c95900cd9b1"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/frb_generated.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77561aaef05b2e5b9a83fb429854312e4cf9ff8f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77561aaef05b2e5b9a83fb429854312e4cf9ff8f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66eab7b3bdc05a9d0dd09642c0b0a3b073dca603"
+    },
+    "disposition": "regenerate_or_resolve_lock",
+    "rationale": "Generated artifacts must be regenerated from adapted sources; lockfiles resolved and reviewed, not blindly copied."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/frb_generated.io.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f343d9ca4b66d307051bdb01d35bc2e9b0f539b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f343d9ca4b66d307051bdb01d35bc2e9b0f539b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fab9dffe5f1a33ab757f0f41d0a50b91fc5875be"
+    },
+    "disposition": "regenerate_or_resolve_lock",
+    "rationale": "Generated artifacts must be regenerated from adapted sources; lockfiles resolved and reviewed, not blindly copied."
+  },
+  {
+    "path": "plugins/rust_api/lib/src/rust/frb_generated.web.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "983b4b35d837f678e3bcdb56ca940b699c50dfa3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "983b4b35d837f678e3bcdb56ca940b699c50dfa3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "68cdb0e34ef51d6a3fa6bf28277ecbbbd402140e"
+    },
+    "disposition": "regenerate_or_resolve_lock",
+    "rationale": "Generated artifacts must be regenerated from adapted sources; lockfiles resolved and reviewed, not blindly copied."
+  },
+  {
+    "path": "plugins/rust_api/pubspec.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7cca26bb8be53d01339f9dc7e6a23d4ee294511"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7cca26bb8be53d01339f9dc7e6a23d4ee294511"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7cca26bb8be53d01339f9dc7e6a23d4ee294511"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/.gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea8c4bf7f35f6f77f75d92ad8ce8349f6e81ddba"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea8c4bf7f35f6f77f75d92ad8ce8349f6e81ddba"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea8c4bf7f35f6f77f75d92ad8ce8349f6e81ddba"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/Cargo.lock",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b230049299a301d5292038d144613ca3ab64795"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b230049299a301d5292038d144613ca3ab64795"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "55ba7d91f1d8aa1db804287549a4e538ed7fea02"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/Cargo.toml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b77a23f1cf3757eabc9e4e3a660c9c3a1ae79a77"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b77a23f1cf3757eabc9e4e3a660c9c3a1ae79a77"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bdf2b0d7257127b405091fb0267e23dc5d5d9b3c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/rust-toolchain.toml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8bc3b265e671f2cb364f7749c1313390c44e88f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8bc3b265e671f2cb364f7749c1313390c44e88f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8bc3b265e671f2cb364f7749c1313390c44e88f"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/charset.rs",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e493e134a756c08b236633be2b646c6891f334c4"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/editor.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2599508d084dd8cc758d5d75f552bdeac5cdaaa6"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2599508d084dd8cc758d5d75f552bdeac5cdaaa6"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5323fc10a936c8ae606eacefaa4aa55b1a8c2541"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/hotkey.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bb46928d7937e5f98ad6dfdeb3e0da39a5572c7"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bb46928d7937e5f98ad6dfdeb3e0da39a5572c7"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bb46928d7937e5f98ad6dfdeb3e0da39a5572c7"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/init.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1606ea581d5918d670d66efa4336e2268a8a2b98"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1606ea581d5918d670d66efa4336e2268a8a2b98"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1606ea581d5918d670d66efa4336e2268a8a2b98"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/ipc.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e66873cf977776ba4275f987593765875a9bcdd7"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e66873cf977776ba4275f987593765875a9bcdd7"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e66873cf977776ba4275f987593765875a9bcdd7"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/mod.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74c477b9f45f3beaa9be265c5e8fb44afdf2cde6"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74c477b9f45f3beaa9be265c5e8fb44afdf2cde6"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a6b731f958e6378b5a21dbc10541f7146b2d03a"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/api/script.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db54077e9e0418b4f4c27c5456d8df3f4d7841a5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db54077e9e0418b4f4c27c5456d8df3f4d7841a5"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db54077e9e0418b4f4c27c5456d8df3f4d7841a5"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/editor/buffer.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26a37996f63227e4a282eae126e135e36caa3be9"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26a37996f63227e4a282eae126e135e36caa3be9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4b9ad850231dc81a69ab5118d5a1e068f4e7ae1b"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/editor/folds.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f64e3c30aee89aa3bd6453ea0125c83036fb13a3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f64e3c30aee89aa3bd6453ea0125c83036fb13a3"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f64e3c30aee89aa3bd6453ea0125c83036fb13a3"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/editor/guides.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6acf325c53fb717a24eea537dd31f5153948d15c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6acf325c53fb717a24eea537dd31f5153948d15c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6acf325c53fb717a24eea537dd31f5153948d15c"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/editor/mod.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72f945bea1df444a2cbb48c7691cf92607d971e4"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72f945bea1df444a2cbb48c7691cf92607d971e4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c7f1fb4a265f743fa47be4726ac2ed29a968fcd"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/editor/words.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb877233e449c0896e5f13965d51615fc0434074"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb877233e449c0896e5f13965d51615fc0434074"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb877233e449c0896e5f13965d51615fc0434074"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/frb_generated.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b5ede7e5be789b3a6ca7a0b2487568272520b9b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b5ede7e5be789b3a6ca7a0b2487568272520b9b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e25af900d143e772bf81ab464929f1eddba1232a"
+    },
+    "disposition": "regenerate_or_resolve_lock",
+    "rationale": "Generated artifacts must be regenerated from adapted sources; lockfiles resolved and reviewed, not blindly copied."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/hotkey/keys.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "304eb35ec727b9bfbfdeda3050bb443917ed2d45"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "304eb35ec727b9bfbfdeda3050bb443917ed2d45"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "304eb35ec727b9bfbfdeda3050bb443917ed2d45"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/hotkey/mod.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b431b6823e53d356d9fc4fdf36e6e951e36d5cf"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b431b6823e53d356d9fc4fdf36e6e951e36d5cf"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b431b6823e53d356d9fc4fdf36e6e951e36d5cf"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/hotkey/owner.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33dada6cfa71ae4d3d35f1783d18b5354488c9f1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33dada6cfa71ae4d3d35f1783d18b5354488c9f1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33dada6cfa71ae4d3d35f1783d18b5354488c9f1"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/hotkey/service.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1eecf4eb901287242e30cad1f488569b1a55b09b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1eecf4eb901287242e30cad1f488569b1a55b09b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1eecf4eb901287242e30cad1f488569b1a55b09b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/hotkey/unsupported.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6176538170893dff2328372d682015341d800378"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6176538170893dff2328372d682015341d800378"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6176538170893dff2328372d682015341d800378"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/ipc/access.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f485a757a089cc2d458f9e981e46ce61a0d8f8b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f485a757a089cc2d458f9e981e46ce61a0d8f8b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f485a757a089cc2d458f9e981e46ce61a0d8f8b"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/ipc/frame.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463dd7e81552081deb1113dbf11e09f1e5ba41af"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463dd7e81552081deb1113dbf11e09f1e5ba41af"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463dd7e81552081deb1113dbf11e09f1e5ba41af"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/ipc/mod.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88475d7f54539ccb0b26b26251cda3d3cf8c5cc1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88475d7f54539ccb0b26b26251cda3d3cf8c5cc1"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88475d7f54539ccb0b26b26251cda3d3cf8c5cc1"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/ipc/outbox.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "891fcf3e053cedd2f2f8c6410be1e058682b1b14"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "891fcf3e053cedd2f2f8c6410be1e058682b1b14"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "891fcf3e053cedd2f2f8c6410be1e058682b1b14"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/ipc/server.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57d1a6c213f5649bf90cdce7a1167ec0f323c1f8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b24efbe20492ae543d1432e526adbe41e6a457fb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57d1a6c213f5649bf90cdce7a1167ec0f323c1f8"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/ipc/unsupported.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6aac47979f07e7dff514d16301f613fb864e945"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6aac47979f07e7dff514d16301f613fb864e945"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6aac47979f07e7dff514d16301f613fb864e945"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/lib.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "062e25ffb9d5c8e216a6bec52642dd3e5c02ec4d"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "062e25ffb9d5c8e216a6bec52642dd3e5c02ec4d"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "062e25ffb9d5c8e216a6bec52642dd3e5c02ec4d"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/script/console.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3d2333a8f35a64686339f47b578f772be194086"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3d2333a8f35a64686339f47b578f772be194086"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3d2333a8f35a64686339f47b578f772be194086"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/src/script/mod.rs",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e29b24d1fdb3dd594319e78516e11dbc58c97660"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e29b24d1fdb3dd594319e78516e11dbc58c97660"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e29b24d1fdb3dd594319e78516e11dbc58c97660"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/tests/fixtures/profile_config.json",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb6cf6cb5a4261be273576c132ae7932aae17a1e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb6cf6cb5a4261be273576c132ae7932aae17a1e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb6cf6cb5a4261be273576c132ae7932aae17a1e"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/rust/tests/fixtures/profile_script.js",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2e0160571bbc24f49fd44a296dac2467ddfad79"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2e0160571bbc24f49fd44a296dac2467ddfad79"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2e0160571bbc24f49fd44a296dac2467ddfad79"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/rust_api/test_driver/integration_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b38629cca97bc2fd126eba080d20252926cf2868"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b38629cca97bc2fd126eba080d20252926cf2868"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b38629cca97bc2fd126eba080d20252926cf2868"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/setup/.gitignore",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9d7f25b91b64b864e4219fce3c5385e29eb61bc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9d7f25b91b64b864e4219fce3c5385e29eb61bc"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9d7f25b91b64b864e4219fce3c5385e29eb61bc"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/setup/analysis_options.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dde9ee9e1d43b949c5b4c79d52349e280ad064ac"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dde9ee9e1d43b949c5b4c79d52349e280ad064ac"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dde9ee9e1d43b949c5b4c79d52349e280ad064ac"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/setup/hook/build.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1301772ffae32f6c971c7b3e5efb2ce06d26bde0"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1301772ffae32f6c971c7b3e5efb2ce06d26bde0"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1301772ffae32f6c971c7b3e5efb2ce06d26bde0"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/setup/pubspec.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa5546ec5271fc55432c3e937a55b40dbb3c6335"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb547f2f3621fe0ff0fd206b42e9f592c752e527"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa5546ec5271fc55432c3e937a55b40dbb3c6335"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "plugins/setup/setup_hooks/analysis_options.yaml",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddd02d8fe44f5c64f10cd090d936b6e8d81f5c36"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddd02d8fe44f5c64f10cd090d936b6e8d81f5c36"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddd02d8fe44f5c64f10cd090d936b6e8d81f5c36"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/setup/setup_hooks/lib/setup_hooks.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75e2d9752e8981f7f183b43241501ea9b5194ddb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75e2d9752e8981f7f183b43241501ea9b5194ddb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75e2d9752e8981f7f183b43241501ea9b5194ddb"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  },
+  {
+    "path": "plugins/setup/setup_hooks/lib/src/build.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e7c538573a7a7552abd3858b5157bf9b07cce51"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e7c538573a7a7552abd3858b5157bf9b07cce51"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e7c538573a7a7552abd3858b5157bf9b07cce51"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  }
+]

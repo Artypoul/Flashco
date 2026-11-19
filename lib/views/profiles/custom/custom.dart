@@ -3,20 +3,20 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:flashco/common/common.dart';
-import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/form/form.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/config/dns.dart';
 import 'package:flashco/views/config/ntp.dart';
 import 'package:flashco/views/config/sniffer.dart';
 import 'package:flashco/views/config/tun.dart';
 import 'package:flashco/views/profiles/edit.dart';
+import 'package:flashco/views/profiles/preview.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dialers.dart';
@@ -42,6 +42,37 @@ void _push(BuildContext context, Widget view) {
   BaseNavigator.push(context, view);
 }
 
+Widget _sectionRow(
+  BuildContext context,
+  Glyph glyph,
+  String title,
+  Widget state,
+  Widget view,
+) {
+  return ListItem(
+    leading: GlyphIcon(glyph),
+    title: Text(title),
+    trailing: Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 4,
+      children: [
+        Flexible(
+          child: DefaultTextStyle.merge(
+            style: context.listTitleStyle.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            child: state,
+          ),
+        ),
+        const GlyphIcon(AppGlyphs.chevronForward),
+      ],
+    ),
+    onTap: () => _push(context, view),
+  );
+}
+
 class CustomProfileView extends ConsumerStatefulWidget {
   final int profileId;
 
@@ -58,8 +89,7 @@ class CustomProfileView extends ConsumerStatefulWidget {
   ConsumerState<CustomProfileView> createState() => _CustomProfileViewState();
 }
 
-class _CustomProfileViewState extends ConsumerState<CustomProfileView>
-    with RouteSettledMixin<CustomProfileView> {
+class _CustomProfileViewState extends ConsumerState<CustomProfileView> {
   late SetupAction _setupAction;
   late ProfilesAction _profilesAction;
   late final Profile? _initialProfile;
@@ -68,6 +98,8 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
   var _discarded = false;
   var _discardOnDispose = false;
   var _loaded = false;
+  var _groupsScheduled = false;
+  var _groupsShown = false;
   List<Object?>? _loadedInputs;
   var _edited = false;
   var _importing = false;
@@ -81,7 +113,7 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
   }
 
   bool get _isUntouched {
-    if (!routeSettled) {
+    if (!_loaded) {
       return true;
     }
     final profileId = widget.profileId;
@@ -101,9 +133,6 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
       ref.read(profileRulesProvider(profileId)).value,
     ];
   }
-
-  @override
-  void didSettleRoute() => setState(() {});
 
   bool get _isEmpty {
     final profileId = widget.profileId;
@@ -155,12 +184,29 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
       if (!_isEmpty) {
         final res = await dialogs.showMessage(
           message: TextSpan(text: appLocalizations.importConfigReplaceTip),
+          destructive: true,
+          confirmText: appLocalizations.replace,
         );
         if (res != true || !mounted) {
           return;
         }
       }
       await _profilesAction.importCustomProfile(widget.profileId, config);
+      final dropped = [
+        if (config.droppedSubRules > 0)
+          appLocalizations.customImportDroppedSubRules(
+            config.droppedSubRules,
+            config.droppedSubRules.compact,
+          ),
+      ];
+      if (dropped.isNotEmpty && mounted) {
+        unawaited(
+          dialogs.showAlert(
+            title: appLocalizations.import,
+            message: TextSpan(text: dropped.join('\n\n')),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -190,6 +236,20 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
     return true;
   }
 
+  void _handleRename() {
+    final profile = ref.read(profileProvider(widget.profileId));
+    if (profile != null) {
+      unawaited(renameProfile(context, ref, profile));
+    }
+  }
+
+  void _handlePreview() {
+    final profile = ref.read(profileProvider(widget.profileId));
+    if (profile != null) {
+      _push(context, PreviewProfileView(profile: profile));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
@@ -199,12 +259,9 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
         profileId,
       ).select((state) => state?.realLabel ?? _initialProfile?.realLabel ?? ''),
     );
-    // Reads nothing until the route settles, since loading mid-transition
-    // drops frames.
     _loaded =
         _loaded ||
-        (routeSettled &&
-            ref.watch(
+        (ref.watch(
               customProfileDataProvider(
                 profileId,
               ).select((state) => state != null),
@@ -216,70 +273,100 @@ class _CustomProfileViewState extends ConsumerState<CustomProfileView>
             ));
     if (_loaded) {
       _loadedInputs ??= _inputs;
+      _showGroupsNextFrame();
     }
-    return CommonPopScope(
-      onPop: widget.isNew ? _nameBeforeLeaving : null,
-      onPopSuccess: _discardIfUntouched,
-      child: ProfileIdProvider(
-        profileId: profileId,
-        child: CommonScaffold(
-          title: label,
-          isLoading: _importing,
-          actions: [
-            CommonPopupBox(
-              targetBuilder: (open) => FilledButton(
-                onPressed: _loaded && !_importing
-                    ? () =>
-                          open(offset: Offset(0, context.isMobileView ? 0 : 20))
-                    : null,
-                child: Text(appLocalizations.import),
+    return ArrivalHold(
+      ready: _groupsShown,
+      child: PopGuard(
+        onPop: widget.isNew ? _nameBeforeLeaving : null,
+        onPopSuccess: _discardIfUntouched,
+        child: ProfileIdProvider(
+          profileId: profileId,
+          child: Scaffold(
+            title: label,
+            titleMenuItems: [
+              PopupMenuItem(
+                glyph: AppGlyphs.textShort,
+                label: appLocalizations.rename,
+                onPressed: _handleRename,
               ),
-              popupBuilder: (_) => CommonPopupMenu(
-                items: [
-                  CommonPopupMenuItem(
-                    glyph: AppGlyphs.cloudDownload,
-                    label: appLocalizations.importUrl,
-                    onPressed: _handleImportFromUrl,
-                  ),
-                  CommonPopupMenuItem(
-                    glyph: AppGlyphs.importFile,
-                    label: appLocalizations.importFile,
-                    onPressed: _handleImportFromFile,
-                  ),
-                ],
+              PopupMenuItem(
+                glyph: AppGlyphs.eye,
+                label: appLocalizations.runtimeConfig,
+                onPressed: _handlePreview,
               ),
-            ),
-          ],
-          body: NullStatusSwitcher(
-            isEmpty: !_loaded,
-            nullStatus: const NullStatus(
-              illustration: NullStatusIllustration.profile,
-            ),
-            child: ScrollConfiguration(
-              behavior: const ShowBarScrollBehavior(),
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: SizedBox(height: context.contentTopPadding),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                    ).copyWith(bottom: 24),
-                    sliver: SliverMainAxisGroup(
-                      slivers: [
-                        SliverToBoxAdapter(child: _overview),
-                        _groups,
-                      ],
+            ],
+            isLoading: _importing,
+            actions: [
+              PopupAnchor(
+                targetBuilder: (open) => FilledButton(
+                  onPressed: _loaded && !_importing ? open : null,
+                  child: Text(appLocalizations.import),
+                ),
+                popupBuilder: (_) => PopupMenu(
+                  items: [
+                    PopupMenuItem(
+                      glyph: AppGlyphs.cloudDownload,
+                      label: appLocalizations.importUrl,
+                      onPressed: _handleImportFromUrl,
                     ),
+                    PopupMenuItem(
+                      glyph: AppGlyphs.importFile,
+                      label: appLocalizations.importFile,
+                      onPressed: _handleImportFromFile,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            body: NullStatusSwitcher(
+              isLoading: !_loaded,
+              loadingStatus: const NullStatus(
+                illustration: NullStatusIllustration.profile,
+              ),
+              child: ScrollConfiguration(
+                behavior: const ShowBarScrollBehavior(),
+                child: ArrivalCacheExtentBuilder(
+                  builder: (cacheExtent) => CustomScrollView(
+                    scrollCacheExtent: cacheExtent,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: SizedBox(height: context.sectionsTopPadding),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ).copyWith(bottom: 24 + context.bottomInset),
+                        sliver: SliverMainAxisGroup(
+                          slivers: [
+                            SliverToBoxAdapter(child: _overview),
+                            if (_groupsShown) _groups,
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  // The groups come a frame after the overview, while the push still holds:
+  // built in one frame, the first screen overran it on a phone.
+  void _showGroupsNextFrame() {
+    if (_groupsScheduled) {
+      return;
+    }
+    _groupsScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _groupsShown = true);
+      }
+    });
   }
 
   @override
@@ -331,15 +418,9 @@ class _Overview extends ConsumerWidget {
         _MoreSectionsView(profileId, showsTun: showsTun),
       ),
     ];
-    Widget tile(int index, Widget value, {bool invalid = false}) {
-      final (glyph, label, view) = sections[index];
-      return _OverviewTile(
-        glyph: glyph,
-        label: label,
-        invalid: invalid,
-        onPressed: () => _push(context, view),
-        value: value,
-      );
+    Widget row(int index, Widget state) {
+      final (glyph, title, view) = sections[index];
+      return _sectionRow(context, glyph, title, state, view);
     }
 
     ref.listen(customProfileDataProvider(profileId), (_, _) {});
@@ -364,7 +445,7 @@ class _Overview extends ConsumerWidget {
         issueCounts.dns +
         issueCounts.ntp;
     final dialerCount = ref.watch(_dialerCount(profileId));
-    final providers = referencedProviders(ref, profileId);
+    final providers = ref.watch(customReferencedProvidersProvider(profileId));
     final missingProviders = ref.watch(
       customProfileDataProvider(profileId).select(
         (state) => state != null
@@ -392,38 +473,33 @@ class _Overview extends ConsumerWidget {
               ? appLocalizations.customIssuesSummary(issueCount)
               : null,
         ),
-        _TileGrid(
-          children: [
-            tile(
-              0,
-              _CountText(count: ruleNum, issueCount: issueCounts.rules),
-              invalid: issueCounts.rules > 0,
-            ),
-            tile(
+        generateSection(
+          items: [
+            row(0, _CountText(count: ruleNum, issueCount: issueCounts.rules)),
+            row(
               1,
               _CountText(
                 count: providers.proxy.length + providers.rule.length,
                 issueCount: missingProviders,
               ),
-              invalid: missingProviders > 0,
             ),
-            tile(
+            row(
               2,
               _StatusText(
                 _enabledText(appLocalizations, status.dns),
                 active: status.dns,
+                invalid: issueCounts.dns > 0,
               ),
-              invalid: issueCounts.dns > 0,
             ),
-            tile(
+            row(
               3,
               _StatusText(
                 moreInEffect > 0
                     ? appLocalizations.sectionsInEffect(moreInEffect)
                     : appLocalizations.defaultText,
                 active: moreInEffect > 0,
+                invalid: issueCounts.dialers + issueCounts.ntp > 0,
               ),
-              invalid: issueCounts.dialers + issueCounts.ntp > 0,
             ),
           ],
         ),
@@ -474,25 +550,18 @@ class _MoreSectionsView extends ConsumerWidget {
         ),
       ),
     );
-    Widget section(Glyph glyph, String title, Widget state, Widget view) {
-      return ListItem(
-        leading: GlyphIcon(glyph),
-        title: Text(title),
-        subtitle: state,
-        onTap: () => _push(context, view),
-      );
-    }
-
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.more,
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ).copyWith(top: context.contentTopPadding, bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+          top: context.sectionsTopPadding,
+          bottom: 16 + context.bottomInset,
+        ),
         children: [
-          generateSectionV3(
+          generateSection(
             items: [
-              section(
+              _sectionRow(
+                context,
                 AppGlyphs.link,
                 appLocalizations.dialerProxy,
                 Text(
@@ -508,7 +577,8 @@ class _MoreSectionsView extends ConsumerWidget {
                 ),
                 CustomProxyDialersView(profileId),
               ),
-              section(
+              _sectionRow(
+                context,
                 AppGlyphs.clock,
                 'NTP',
                 Text(
@@ -519,14 +589,16 @@ class _MoreSectionsView extends ConsumerWidget {
                 ),
                 NtpView(profileId),
               ),
-              section(
+              _sectionRow(
+                context,
                 AppGlyphs.eye,
                 appLocalizations.sniffer,
                 Text(_enabledText(appLocalizations, status.sniffer)),
                 SnifferView(profileId),
               ),
               if (showsTun)
-                section(
+                _sectionRow(
+                  context,
                   AppGlyphs.vpn,
                   appLocalizations.tun,
                   Text(
@@ -539,124 +611,6 @@ class _MoreSectionsView extends ConsumerWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Balances its rows, so four tiles that fit three abreast make two rows of
-/// two rather than three and one.
-class _TileGrid extends StatelessWidget {
-  const _TileGrid({required this.children});
-
-  final List<Widget> children;
-
-  static const _spacing = 8.0;
-  static const _minTileWidth = 150.0;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final fit =
-            ((constraints.maxWidth + _spacing) ~/ (_minTileWidth + _spacing))
-                .clamp(1, children.length);
-        final rows = (children.length / fit).ceil();
-        final columns = (children.length / rows).ceil();
-        return Column(
-          spacing: _spacing,
-          children: [
-            for (var start = 0; start < children.length; start += columns)
-              Row(
-                spacing: _spacing,
-                children: [
-                  for (var index = start; index < start + columns; index++)
-                    Expanded(
-                      child: index < children.length
-                          ? children[index]
-                          : const SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _OverviewTile extends StatelessWidget {
-  const _OverviewTile({
-    required this.glyph,
-    required this.label,
-    required this.onPressed,
-    required this.value,
-    this.invalid = false,
-  });
-
-  final Glyph glyph;
-  final String label;
-  final VoidCallback onPressed;
-  final Widget value;
-  final bool invalid;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = context.colorScheme;
-    final textTheme = context.textTheme;
-    return CommonCard(
-      type: context.isInBottomSheet
-          ? CommonCardType.filled
-          : CommonCardType.plain,
-      radius: AppCorner.lg,
-      onPressed: onPressed,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          spacing: 12,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: ShapeDecoration(
-                color: invalid
-                    ? colorScheme.errorContainer
-                    : colorScheme.secondaryContainer,
-                shape: AppShape.circle,
-              ),
-              child: GlyphIcon(
-                glyph,
-                size: 20,
-                color: invalid
-                    ? colorScheme.onErrorContainer
-                    : colorScheme.onSecondaryContainer,
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  DefaultTextStyle.merge(
-                    style: textTheme.titleMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    child: value,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -682,10 +636,11 @@ class _CountText extends StatelessWidget {
 }
 
 class _StatusText extends StatelessWidget {
-  const _StatusText(this.text, {required this.active});
+  const _StatusText(this.text, {required this.active, this.invalid = false});
 
   final String text;
   final bool active;
+  final bool invalid;
 
   @override
   Widget build(BuildContext context) {
@@ -693,7 +648,11 @@ class _StatusText extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: active ? colorScheme.tertiary : colorScheme.onSurfaceVariant,
+        color: invalid
+            ? colorScheme.error
+            : active
+            ? colorScheme.tertiary
+            : colorScheme.onSurfaceVariant,
       ),
     );
   }

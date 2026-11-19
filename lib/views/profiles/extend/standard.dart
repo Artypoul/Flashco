@@ -1,13 +1,12 @@
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/features/form/form.dart';
-import 'package:flashco/icons/icons.dart';
 import 'package:flashco/models/clash_config.dart';
-import 'package:flashco/models/state.dart';
 import 'package:flashco/providers/providers.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/views/config/rules.dart';
 import 'package:flashco/widgets/widgets.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class StandardContent extends ConsumerStatefulWidget {
@@ -22,8 +21,9 @@ class _StandardContentState extends ConsumerState<StandardContent> {
   late int _profileId;
 
   Future<void> _handleAddOrUpdate([Rule? rule]) async {
-    final res = await dialogs.showCommonDialog<Rule>(
-      child: AddOrEditRuleDialog(rule: rule),
+    final res = await showFormSheet<Rule>(
+      context: context,
+      builder: (_) => RuleForm(rule: rule),
     );
     if (res == null) {
       return;
@@ -68,6 +68,8 @@ class _StandardContentState extends ConsumerState<StandardContent> {
       message: TextSpan(
         text: appLocalizations.deleteMultipTip(appLocalizations.rule),
       ),
+      destructive: true,
+      confirmText: appLocalizations.delete,
     );
     if (res != true) {
       return;
@@ -91,7 +93,7 @@ class _StandardContentState extends ConsumerState<StandardContent> {
 
   Widget _buildRuleItem(List<Rule> rules, int index, Set<dynamic> selected) {
     final rule = rules[index];
-    return ReorderableDelayedDragStartListener(
+    return ReorderDragStartListener(
       key: ObjectKey(rule),
       index: index,
       child: ItemPositionProvider(
@@ -121,81 +123,49 @@ class _StandardContentState extends ConsumerState<StandardContent> {
     _profileId = ProfileIdProvider.of(context)!.profileId;
     final addedRules = ref.watch(profileRulesProvider(_profileId)).value ?? [];
     final selectedRules = ref.watch(itemsProvider(_key));
-    return CommonPopScope(
-      onPop: (_) {
-        if (selectedRules.isNotEmpty) {
-          ref.read(itemsProvider(_key).notifier).value = {};
-          return false;
-        }
-        Navigator.of(context).pop();
-        return false;
-      },
+    return PopGuard(
+      onPop: selectedRules.isEmpty
+          ? null
+          : (_) {
+              ref.read(itemsProvider(_key).notifier).value = {};
+              return false;
+            },
       child: SliverMainAxisGroup(
         slivers: [
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
           SliverToBoxAdapter(
-            child: Column(
-              children: [
-                ListHeader(
-                  title: appLocalizations.addedRules,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.mAp,
-                    vertical: 8.mAp,
-                  ),
-                  actions: [
-                    if (selectedRules.isNotEmpty) ...[
-                      CommonMinIconButtonTheme(
-                        child: ElasticButton(
-                          child: IconButton.filledTonal(
-                            tooltip: context.appLocalizations.delete,
-                            onPressed: () {
-                              _handleDelete();
-                            },
-                            icon: const GlyphIcon(AppGlyphs.delete, fill: 1),
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (selectedRules.isEmpty)
-                      CommonMinIconButtonTheme(
-                        child: ElasticButton(
-                          child: IconButton.filledTonal(
-                            tooltip: appLocalizations.quickActions,
-                            onPressed: _handleQuickActions,
-                            icon: const GlyphIcon(AppGlyphs.bolt, fill: 1),
-                          ),
-                        ),
-                      ),
-                    if (selectedRules.isNotEmpty)
-                      CommonMinFilledButtonTheme(
-                        child: ElasticButton(
-                          child: FilledButton(
-                            onPressed: () {
-                              _handleSelectAll();
-                            },
-                            child: Text(appLocalizations.selectAll),
-                          ),
-                        ),
-                      )
-                    else
-                      CommonMinIconButtonTheme(
-                        child: ElasticButton(
-                          child: IconButton.filledTonal(
-                            tooltip: appLocalizations.add,
-                            onPressed: () {
-                              _handleAddOrUpdate();
-                            },
-                            icon: const GlyphIcon(AppGlyphs.addCircle, fill: 1),
-                          ),
-                        ),
-                      ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListHeader(
+                title: appLocalizations.addedRules,
+                actions: [
+                  if (selectedRules.isNotEmpty) ...[
+                    IconButtonData(
+                      glyph: AppGlyphs.delete,
+                      tooltip: appLocalizations.delete,
+                      onPressed: _handleDelete,
+                    ),
+                    IconButtonData(
+                      glyph: AppGlyphs.selectAll,
+                      tooltip: appLocalizations.selectAll,
+                      onPressed: _handleSelectAll,
+                    ),
+                  ] else ...[
+                    IconButtonData(
+                      glyph: AppGlyphs.rulePresets,
+                      tooltip: appLocalizations.quickActions,
+                      onPressed: _handleQuickActions,
+                    ),
+                    IconButtonData(
+                      glyph: AppGlyphs.addCircle,
+                      tooltip: appLocalizations.add,
+                      onPressed: _handleAddOrUpdate,
+                    ),
                   ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 8)),
-          SliverReorderableList(
+          SliverPrismReorderableList(
             itemCount: addedRules.length,
             itemBuilder: (_, index) =>
                 _buildRuleItem(addedRules, index, selectedRules),
@@ -300,11 +270,14 @@ class _MatchTargetItem extends ConsumerWidget {
       label: appLocalizations.matchTarget,
       trailing: Text(
         matchTarget ?? appLocalizations.followProfile,
-        style: context.textTheme.bodyMedium?.toJetBrainsMono.copyWith(
-          color: invalid
-              ? context.colorScheme.error
-              : context.colorScheme.tertiary,
-        ),
+        style: AppTextStyle.subheadline
+            .of(context)
+            .toJetBrainsMono
+            .copyWith(
+              color: invalid
+                  ? context.colorScheme.error
+                  : context.colorScheme.tertiary,
+            ),
       ),
       onPressed: () {
         _handleSelect(context, ref);
@@ -359,7 +332,7 @@ class _EditGlobalAddedRulesState extends ConsumerState<_EditGlobalAddedRules> {
     final rules = (rulesState.value ?? [])
         .whereMatches(_query, (rule) => rule.searchFields, texts: _searchTexts)
         .toList();
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.editGlobalRules,
       searchState: AppBarSearchState(onSearch: _handleSearch),
       body: NullStatusSwitcher(
@@ -369,11 +342,10 @@ class _EditGlobalAddedRulesState extends ConsumerState<_EditGlobalAddedRules> {
         nullStatus: NullStatus(
           label: appLocalizations.nullTip(appLocalizations.rule),
           illustration: NullStatusIllustration.rules,
-          action: ElasticButton(
-            child: FilledButton.tonal(
-              onPressed: _handleToAddedRules,
-              child: Text(appLocalizations.goToConfigureAddedRules),
-            ),
+          action: TonalButton(
+            size: TonalButtonSize.bar,
+            label: appLocalizations.goToConfigureAddedRules,
+            onPressed: _handleToAddedRules,
           ),
         ),
         child: ScrollConfiguration(
@@ -412,7 +384,7 @@ class _EditGlobalAddedRulesState extends ConsumerState<_EditGlobalAddedRules> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: SizedBox(height: 12 + BottomInsetScope.of(context)),
+                  child: SizedBox(height: 12 + context.bottomInset),
                 ),
               ],
             ),

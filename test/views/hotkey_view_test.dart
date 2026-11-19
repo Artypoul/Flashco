@@ -5,12 +5,14 @@ import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/hotkey.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:prism_ui/common_button.dart';
 
 import '../helpers/test_app.dart';
+import '../helpers/host_scaffold.dart';
 
 const _labels = ShortcutLabels(isMacOS: false, isWindows: true);
 
@@ -67,8 +69,8 @@ Future<void> _pumpRecorder(
         child: Builder(
           builder: (context) => TextButton(
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => Scaffold(
+              HostPageRoute(
+                builder: (_) => HostScaffold(
                   body: HotKeyRecorder(hotKeyAction: action, labels: _labels),
                 ),
               ),

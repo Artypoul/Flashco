@@ -1,0 +1,1074 @@
+[
+  {
+    "path": "test/widgets/open_container_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a76924c2dc2f1e5aec3cc0cff4b9a3933149a12"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a16eea075fbee739b4c6b7de425c80ae63257a89"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2d0673fdcadf31c3d5ce9209be98c288e8e33140"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/paged_sheet_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c45b2aca204e7e18e4c5a8971c4dcc77dc2a0729"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ab8553aadfe70cc450d6729b86aad38ab7643cc"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46ef3d7a039c591cc95be389e898ad63233a49e1"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/palette_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42f09b8d2b0a7f78a5bbf01dfa0ce31500d35c68"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b67b84059b561969d5f35392b3d8e1ad44b41eb"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29e024690ffab86916eb864502d760b5762b5f5a"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/popup_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48f071d1eb5217af33a6f19cac60d25e672d0950"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db221a1468ca5c6b31de92265f06eb34e6e0d780"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d5fe5eec403511d5ad1c58e9295f8885ecc5aa2"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/popup_theme_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08c8edf8fdcc6f97d918522e161257aab981937d"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/port_dialog_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f661b39298e9cedd4619d2f95112bc54c5a81beb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63278e27241759063fc504c91224028d991a507d"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/port_form_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce030a723aa4909baaae2dfd58cfc34816e8700e"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/prism_app_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "470b4c83231f0e25724d5139e769d8904187e071"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/prism_list_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa9a9157deec069766c2087c10edea7d17b76499"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/profile_focus_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83e3f4247a1020ebffd01f93ecbdf12c26d24ea8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0a3e13b41fcf0b7e156f6d608b56eff28c6eaef"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12b1bc038732dd14e6d950d8b5ef9542c474c527"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/proxies_list_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "596baaa6fe0d4956a0adc1f1e73107192bfd0f3e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6ac1f0a11075d8fb24a081fadc196b5a59d668c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "30d2d35cd31938c5a171991fa4f5ebdd125ace4b"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/proxies_tab_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19598b6c3b7748351515124e14cf8e7c574637e5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dff667561ffff1a3c258fa11ed931efd383d0c80"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72f5dcffaf8113ed004e705d9ce8b9f0b4458949"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/proxy_card_focus_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46e067cfb21728c6a0962731f8cffb6e12d2ea9e"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2edb58df1162921b38f0e6838588c82cdc69e9d4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee05cf343db515940ae68b3446582d4946b97ed7"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/record_feed_list_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfab3fb2e1188099dd1c1defc3a19930a64b5f5b"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/remote_focus_adapter_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b72316de4dc491e765df7f7e10b10c09a1695957"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f1e8f1b5131ad828d3749dc7b688b6b9169f73b"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5aace6eef213d5a1bf2357634cc7e02b8773c15e"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/remote_traversal_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b170e59d68682f5d236fa874e4490524816eb358"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/route_motion_hold_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "35e758cf6c58ab0e4b59dfbef527dc0f8bff3169"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd3836d96be4e71299d910a9e2dbd9c0ced6b07e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "baaabb019e2e580692faab53f59feea4308c8a99"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/route_transition_repaint_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c293bcff99c0378aa896fafba83804315045e7ad"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/scaffold_actions_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "522be3969ba2e3cb1dce298099511db17d955225"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6fc015698576408515bea9fe995a36b669d1088a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ddad4d9aa44fd62e523ef8b97ec650f1c4d7e05"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/scaffold_back_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67525f64f3fa1c381740383bd590322c496e123f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1dfc2d84f2acc2562af0d6bc9716fcea06116dc2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79f6245535626241924da85653df5dd74db317f9"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/scaffold_repaint_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f72f41454981492dd7b290ae3f24a3228033a2ad"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/scaffold_search_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91e0d13de2f3dc90079d707920482bc96d4e8d0a"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e95f78ebeacbc64fe3759c4f27276e47c30c6ce2"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "210c3d080f290bc1bc8025f243eb675bda67e7d0"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/scaffold_sort_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89b1006fa202d3263531e62e47775b3ffae41714"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0cfec21cc247280f7a73f2aebf216c1e3244743"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "494968155e16467690d64d85e8809911dc3a3ee2"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/scroll_to_end_box_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "012b895be3cf90433086b2291aa6030731e4a100"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2db79878a3d79023ae2fcc6e2bfe0b9305f83538"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b90d24691e87d1c86b9287f9ab7f3472e66f19e9"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/scrollbar_inset_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f91a4fd5c01a2a4420a8cfcc58bdc38ce97d47a2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8b2d2a034d44510185af597dd90c9c5cca32991"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "452d7684a7d7364f148a4e179944c01c7a05d07f"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sheet_barrier_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aec84c5c259afa1dce761d0fbb89f6320e98f9c1"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b26b217f2675b06d8eb358bc326779e3c1d97594"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f10819ca3baf9cc9c1f4817ad0f357ef6da702a4"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sheet_cover_scale_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10ccd83c24ed9bac93305e9f1015dbfa49cb01a3"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/sheet_cover_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6cf7b3e6a0ff430af3a1c4b38d50bd5ad76b19b"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76b39aebc16681b483a28945b20329f4e9f9088e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5fd7d1ccfec7fb7c398c8f8d47abf566bc006e0"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sheet_navigator_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7240cacd29c8c0e479db457c597a03519de10a08"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "527a0bd152c2a441f7abc10e60f7cfb630ead26d"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dae463ecd5db4daabfa4e057474bb62469e9f8fb"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sheet_search_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f896ff9100ed0502992d456a45de91a4b0822d2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9704b1bca591b9b1eac4ba1f1db051731c73526d"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f570c09bdce771b7244d3b5cd76af514a369a0f"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sheet_theme_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3689382c8f28c1df510e7954852d0f5f49f474c"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/side_sheet_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "895fa00581d5c59d052ae01f6d3d670f9ad8bc8c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "50cda04fccf9f51ddf4d0a9f493dbcfc58fef699"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dad5ebff5f5c9dd74dfb7b468bb46b11d7a8c31a"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/side_sheet_width_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "820f1e038dfd1e62bc6cf6d929e6f79afd634ab8"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c5e60fc4ad84c527a5084a867fcdfeb7be9cc6c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77dab9ad35714198e7bf7cb4999d4d717ce7ccff"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sidebar_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b75816b454f45600e5d3df0eedee95f1531e831"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a9852b27e2a0a80be5836ad770d0a2623b468af"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23e58ec433ea950f4dad17c2a98198a22669059e"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/skeleton_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08e0566fecd5339d6e32d0080fe369faa0892d51"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "64aa80d01e8a839276d8877a49b2cafe3a9139e4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "221cd13e07a07bf3477847d67a569cfb619bf83a"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/snap_sheet_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9529f8ad1d91870bd467b6677681f4fb961bf068"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a5f7c29fb1394f5669fac58b51f78d7a35686c02"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf69162b8f320f576234c87e56c809d10154a087"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/sortable_context_menu_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2ef2cc840ce7870a8441a2e4dadb6ebb43d7ac5"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f58aba24147fa3c624e41247226a526484c9cf6c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91a7b989d853f8aea1c7bdce37dbcaffd213a3a1"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/stacked_sheet_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6112e9a5174c4eeee7c858347c985807030d01b2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88fadd1664e114e0e38f3c906383e4ab805355c9"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/start_button_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a64bfb42e70bdd6f0af22e0ee7c0dfe129b313dc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a501ebea3b69284f0b427d54921e7966e3045412"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/state_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "537bceaa9fb86d91bd2538398e73aa35221a4169"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f3b77330bfe876c7bb51a6a48403aded9b9227c"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec700fa35e5b8b29211fc03f264fe046718ef6bc"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/subscription_info_view_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0bda52ffb00132f3beffab2b72b875cabbb8951f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0763cca07580223123ab4ef26e014e3ca7b1208e"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "96916b16a0d7d7b922c1daf5d8f0e2e7bf4eda90"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/super_grid_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe47a33e452246a0e72dd51241a93713f2404590"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a466a328a8db7782600009aff22bc61a1afb51e9"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/super_reorderable_list_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d90b6e0d8a61bedbcf55eebd53444814c2d9d978"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2ad37db8060063ec21d8f07ca1c66126160e17ef"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/tab_focus_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4d00d9d2012157b88d3187c7fa2065fb4a9bdf6f"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ed7bfc08b079514734a654506fa73f3fb62d8e3"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/tab_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c425eec21cf4f77baafad43827302771e7f9bacc"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad27e4889d67c3e12f82b2158e1b2f362c37178b"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/table_layout_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "55c7b9bfd33317dcfb6b5251c9e974a6d865653f"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/target_icon_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "15b762e3cbe82610373dd6d8754aca6b179de09c"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c5c1f456bea700d30f40975c61c4a9cb7e9767a"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f865455b973cffd3121b92031bb1a6335a63270a"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/text_loupe_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72c6615f880d6ec620bf7c93236fc36ffe6701cb"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "539cc2c8420158b0184d539b3aa1cd9c83e1f1b8"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "945f8f81e4624df4d4f69bb66f32872d8c0f6d8c"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/text_scale_notification_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e18e66254c0e0bd0221585d6aba8cacfd87c1dd3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "afafc2d803e5b70897aadea9124cec5e4b7ce71b"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/text_selection_menu_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "726995ea3573b54cbe697f1729556f9e56c110f7"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/theme_cross_fade_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "01b2668e037157b654e5dc18b132db7f0bc6d26f"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/tooltip_text_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b0d9093825a58ee166f109b0bab9107a07ab7e9"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/tracker_info_mitm_host_test.dart",
+    "base": null,
+    "flashco": null,
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7ad3df805b7782fb91ee1219e1c4d2e2730f8cf1"
+    },
+    "disposition": "donor_candidate",
+    "rationale": "Flashco matches base; donor change is a candidate subject to product and build review."
+  },
+  {
+    "path": "test/widgets/tv_fab_layout_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b63b9ffbd59158df08b02370abdf228d42dc88c2"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "267c3836ab11624d47978db314e45ba9dfd4763f"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/tv_search_back_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f581b66353eb186430c38fc505bef60f8c8e01a3"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b9f1339eec8857d242d9900577fd817359eff1f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8cdc5a3a815f3c8d0d6bfe04ba26707297acef5"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/uncovered_views_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5264c7d329908caa00c3bf4d7dc6914c49bae1a6"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79b6497701860aa3d885096d78d596598fb0a56f"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3dfc8d05e0edc3845230232ad25622e75eabbca3"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/update_dialog_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf4bb79b52da70608f6ac9f421e232a88ec53293"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b57df29c46c73d250aa5c9b0abd63b13e434b8f9"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2acb754c710e06748ecde6abe937d951abc2514d"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/views_smoke_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "415a1001ed6f044c510c7bfdc116ad72871fc278"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b15759cb2ae09bdecca6c5c1aa414ef5185775f4"
+    },
+    "donor": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "055e5f4b4f3c0a1b69313532dcaff2a4514f941f"
+    },
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "test/widgets/wave_test.dart",
+    "base": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "214fc3b354e4c5816b361412649a6a34be772b37"
+    },
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b29ecc6616729081b0cbd51071d2b78edced268"
+    },
+    "donor": null,
+    "disposition": "manual_three_way_adaptation",
+    "rationale": "Both sides differ from base or path moved; inspect content and semantic invariants."
+  },
+  {
+    "path": "tool/PrepareAndroidSigning.java",
+    "base": null,
+    "flashco": {
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9bd971b97828e4402e35b31f24f09ddaf0e0297"
+    },
+    "donor": null,
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "tool/build_site.sh",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "fa564e2949999d2a6259d5c35ac9e5067fd9a7f5"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "0c2a9638d09d069e6bbb395eccf6efcc82fce97c"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "fa564e2949999d2a6259d5c35ac9e5067fd9a7f5"
+    },
+    "disposition": "preserve_flashco",
+    "rationale": "Donor matches base; retain Flashco change, including additions/deletions."
+  },
+  {
+    "path": "tool/bump_version.sh",
+    "base": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "6cad3a500a602b27d5f479d4592de2d571fb3683"
+    },
+    "flashco": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "6cad3a500a602b27d5f479d4592de2d571fb3683"
+    },
+    "donor": {
+      "mode": "100755",
+      "type": "blob",
+      "sha": "6cad3a500a602b27d5f479d4592de2d571fb3683"
+    },
+    "disposition": "same",
+    "rationale": "Flashco and donor have identical object/mode or are both absent."
+  }
+]

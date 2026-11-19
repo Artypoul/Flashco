@@ -52,7 +52,7 @@ void main() {
       expect(profile?.url, edited.url);
     });
 
-    test('updates selection, inserts first profile, and reorders profiles', () {
+    test('updates selection and inserts the first profile', () {
       final first = Profile.normal(label: 'First');
       final second = Profile.normal(label: 'Second');
       final container = ProviderContainer(
@@ -75,9 +75,6 @@ void main() {
       action.putProfile(second);
       expect(container.read(currentProfileIdProvider), second.id);
       expect(container.read(profilesProvider), [updatedFirst, second]);
-
-      action.reorder([second, updatedFirst]);
-      expect(container.read(profilesProvider), [second, updatedFirst]);
     });
 
     test(
@@ -109,25 +106,6 @@ void main() {
         expect(container.read(profilesProvider), profiles);
       },
     );
-
-    test('setProfileAndAutoApply stores a non-current profile', () {
-      final current = Profile.normal(label: 'Current');
-      final other = Profile.normal(label: 'Other');
-      final container = ProviderContainer(
-        overrides: [
-          currentProfileIdProvider.overrideWithBuild((_, _) => current.id),
-          profilesProvider.overrideWith(() => TestProfiles([current])),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      container
-          .read(profilesActionProvider.notifier)
-          .setProfileAndAutoApply(other);
-
-      expect(container.read(profilesProvider), [current, other]);
-      expect(container.read(currentProfileIdProvider), current.id);
-    });
   });
 
   group('ScriptsAction', () {
@@ -230,7 +208,7 @@ void main() {
 
     test('forwards a manual resource update to Core', () async {
       final core = _MockCoreHandlerInterface();
-      when(() => core.updateGeoData('MMDB')).thenAnswer((_) async => '');
+      when(() => core.updateGeoData('MMDB')).thenAnswer((_) async {});
       final container = ProviderContainer(
         overrides: [
           coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
@@ -284,6 +262,28 @@ void main() {
   });
 
   group('CoreAction', () {
+    test('reports a network change to the Core only while connected', () async {
+      final core = _MockCoreHandlerInterface();
+      when(core.reportNetworkChange).thenAnswer((_) async => true);
+      final container = ProviderContainer(
+        overrides: [
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+        ],
+      );
+      addTearDown(container.dispose);
+      final action = container.read(coreActionProvider.notifier);
+
+      await action.reportNetworkChange();
+      verifyNever(core.reportNetworkChange);
+
+      container.read(coreStatusProvider.notifier).value = CoreStatus.connected;
+      await action.reportNetworkChange();
+      verify(core.reportNetworkChange).called(1);
+
+      when(core.reportNetworkChange).thenThrow(StateError('disconnected'));
+      await expectLater(action.reportNetworkChange(), completes);
+    });
+
     test('applies the profile after restarting a stopped core', () async {
       final container = ProviderContainer(
         overrides: [
@@ -653,9 +653,11 @@ void main() {
         final action =
             container.read(setupActionProvider.notifier) as _RaceSetupAction;
         action.startCompleter = startCompleter;
+        final startEntered = Completer<void>();
+        action.startEntered = startEntered;
 
         final firstStart = action.setRunning(true);
-        await Future<void>.delayed(Duration.zero);
+        await startEntered.future;
         final stop = action.setRunning(false);
         final latestStart = action.setRunning(true);
 
@@ -1006,6 +1008,7 @@ class _RaceSetupAction extends SetupAction {
   int resetCoreTrafficCount = 0;
   final transitions = <bool>[];
   Completer<bool>? startCompleter;
+  Completer<void>? startEntered;
   Completer<bool>? stopCompleter;
 
   @override
@@ -1016,6 +1019,10 @@ class _RaceSetupAction extends SetupAction {
   @override
   Future<bool> setCoreRunning(bool running) async {
     transitions.add(running);
+    if (running) {
+      startEntered?.complete();
+      startEntered = null;
+    }
     return running
         ? await startCompleter?.future ?? true
         : await stopCompleter?.future ?? true;

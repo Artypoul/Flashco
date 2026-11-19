@@ -1,0 +1,249 @@
+{
+  "schema_version": 2,
+  "original_inventory_blob": "b2b9bb89747a2823adba93388ea963f052a887f2",
+  "metadata": {
+    "schema_version": 1,
+    "snapshots": {
+      "base": "03f955382409a4a7ac1f3f92e46d9fcc6d39f106",
+      "flashco": "871a89e4d7da3fe4a484c193b2fbeccc57129c5b",
+      "donor": "be84736605527034689c95bf27828ff27d912c5e"
+    },
+    "actual_merge_base": "4b59eca853778d4e7be3de26589252889c899bc5",
+    "method": "Complete git ls-tree -rz snapshots; raw paths and blob modes/OIDs retained; path-only disposition is provisional. Git links are commit OIDs.",
+    "tree_counts": {
+      "base": 1356,
+      "flashco": 1439,
+      "donor": 1411
+    },
+    "union_path_count": 1668,
+    "no_renames_diff_counts": {
+      "base_to_flashco": {
+        "A": 128,
+        "D": 45,
+        "M": 712,
+        "total": 885
+      },
+      "base_to_donor": {
+        "A": 184,
+        "D": 129,
+        "M": 648,
+        "total": 961
+      }
+    },
+    "initial_disposition_counts": {
+      "preserve_flashco_exclude_donor_instructions": 30,
+      "same": 363,
+      "preserve_flashco": 321,
+      "manual_three_way_adaptation": 529,
+      "donor_candidate": 385,
+      "pin_gitlink_review": 2,
+      "regenerate_or_resolve_lock": 38
+    },
+    "android_rename_pairs": {
+      "android/app/src/main/kotlin/com/follow/clash/Ext.kt": "android/app/src/main/kotlin/com/follow/flashco/Ext.kt",
+      "android/app/src/main/kotlin/com/follow/clash/FlClashApplication.kt": "android/app/src/main/kotlin/com/follow/flashco/FlashcoApplication.kt",
+      "android/app/src/main/kotlin/com/follow/clash/MainActivity.kt": "android/app/src/main/kotlin/com/follow/flashco/MainActivity.kt",
+      "android/app/src/main/kotlin/com/follow/clash/QuickActionActivity.kt": "android/app/src/main/kotlin/com/follow/flashco/QuickActionActivity.kt",
+      "android/app/src/main/kotlin/com/follow/clash/ServiceBroadcastReceiver.kt": "android/app/src/main/kotlin/com/follow/flashco/ServiceBroadcastReceiver.kt",
+      "android/app/src/main/kotlin/com/follow/clash/ServiceController.kt": "android/app/src/main/kotlin/com/follow/flashco/ServiceController.kt",
+      "android/app/src/main/kotlin/com/follow/clash/ServiceState.kt": "android/app/src/main/kotlin/com/follow/flashco/ServiceState.kt",
+      "android/app/src/main/kotlin/com/follow/clash/ServiceStateHost.kt": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateHost.kt",
+      "android/app/src/main/kotlin/com/follow/clash/ServiceStateMachine.kt": "android/app/src/main/kotlin/com/follow/flashco/ServiceStateMachine.kt",
+      "android/app/src/main/kotlin/com/follow/clash/TileService.kt": "android/app/src/main/kotlin/com/follow/flashco/TileService.kt",
+      "android/app/src/main/kotlin/com/follow/clash/models/InstalledPackage.kt": "android/app/src/main/kotlin/com/follow/flashco/models/InstalledPackage.kt",
+      "android/app/src/main/kotlin/com/follow/clash/models/State.kt": "android/app/src/main/kotlin/com/follow/flashco/models/State.kt",
+      "android/app/src/main/kotlin/com/follow/clash/packages/ChinaPackageMatcher.kt": "android/app/src/main/kotlin/com/follow/flashco/packages/ChinaPackageMatcher.kt",
+      "android/app/src/main/kotlin/com/follow/clash/packages/PackageResolver.kt": "android/app/src/main/kotlin/com/follow/flashco/packages/PackageResolver.kt",
+      "android/app/src/main/kotlin/com/follow/clash/plugins/AppPlugin.kt": "android/app/src/main/kotlin/com/follow/flashco/plugins/AppPlugin.kt",
+      "android/app/src/main/kotlin/com/follow/clash/plugins/BatteryPlugin.kt": "android/app/src/main/kotlin/com/follow/flashco/plugins/BatteryPlugin.kt",
+      "android/app/src/main/kotlin/com/follow/clash/plugins/MainThreadResult.kt": "android/app/src/main/kotlin/com/follow/flashco/plugins/MainThreadResult.kt",
+      "android/app/src/main/kotlin/com/follow/clash/plugins/ServicePlugin.kt": "android/app/src/main/kotlin/com/follow/flashco/plugins/ServicePlugin.kt",
+      "android/app/src/main/kotlin/com/follow/clash/plugins/TilePlugin.kt": "android/app/src/main/kotlin/com/follow/flashco/plugins/TilePlugin.kt",
+      "android/common/src/main/java/com/follow/clash/common/BroadcastLease.kt": "android/common/src/main/java/com/follow/flashco/common/BroadcastLease.kt",
+      "android/common/src/main/java/com/follow/clash/common/Components.kt": "android/common/src/main/java/com/follow/flashco/common/Components.kt",
+      "android/common/src/main/java/com/follow/clash/common/Enums.kt": "android/common/src/main/java/com/follow/flashco/common/Enums.kt",
+      "android/common/src/main/java/com/follow/clash/common/Ext.kt": "android/common/src/main/java/com/follow/flashco/common/Ext.kt",
+      "android/common/src/main/java/com/follow/clash/common/GlobalState.kt": "android/common/src/main/java/com/follow/flashco/common/GlobalState.kt",
+      "android/common/src/main/java/com/follow/clash/common/PendingCallback.kt": "android/common/src/main/java/com/follow/flashco/common/PendingCallback.kt",
+      "android/common/src/main/java/com/follow/clash/common/RunIntentArbiter.kt": "android/common/src/main/java/com/follow/flashco/common/RunIntentArbiter.kt",
+      "android/core/src/main/java/com/follow/clash/core/Core.kt": "android/core/src/main/java/com/follow/flashco/core/Core.kt",
+      "android/service/src/main/java/com/follow/clash/service/FilesProvider.kt": "android/service/src/main/java/com/follow/flashco/service/FilesProvider.kt",
+      "android/service/src/main/java/com/follow/clash/service/ManagedService.kt": "android/service/src/main/java/com/follow/flashco/service/ManagedService.kt",
+      "android/service/src/main/java/com/follow/clash/service/ProxyService.kt": "android/service/src/main/java/com/follow/flashco/service/ProxyService.kt",
+      "android/service/src/main/java/com/follow/clash/service/ServiceConfig.kt": "android/service/src/main/java/com/follow/flashco/service/ServiceConfig.kt",
+      "android/service/src/main/java/com/follow/clash/service/VpnService.kt": "android/service/src/main/java/com/follow/flashco/service/VpnService.kt",
+      "android/service/src/main/java/com/follow/clash/service/models/NotificationParams.kt": "android/service/src/main/java/com/follow/flashco/service/models/NotificationParams.kt",
+      "android/service/src/main/java/com/follow/clash/service/models/Traffic.kt": "android/service/src/main/java/com/follow/flashco/service/models/Traffic.kt",
+      "android/service/src/main/java/com/follow/clash/service/models/VpnOptions.kt": "android/service/src/main/java/com/follow/flashco/service/models/VpnOptions.kt",
+      "android/service/src/main/java/com/follow/clash/service/modules/NetworkObserveModule.kt": "android/service/src/main/java/com/follow/flashco/service/modules/NetworkObserveModule.kt",
+      "android/service/src/main/java/com/follow/clash/service/modules/NotificationModule.kt": "android/service/src/main/java/com/follow/flashco/service/modules/NotificationModule.kt",
+      "android/service/src/main/java/com/follow/clash/service/modules/ServiceModules.kt": "android/service/src/main/java/com/follow/flashco/service/modules/ServiceModules.kt"
+    },
+    "mechanical_merge_probe": {
+      "method": "Same base-path existing blobs changed on both sides, aligning detected Android package renames; normalize com.follow.clash and FlClashApplication in base/donor copies only; git merge-file -p. Excludes add/delete, non-Android cross-path renames, binary content and generated/instruction exclusions only as noted; merge success is not semantic safety.",
+      "counts": {
+        "text_conflict": 353,
+        "text_clean": 98
+      }
+    }
+  },
+  "path_parts": [
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-001.json",
+      "entries": 61,
+      "sha256": "53ee907e74a04613cc678cc7664f96256d4232b40d137272f18a7abeb40acdf8"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-002.json",
+      "entries": 58,
+      "sha256": "c393e1d01ad799a9f5f78ff4ff8ef9f154dbd1576b735d5615a956d2a784cdf0"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-003.json",
+      "entries": 55,
+      "sha256": "713f3414e4071ce10783b334f2c13eafcab5a0adba40371a839e5651ff36544b"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-004.json",
+      "entries": 57,
+      "sha256": "a7f3a649f78c6801cd3296cbf2e7eddb34c367fc0c1f07f0fdbc34ed5055c9e8"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-005.json",
+      "entries": 57,
+      "sha256": "6adf4000be85a09da5915fc1474d02979a90615cc824063d2aab0dd4d9ce8aa3"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-006.json",
+      "entries": 62,
+      "sha256": "682585d5b113c9084dad0e8adc97a6bb5eab0d78dc2de6956902fd9a6a9ec6aa"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-007.json",
+      "entries": 62,
+      "sha256": "1d32a193607bb4a9c294ed9f32f4bb858aa15ac590a9c84343bad9a8dd756398"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-008.json",
+      "entries": 60,
+      "sha256": "4ae51df42a966c76f67f55b4e1028a0fd4831fe4553834b9916265031bd602de"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-009.json",
+      "entries": 62,
+      "sha256": "04a525ddb3ca57163bca4d2c0c9cccd56793bad331b99a98703a605eb601e3d8"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-010.json",
+      "entries": 56,
+      "sha256": "5da9502d41f25960175f00196fc1396088b1c56f4da46b5de37a7c96a7cdc488"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-011.json",
+      "entries": 61,
+      "sha256": "871c1e286af5e31b080323bfeac4252484fa201b1dc1c47f25adff4a0ac1c000"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-012.json",
+      "entries": 63,
+      "sha256": "82ae412c015e7f5ed48a0d32226d65cead6e65d3270f46f7c3cbe05d52b541e9"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-013.json",
+      "entries": 60,
+      "sha256": "065127118a0dae4a864d96065f0f165e903a194a1644509a60054fa803482a8d"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-014.json",
+      "entries": 65,
+      "sha256": "042cc6e1ff67bb60d7471433d52d95da51c2b6f5e01c4df2003e00fd2545d6e8"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-015.json",
+      "entries": 56,
+      "sha256": "8fad7b08ffe1fda40ad3bc83f0d4cc02ebe9a326426ba5be78779c2d7b88ccb6"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-016.json",
+      "entries": 64,
+      "sha256": "db2c5f082423152073fcb462c54663e955b8aef341e1ebf51daaf01ef95fee20"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-017.json",
+      "entries": 57,
+      "sha256": "718f257652864d34bc216b9858299ce451d175ac914c276c2257148060ba8790"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-018.json",
+      "entries": 57,
+      "sha256": "64b63e0460d2c17023165d8481f126d31f7e8d628a8208f3d1bec4100051d646"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-019.json",
+      "entries": 57,
+      "sha256": "9402b89cfa92b51414410e59e181398f4e21235ba5ce981b1e9a8d928f7a368a"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-020.json",
+      "entries": 58,
+      "sha256": "c3fc072a2b500010a4fbb05c5b862907bc232df1d07331f9ace4dd132d09934a"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-021.json",
+      "entries": 60,
+      "sha256": "244bf1a373ff9a7e3b260690c1e85961137f21c18996f9f416311b79d6a94903"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-022.json",
+      "entries": 68,
+      "sha256": "70237375e87e9dd15303c2b2ed63687d65bd36aef96e6d092b6d15092ba931cd"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-023.json",
+      "entries": 57,
+      "sha256": "ac6f599c661c881e73406144b7f379753d63ff9bd14deb7bd0ac45cd64eabab9"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-024.json",
+      "entries": 56,
+      "sha256": "de44796e9f5965c233c6321151cefa78cf9c7909c88bfc7400cc49d8ad96c4c3"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-025.json",
+      "entries": 65,
+      "sha256": "8a09eb527d2616866e70db5f3666688d5490d750238084a638373991c3ea227f"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-026.json",
+      "entries": 59,
+      "sha256": "92ae370cff42021e87051ca210b9dd3a93af127ca05d2e3a9dc37d4c38af5c27"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-027.json",
+      "entries": 62,
+      "sha256": "55d47b3faf1e5fb0a0d0115158fd67909105832766083bc8ca8feb047edaf0c1"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/paths-028.json",
+      "entries": 53,
+      "sha256": "329e059d8b4f9cb0b8db79306b4b03cb44842f3b3a1f307b533dc96baf5c5b3f"
+    }
+  ],
+  "probe_parts": [
+    {
+      "path": "2026-11-19-v0.9.3-inventory/probe-001.json",
+      "entries": 163,
+      "sha256": "c7f475f6ad0b1fadb2a589daa11d359b75d893163d7407499760dfb54d07aac6"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/probe-002.json",
+      "entries": 158,
+      "sha256": "c3597a3a4fce3df46d83534968e7f697f3149782f7cd8960ceacee20d74a5aa6"
+    },
+    {
+      "path": "2026-11-19-v0.9.3-inventory/probe-003.json",
+      "entries": 130,
+      "sha256": "356f0464228e1bc481a28bef8deb8ebda4573482b954281e6e535562681ce440"
+    }
+  ]
+}

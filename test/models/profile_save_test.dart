@@ -5,31 +5,17 @@ import 'dart:typed_data';
 import 'package:flashco/common/common.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
-class _FakePathProvider extends PathProviderPlatform {
-  final String root;
-
-  _FakePathProvider(this.root);
-
-  @override
-  Future<String?> getTemporaryPath() async => root;
-
-  @override
-  Future<String?> getApplicationSupportPath() async => root;
-
-  @override
-  Future<String?> getApplicationCachePath() async => root;
-}
+import '../helpers/app_paths.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tempDir;
 
-  setUpAll(() {
+  setUpAll(() async {
     tempDir = Directory.systemTemp.createTempSync('profile_save_test');
-    PathProviderPlatform.instance = _FakePathProvider(tempDir.path);
+    await useAppPaths(tempDir);
   });
 
   tearDownAll(() {
@@ -64,7 +50,10 @@ void main() {
       final profile = Profile.normal(label: 'p');
       final bytes = Uint8List.fromList(utf8.encode('proxies: []'));
 
-      final saved = await profile.saveFile(bytes, validate: (_, _) async => '');
+      final saved = await profile.saveFile(
+        bytes,
+        validate: (_, _) async => null,
+      );
 
       expect(saved.lastUpdateDate, isNotNull);
       final savedFile = await profile.file;
@@ -82,7 +71,7 @@ void main() {
         bytes,
         validate: (_, key) async {
           ageSecretKey = key;
-          return '';
+          return null;
         },
       );
 

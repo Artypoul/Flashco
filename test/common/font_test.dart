@@ -1,6 +1,6 @@
-import 'package:flashco/common/font.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:prism_ui/font.dart';
 
 void main() {
   List<String> fallback(

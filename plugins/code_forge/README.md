@@ -25,6 +25,7 @@ in step with upstream.
   `scrollbarBuilder` hooks, a `completionSource` the app fills the popup from,
   with Tab-stop snippets as what a suggestion inserts, platform keyboard shortcuts
   (`CodeForgeKeyboardShortcuts.forPlatform`), whole-line copy and cut with no
-  selection, line selection from the gutter, and Material from `material_ui`.
+  selection, and line selection from the gutter. The editor uses Flutter widgets;
+  the app provides its surrounding UI.
 
 Regression tests live in `test/plugins/code_forge/` at the repository root.

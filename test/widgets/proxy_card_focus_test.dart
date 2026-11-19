@@ -5,12 +5,13 @@ import 'package:flashco/state.dart';
 import 'package:flashco/views/proxies/card.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
 
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
+import '../helpers/host_scaffold.dart';
 
 const _testUrl = 'https://example.com/generate_204';
 
@@ -57,7 +58,7 @@ void main() {
       UncontrolledProviderScope(
         container: container,
         child: TestApp(
-          homeBuilder: (child) => Scaffold(body: child),
+          homeBuilder: (child) => HostScaffold(body: child),
           child: Column(
             children: [
               for (var index = 0; index < 2; index++)
@@ -120,7 +121,7 @@ void main() {
   testWidgets('tab walks card to card without stopping on the delay control', (
     tester,
   ) async {
-    await pumpCards(tester, ProxyCardType.shrink);
+    await pumpCards(tester, ProxyCardType.standard);
 
     await focusCard(tester, 0);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
@@ -134,7 +135,7 @@ void main() {
   });
 
   testWidgets('enter on the delay control runs the delay test', (tester) async {
-    await pumpCards(tester, ProxyCardType.shrink);
+    await pumpCards(tester, ProxyCardType.standard);
 
     await focusCard(tester, 0);
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);

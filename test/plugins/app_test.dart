@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:flashco/common/boot_record.dart';
 import 'package:flashco/common/constant.dart';
+import 'package:flashco/common/exception.dart';
+import 'package:flashco/enum/enum.dart';
 import 'package:flashco/plugins/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -198,6 +201,183 @@ void main() {
 
       expect(await App().isInstalledAppsPermissionGranted(), isTrue);
       expect(await App().requestInstalledAppsPermission(), isFalse);
+    },
+  );
+
+  test('reports download progress and completes only on success', () async {
+    final calls = <MethodCall>[];
+    final progress = <(int, int)>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          calls.add(call);
+          if (call.method == 'enqueueDownload') return 42;
+          if (call.method == 'queryDownload') {
+            final count = calls
+                .where((c) => c.method == 'queryDownload')
+                .length;
+            return {
+              'status': count == 1 ? 2 : 8,
+              'received': count * 5,
+              'total': 10,
+            };
+          }
+          fail('Unexpected call: ${call.method}');
+        });
+
+    await App().downloadFile(
+      Uri.parse('https://example.com/update.apk'),
+      '/downloads/update.apk',
+      title: 'Update',
+      onReceiveProgress: (received, total) => progress.add((received, total)),
+      cancelToken: CancelToken(),
+    );
+
+    expect(calls.map((c) => c.method), [
+      'enqueueDownload',
+      'queryDownload',
+      'queryDownload',
+    ]);
+    expect(
+      calls.first.arguments,
+      containsPair('url', 'https://example.com/update.apk'),
+    );
+    expect(
+      calls.first.arguments,
+      containsPair('path', '/downloads/update.apk'),
+    );
+    expect(calls.first.arguments, containsPair('title', 'Update'));
+    expect(calls.skip(1).map((c) => c.arguments), everyElement({'id': 42}));
+    expect(progress, [(5, 10), (10, 10)]);
+  });
+
+  test('propagates system download failure and its reason', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          channel,
+          (call) async => switch (call.method) {
+            'enqueueDownload' => 7,
+            'queryDownload' => {
+              'status': 16,
+              'received': 3,
+              'total': 10,
+              'reason': 1006,
+            },
+            _ => fail('Unexpected call: ${call.method}'),
+          },
+        );
+    final progress = <(int, int)>[];
+
+    await expectLater(
+      App().downloadFile(
+        Uri.parse('https://example.com/a'),
+        '/a',
+        title: 'Update',
+        onReceiveProgress: (r, t) => progress.add((r, t)),
+        cancelToken: CancelToken(),
+      ),
+      throwsA(
+        isA<SystemDownloadException>().having((e) => e.reason, 'reason', 1006),
+      ),
+    );
+    expect(progress, [(3, 10)]);
+  });
+
+  test(
+    'cancellation stops polling before a download status is requested',
+    () async {
+      final enqueued = Completer<void>();
+      final calls = <String>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            calls.add(call.method);
+            if (call.method == 'enqueueDownload') {
+              enqueued.complete();
+              return 9;
+            }
+            fail('Unexpected call: ${call.method}');
+          });
+      final token = CancelToken();
+      final download = App().downloadFile(
+        Uri.parse('https://example.com/a'),
+        '/a',
+        title: 'Update',
+        onReceiveProgress: (_, _) => fail('Unexpected progress'),
+        cancelToken: token,
+      );
+      await enqueued.future;
+      token.cancel('cancelled by user');
+
+      await expectLater(
+        download,
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.type,
+            'type',
+            DioExceptionType.cancel,
+          ),
+        ),
+      );
+      expect(calls, ['enqueueDownload']);
+    },
+  );
+
+  test(
+    'certificate operations preserve DER bytes and map platform outcomes',
+    () async {
+      final calls = <MethodCall>[];
+      var rootResult = 'installed';
+      var installResult = 'prompted';
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            calls.add(call);
+            return switch (call.method) {
+              'locateCaCertificate' => {'user': true, 'system': false},
+              'installCaCertificateWithRoot' => rootResult,
+              'installCaCertificate' => installResult,
+              'removeCaCertificateWithRoot' => true,
+              _ => fail('Unexpected call: ${call.method}'),
+            };
+          });
+      const der = [0, 127, 255];
+      expect(await App().locateCaCertificate(der), (
+        user: true,
+        system: false,
+        root: false,
+      ));
+      expect(
+        await App().installCaCertificateWithRoot(der),
+        MitmInstallOutcome.installed,
+      );
+      rootResult = 'untilReboot';
+      expect(
+        await App().installCaCertificateWithRoot(der),
+        MitmInstallOutcome.untilReboot,
+      );
+      rootResult = 'denied';
+      expect(await App().installCaCertificateWithRoot(der), isNull);
+      expect(
+        await App().installCaCertificate(der, name: 'CA', fileName: 'ca.crt'),
+        MitmInstallOutcome.prompted,
+      );
+      installResult = 'saved';
+      expect(
+        await App().installCaCertificate(der, name: 'CA', fileName: 'ca.crt'),
+        MitmInstallOutcome.saved,
+      );
+      installResult = 'unavailable';
+      expect(
+        await App().installCaCertificate(der, name: 'CA', fileName: 'ca.crt'),
+        isNull,
+      );
+      expect(await App().removeCaCertificateWithRoot(der), isTrue);
+      for (final call in calls) {
+        expect(call.arguments['der'], isA<Uint8List>());
+        expect(call.arguments['der'], orderedEquals(der));
+      }
+      expect(
+        calls.where((c) => c.method == 'installCaCertificate').first.arguments,
+        containsPair('fileName', 'ca.crt'),
+      );
     },
   );
 }

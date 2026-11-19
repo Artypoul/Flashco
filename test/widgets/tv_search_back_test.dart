@@ -1,19 +1,19 @@
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
-import 'package:flashco/l10n/l10n.dart';
 import 'package:flashco/manager/hotkey_manager.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/pages/home.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/glyph_finders.dart';
+import '../helpers/test_app.dart';
 
 void main() {
   testWidgets('desktop escape runs the back flow and exits search', (
@@ -27,15 +27,11 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(
+        child: HostApp(
+          builder: (context, child) => wrapAppScopes(context, child!),
           navigatorKey: globalState.navigatorKey,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: AppLocalizations.delegate.supportedLocales,
           home: HotKeyManager(
-            child: CommonScaffold(
+            child: Scaffold(
               title: 'Logs',
               searchState: AppBarSearchState(onSearch: (_) {}),
               body: Center(
@@ -94,8 +90,7 @@ void main() {
               NavigationItem(
                 glyph: AppGlyphs.dashboard,
                 label: PageLabel.dashboard,
-                builder: (_) => CommonScaffold(
-                  key: const GlobalObjectKey(PageLabel.dashboard),
+                builder: (_) => Scaffold(
                   title: 'Search page',
                   searchState: AppBarSearchState(
                     onSearch: (value) {
@@ -125,12 +120,8 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: AppLocalizations.delegate.supportedLocales,
+        child: HostApp(
+          builder: (context, child) => wrapAppScopes(context, child!),
           home: const HomePage(),
         ),
       ),

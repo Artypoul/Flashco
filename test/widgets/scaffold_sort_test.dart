@@ -1,14 +1,18 @@
 import 'dart:async';
 
-import 'package:flashco/icons/icons.dart';
-import 'package:flashco/models/models.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/glyph_finders.dart';
 import '../helpers/test_app.dart';
+
+final _back = find.ancestor(
+  of: find.byTooltip('Back'),
+  matching: find.byType(IconButton),
+);
 
 Future<void> _pushPage(
   WidgetTester tester, {
@@ -21,10 +25,10 @@ Future<void> _pushPage(
     tester
         .state<NavigatorState>(find.byType(Navigator).first)
         .push(
-          MaterialPageRoute<void>(
+          HostPageRoute<void>(
             builder: (_) => ValueListenableBuilder<bool>(
               valueListenable: canSort,
-              builder: (_, canSort, _) => CommonScaffold(
+              builder: (_, canSort, _) => Scaffold(
                 title: 'Page',
                 canSort: canSort,
                 searchState: AppBarSearchState(onSearch: (_) {}),
@@ -51,15 +55,15 @@ Finder _inBar(Finder finder) =>
 
 void _expectIdle(WidgetTester tester) {
   expect(find.text('idle'), findsOneWidget);
-  expect(find.byType(BackButton).hitTestable(), findsOneWidget);
-  expect(_inBar(find.byTooltip('Search')), findsOneWidget);
+  expect(_back.hitTestable(), findsOneWidget);
+  expect(find.byType(SearchField), findsOneWidget);
   expect(_inBar(find.text('Add')), findsOneWidget);
 }
 
 void _expectSorting(WidgetTester tester) {
   expect(find.text('sorting'), findsOneWidget);
-  expect(find.byType(BackButton).hitTestable(), findsNothing);
-  expect(_inBar(find.byTooltip('Search')), findsNothing);
+  expect(_back.hitTestable(), findsNothing);
+  expect(find.byType(SearchField), findsNothing);
   expect(_inBar(find.text('Add')), findsNothing);
   final toggle = _inBar(find.widgetWithGlyph(IconButton, AppGlyphs.sort));
   expect(tester.widget<IconButton>(toggle).isSelected, isTrue);
@@ -100,6 +104,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('idle'), findsOneWidget);
-    expect(find.byType(BackButton).hitTestable(), findsOneWidget);
+    expect(_back.hitTestable(), findsOneWidget);
   });
 }

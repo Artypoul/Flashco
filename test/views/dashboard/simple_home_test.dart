@@ -2,18 +2,17 @@ import 'package:flashco/common/common.dart';
 import 'package:flashco/core/controller.dart';
 import 'package:flashco/core/interface.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
 import 'package:flashco/views/dashboard/simple_home.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flashco/views/navigation.dart';
-import 'package:flashco/views/profiles/add.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../helpers/test_app.dart';
@@ -115,7 +114,7 @@ void main() {
                       ref.watch(currentBrightnessProvider),
                     ),
                   ),
-                ).withAppShapes,
+                ),
                 child: Builder(builder: navigation.getItems().first.builder),
               ),
             ),
@@ -138,7 +137,7 @@ void main() {
     final power = find.byTooltip('Launch');
     expect(tester.getSize(power).width, tester.getSize(power).height);
     expect(tester.getSize(power).width, greaterThanOrEqualTo(112));
-    expect(find.byType(CommonCheckBox), findsNothing);
+    expect(find.byType(Checkbox), findsNothing);
     expect(find.byType(TextButton), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -185,7 +184,7 @@ void main() {
           ),
         );
     await pumpHome(tester);
-    expect(find.byType(CommonCheckBox), findsNothing);
+    expect(find.byType(Checkbox), findsNothing);
     expect(container.read(currentProfileProvider)!.selectedMap, {
       'PROXY': 'Fastest',
     });
@@ -204,7 +203,7 @@ void main() {
       isNull,
     );
     expect(find.text('Add configuration'), findsOneWidget);
-    expect(find.byType(CommonCheckBox), findsNothing);
+    expect(find.byType(Checkbox), findsNothing);
   });
 
   testWidgets('small screen with large text scrolls without overflow', (
@@ -232,13 +231,14 @@ void main() {
     expect(find.byTooltip('Stop'), findsOneWidget);
   });
 
-  testWidgets('configuration action opens the existing import screen', (
+  testWidgets('configuration action offers profile import choices', (
     tester,
   ) async {
     await pumpHome(tester);
     await tester.tap(find.text('Add configuration'));
     await tester.pumpAndSettle();
-    expect(find.byType(AddProfileView), findsOneWidget);
+    expect(find.text('Link'), findsOneWidget);
+    expect(find.text('File'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -264,17 +264,12 @@ void main() {
         ),
       );
       expect(Theme.of(context).colorScheme, scheme);
-      final surface = tester.widget<Material>(
-        find
-            .descendant(
-              of: find.widgetWithGlyph(IconButton, AppGlyphs.power),
-              matching: find.byType(Material),
-            )
-            .first,
+      final power = tester.widget<IconButton>(
+        find.widgetWithGlyph(IconButton, AppGlyphs.power),
       );
-      buttonColors.add(surface.color);
-      expect(surface.shape, AppShape.xxl);
-      expect(find.byType(CommonCheckBox), findsNothing);
+      buttonColors.add(power.style?.backgroundColor?.resolve({}));
+      expect(power.style?.shape, AppShape.xxl);
+      expect(find.byType(Checkbox), findsNothing);
       expect(find.byType(ListItem<dynamic>), findsNothing);
       expect(tester.takeException(), isNull);
     }

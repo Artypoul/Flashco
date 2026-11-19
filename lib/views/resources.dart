@@ -1,18 +1,20 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/features/mitm/module_editor.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/providers/action.dart';
 import 'package:flashco/providers/app.dart';
 import 'package:flashco/providers/config.dart';
 import 'package:flashco/providers/database.dart';
 import 'package:flashco/state.dart';
+import 'package:flashco/ui/icons/icons.dart';
 import 'package:flashco/widgets/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' hide context;
 
@@ -20,12 +22,14 @@ typedef _RemoteResources = ({
   List<IconSet> iconSets,
   List<ClashProvider> ruleProviders,
   List<Script> scripts,
+  List<MitmModule> modules,
 });
 
 const _RemoteResources _noResources = (
   iconSets: <IconSet>[],
   ruleProviders: <ClashProvider>[],
   scripts: <Script>[],
+  modules: <MitmModule>[],
 );
 
 class ResourcesView extends ConsumerStatefulWidget {
@@ -35,8 +39,7 @@ class ResourcesView extends ConsumerStatefulWidget {
   ConsumerState<ResourcesView> createState() => _ResourcesViewState();
 }
 
-class _ResourcesViewState extends ConsumerState<ResourcesView>
-    with RouteMotionHoldMixin<ResourcesView>, RouteSettledMixin<ResourcesView> {
+class _ResourcesViewState extends ConsumerState<ResourcesView> {
   _RemoteResources? _resources;
   var _fileInfos = const <String, FileInfo?>{};
 
@@ -46,38 +49,30 @@ class _ResourcesViewState extends ConsumerState<ResourcesView>
     ref.listenManual(iconSetsProvider, (_, _) => _refreshResources());
     ref.listenManual(clashProvidersProvider, (_, _) => _refreshResources());
     ref.listenManual(scriptsProvider, (_, _) => _refreshResources());
+    ref.listenManual(mitmModulesProvider, (_, _) => _refreshResources());
+    unawaited(_load());
   }
-
-  @override
-  void didSettleRoute() => unawaited(_load());
 
   Future<void> _load() async {
     await Future.wait<Object>([
       ref.read(iconSetsProvider.future),
       ref.read(clashProvidersProvider.future),
       ref.read(scriptsProvider.future),
+      ref.read(mitmModulesProvider.future),
     ]).catchError((Object _) => const <Object>[]);
     if (!mounted) {
       return;
     }
     final resources = _readResources();
-    final loads = <String, Future<FileInfo?>>{
-      for (final type in GeoResource.values)
-        type.updatingKey: _geoFileInfo(type),
-      for (final provider in resources.ruleProviders)
-        provider.updatingKey: provider.fileInfo,
-      for (final script in resources.scripts)
-        script.updatingKey: script.fileInfo,
-    };
-    final fileInfos = await Future.wait([
-      for (final load in loads.values) load.catchError((Object _) => null),
-    ]);
+    final fileInfos = await _loadFileInfos(
+      resources,
+    ).catchError((Object _) => const <String, FileInfo?>{});
     if (!mounted) {
       return;
     }
     setState(() {
       _resources = _readResources();
-      _fileInfos = Map.fromIterables(loads.keys, fileInfos);
+      _fileInfos = fileInfos;
     });
   }
 
@@ -95,13 +90,18 @@ class _ResourcesViewState extends ConsumerState<ResourcesView>
       for (final script in ref.read(scriptsProvider).value ?? <Script>[])
         if (script.url != null) script,
     ],
+    modules: [
+      for (final module
+          in ref.read(mitmModulesProvider).value ?? <MitmModule>[])
+        if (mitmFeature && module.isRemote) module,
+    ],
   );
 
   void _refreshResources() {
     if (_resources == null) {
       return;
     }
-    updateWhenRouteSettled(() => setState(() => _resources = _readResources()));
+    setState(() => _resources = _readResources());
   }
 
   Future<void> _updateAll() async {
@@ -120,6 +120,9 @@ class _ResourcesViewState extends ConsumerState<ResourcesView>
         value: updateInterval.toString(),
         suffixText: appLocalizations.hours,
         keyboardType: TextInputType.number,
+        inputFormatters: TextInputLimits.digitsOnly(
+          TextInputLimits.geoUpdateInterval,
+        ),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return appLocalizations.emptyTip(
@@ -140,7 +143,7 @@ class _ResourcesViewState extends ConsumerState<ResourcesView>
       ),
     );
     final interval = int.tryParse(value ?? '');
-    if (interval == null || interval <= 0) {
+    if (interval == null || interval <= 0 || !mounted) {
       return;
     }
     ref
@@ -160,19 +163,24 @@ class _ResourcesViewState extends ConsumerState<ResourcesView>
     final autoUpdate = ref.watch(
       patchClashConfigProvider.select((state) => state.geoAutoUpdate),
     );
+    final updateInterval = ref.watch(
+      patchClashConfigProvider.select((state) => state.geoUpdateInterval),
+    );
     final resources = _resources;
-    final (:iconSets, :ruleProviders, :scripts) = resources ?? _noResources;
+    final (:iconSets, :ruleProviders, :scripts, :modules) =
+        resources ?? _noResources;
     final resourceKeys = [
       for (final geoResource in GeoResource.values) geoResource.updatingKey,
       for (final iconSet in iconSets) iconSet.updatingKey,
       for (final provider in ruleProviders) provider.updatingKey,
       for (final script in scripts) script.updatingKey,
+      for (final module in modules) module.updatingKey,
     ];
     final isUpdating = ref.watch(
       updatingKeysProvider.select((keys) => resourceKeys.any(keys.contains)),
     );
 
-    return CommonScaffold(
+    return Scaffold(
       title: appLocalizations.resources,
       iconActions: [
         IconButtonData(
@@ -182,73 +190,83 @@ class _ResourcesViewState extends ConsumerState<ResourcesView>
           onPressed: _updateAll,
         ),
       ],
-      menuItems: [
-        CommonPopupMenuItem(
-          glyph: AppGlyphs.toggle,
-          label: appLocalizations.autoUpdate,
-          subItems: [
-            CommonPopupMenuItem(
-              label: appLocalizations.turnOn,
-              checked: autoUpdate,
-              onPressed: () => _updateAutoUpdate(true),
-            ),
-            CommonPopupMenuItem(
-              label: appLocalizations.turnOff,
-              checked: !autoUpdate,
-              onPressed: () => _updateAutoUpdate(false),
-            ),
-          ],
-        ),
-        CommonPopupMenuItem(
-          glyph: AppGlyphs.clock,
-          label: appLocalizations.resourceUpdateInterval,
-          onPressed: _updateInterval,
-        ),
-      ],
       body: NullStatusSwitcher(
-        isEmpty: resources == null,
-        holdsArrival: true,
-        nullStatus: const NullStatus(illustration: NullStatusIllustration.data),
-        child: ListView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ).copyWith(top: context.appBarInset, bottom: 16),
-          children: [
-            generateSectionV3(
-              title: appLocalizations.geoResources,
-              items: [
-                for (final geoResource in GeoResource.values)
-                  _GeoResourceItem(geoResource, preloaded: _fileInfos),
-              ],
-            ),
-            generateSectionV3(
-              title: appLocalizations.iconSets,
-              items: [
-                for (final iconSet in iconSets)
-                  _IconSetItem(iconSet, key: ValueKey(iconSet.id)),
-              ],
-            ),
-            generateSectionV3(
-              title: appLocalizations.ruleProviders,
-              items: [
-                for (final provider in ruleProviders)
-                  _RuleProviderItem(
-                    provider,
-                    preloaded: _fileInfos,
-                    key: ValueKey(provider.id),
+        isLoading: resources == null,
+        loadingStatus: const NullStatus(
+          illustration: NullStatusIllustration.data,
+        ),
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+                top: context.sectionsTopPadding,
+                bottom: 16 + context.bottomInset,
+              ),
+              sliver: SliverMainAxisGroup(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: generateSection(
+                      items: [
+                        ListItem.toggle(
+                          title: Text(appLocalizations.autoUpdate),
+                          value: autoUpdate,
+                          onChanged: _updateAutoUpdate,
+                        ),
+                        if (autoUpdate)
+                          ListItem(
+                            title: Text(
+                              appLocalizations.resourceUpdateInterval,
+                            ),
+                            subtitle: Text(
+                              '$updateInterval ${appLocalizations.hours}',
+                            ),
+                            onTap: _updateInterval,
+                          ),
+                      ],
+                    ),
                   ),
-              ],
-            ),
-            generateSectionV3(
-              title: appLocalizations.script,
-              items: [
-                for (final script in scripts)
-                  _ScriptItem(
-                    script,
-                    preloaded: _fileInfos,
-                    key: ValueKey(script.id),
+                  SliverToBoxAdapter(
+                    child: generateSection(
+                      title: appLocalizations.geoResources,
+                      items: [
+                        for (final geoResource in GeoResource.values)
+                          _GeoResourceItem(geoResource, preloaded: _fileInfos),
+                      ],
+                    ),
                   ),
-              ],
+                  generateSliverSection(
+                    title: appLocalizations.iconSets,
+                    items: iconSets,
+                    itemBuilder: (iconSet) =>
+                        _IconSetItem(iconSet, key: ValueKey(iconSet.id)),
+                  ),
+                  generateSliverSection(
+                    title: appLocalizations.ruleProviders,
+                    items: ruleProviders,
+                    itemBuilder: (provider) => _RuleProviderItem(
+                      provider,
+                      preloaded: _fileInfos,
+                      key: ValueKey(provider.id),
+                    ),
+                  ),
+                  generateSliverSection(
+                    title: appLocalizations.script,
+                    items: scripts,
+                    itemBuilder: (script) => _ScriptItem(
+                      script,
+                      preloaded: _fileInfos,
+                      key: ValueKey(script.id),
+                    ),
+                  ),
+                  if (mitmFeature)
+                    generateSliverSection(
+                      title: appLocalizations.mitmModules,
+                      items: modules,
+                      itemBuilder: (module) =>
+                          _ModuleItem(module, key: ValueKey(module.id)),
+                    ),
+                ],
+              ),
             ),
           ],
         ),
@@ -281,19 +299,19 @@ class _ResourceItem extends StatelessWidget {
   Future<void> _copyLink(BuildContext context, String url) async {
     await Clipboard.setData(ClipboardData(text: url));
     if (context.mounted) {
-      context.showNotifier(
+      dialogs.showBanner(
         context.appLocalizations.copySuccess,
-        level: MessageLevel.success,
+        level: BannerLevel.success,
       );
     }
   }
 
-  List<CommonPopupMenuItem> _menuItems(BuildContext context) {
+  List<PopupMenuItem> _menuItems(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     final url = this.url;
     return [
       if (!isUpdating)
-        CommonPopupMenuItem(
+        PopupMenuItem(
           glyph: AppGlyphs.sync,
           label: appLocalizations.sync,
           onPressed: () {
@@ -301,13 +319,13 @@ class _ResourceItem extends StatelessWidget {
           },
         ),
       if (onEdit != null)
-        CommonPopupMenuItem(
+        PopupMenuItem(
           glyph: AppGlyphs.edit,
           label: appLocalizations.edit,
           onPressed: onEdit,
         ),
       if (url != null)
-        CommonPopupMenuItem(
+        PopupMenuItem(
           glyph: AppGlyphs.copy,
           label: appLocalizations.copyLink,
           onPressed: () {
@@ -327,21 +345,14 @@ class _ResourceItem extends StatelessWidget {
         children: [...previousChildren, ?currentChild],
       ),
       child: isUpdating
-          ? const SizedBox.square(
-              key: ValueKey('updating'),
-              dimension: 24,
-              child: Padding(
-                padding: EdgeInsets.all(2),
-                child: CommonCircleLoading(),
-              ),
-            )
+          ? const ActivityIndicator(key: ValueKey('updating'), size: 24)
           : chip == null
           ? const SizedBox.shrink()
           : TonalChip(
               key: const ValueKey('chip'),
               label: chip,
-              color: colorScheme.secondaryContainer,
-              foregroundColor: colorScheme.onSecondaryContainer,
+              color: context.raisedSurfaceLevel.colorOf(colorScheme),
+              foregroundColor: colorScheme.onSurfaceVariant,
             ),
     );
   }
@@ -430,15 +441,67 @@ class _FileInfoBuilderState extends ConsumerState<_FileInfoBuilder> {
   }
 }
 
+String _geoFileName(GeoResource type) => switch (type) {
+  GeoResource.MMDB => MMDB,
+  GeoResource.ASN => ASN,
+  GeoResource.GEOIP => GEOIP,
+  GeoResource.GEOSITE => GEOSITE,
+};
+
 Future<FileInfo?> _geoFileInfo(GeoResource type) async {
-  final fileName = switch (type) {
-    GeoResource.MMDB => MMDB,
-    GeoResource.ASN => ASN,
-    GeoResource.GEOIP => GEOIP,
-    GeoResource.GEOSITE => GEOSITE,
-  };
   final homePath = await appPath.homeDirPath;
-  return File(join(homePath, fileName)).getFileInfo();
+  return File(join(homePath, _geoFileName(type))).getFileInfo();
+}
+
+typedef _FileInfoQuery = ({
+  String homeDir,
+  String providersDir,
+  String scriptsDir,
+  List<ClashProvider> providers,
+  List<int> scriptIds,
+});
+
+/// Rule set file names are md5 hashes, so paths are built off the UI isolate
+/// along with one stat per file.
+Future<Map<String, FileInfo?>> _loadFileInfos(
+  _RemoteResources resources,
+) async {
+  final query = (
+    homeDir: await appPath.homeDirPath,
+    providersDir: await appPath.ruleProviderCacheDirPath,
+    scriptsDir: await appPath.scriptsDirPath,
+    providers: resources.ruleProviders,
+    scriptIds: [for (final script in resources.scripts) script.id],
+  );
+  final fileInfos = await _readFileInfosInIsolate(query);
+  return Map.fromIterables([
+    for (final type in GeoResource.values) type.updatingKey,
+    for (final provider in resources.ruleProviders) provider.updatingKey,
+    for (final script in resources.scripts) script.updatingKey,
+  ], fileInfos);
+}
+
+Future<List<FileInfo?>> _readFileInfosInIsolate(_FileInfoQuery query) {
+  return Isolate.run(() => _readFileInfos(query));
+}
+
+List<FileInfo?> _readFileInfos(_FileInfoQuery query) {
+  FileInfo? read(String path) {
+    try {
+      return File(path).getFileInfoSync();
+    } on FileSystemException {
+      return null;
+    }
+  }
+
+  return [
+    for (final type in GeoResource.values)
+      read(join(query.homeDir, _geoFileName(type))),
+    for (final provider in query.providers)
+      read(join(query.providersDir, provider.fileName)),
+    for (final id in query.scriptIds)
+      read(AppPath.scriptPathIn(query.scriptsDir, id.toString())),
+  ];
 }
 
 class _GeoResourceItem extends ConsumerWidget {
@@ -466,7 +529,7 @@ class _GeoResourceItem extends ConsumerWidget {
             .updateGeoResourceUrl(type, newUrl);
       } catch (e) {
         unawaited(
-          dialogs.showMessage(
+          dialogs.showAlert(
             title: type.name,
             message: TextSpan(text: e.toString()),
           ),
@@ -573,6 +636,24 @@ class _ScriptItem extends ConsumerWidget {
         onSync: () =>
             ref.read(resourcesActionProvider.notifier).updateScript(script),
       ),
+    );
+  }
+}
+
+class _ModuleItem extends ConsumerWidget {
+  final MitmModule module;
+
+  const _ModuleItem(this.module, {super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _ResourceItem(
+      title: module.name,
+      url: module.url,
+      chip: null,
+      lastUpdateTime: module.lastUpdateTime,
+      isUpdating: ref.watch(isUpdatingProvider(module.updatingKey)),
+      onSync: () => updateMitmModule(ref, module),
     );
   }
 }

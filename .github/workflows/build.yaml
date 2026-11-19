@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: true
+          submodules: recursive
 
       - name: Test commit message hook
         run: bash tool/check_commit_msg_test.sh
@@ -44,12 +44,22 @@ jobs:
           workspaces: plugins/rust_api/rust
           cache-directories: .dart_tool/hooks_runner
 
+      - name: Setup Go for Core fixture validation
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
 
       - name: Install dependencies
         run: flutter pub get
@@ -69,7 +79,20 @@ jobs:
         run: dart run tool/changelog.dart verify
 
       - name: Run tests
-        run: flutter test --reporter expanded --coverage
+        run: flutter test --reporter expanded --coverage --concurrency=1
+
+      - name: Verify generated product profiles against Core
+        shell: bash
+        env:
+          FLASHCO_CORE_FIXTURE_DIR: ${{ runner.temp }}/flashco-core-fixtures
+          REALITY_MLKEM_FIXTURE_PATH: ${{ runner.temp }}/flashco-reality-overrides.json
+        run: |
+          set -euo pipefail
+          mkdir -p "$FLASHCO_CORE_FIXTURE_DIR"
+          rm -f "$REALITY_MLKEM_FIXTURE_PATH"
+          flutter test --dart-define=REALITY_SUPPORT_X25519MLKEM768=true test/common/profile_core_fixture_test.dart test/providers/profile_pipeline_test.dart test/common/reality_defaults_test.dart
+          test -s "$REALITY_MLKEM_FIXTURE_PATH"
+          CGO_ENABLED=0 go -C core test . -run '^(TestProductProfile|TestRealityMlkemProviderDefaults)' -count=1
 
       - name: Check coverage
         run: dart run tool/check_coverage.dart coverage/lcov.info 75
@@ -81,6 +104,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -88,6 +113,10 @@ jobs:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
 
       - name: Validate local Flutter packages
         run: bash tool/check_plugins.sh
@@ -157,8 +186,32 @@ jobs:
         if: matrix.platform == 'windows'
         run: git config --global core.longpaths true
 
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Verify Windows checkout before build
+        id: windows_checkout
+        if: matrix.platform == 'windows'
+        shell: bash
+        run: dart run tool/verify_candidate_checkout.dart "$GITHUB_SHA"
+
+      - name: Show bounded tracked changes on checkout failure
+        if: failure() && matrix.platform == 'windows' && steps.windows_checkout.outcome == 'failure'
+        shell: bash
+        run: |
+          diff_file="$RUNNER_TEMP/flashco-tracked.diff"
+          trap 'rm -f "$diff_file"' EXIT
+          git diff --no-ext-diff --no-color > "$diff_file"
+          python -c 'import pathlib, sys; d = pathlib.Path(sys.argv[1]).read_bytes(); sys.stdout.buffer.write(d[:131072]); sys.stdout.buffer.write(b"\n[tracked diff truncated at 128 KiB]\n" if len(d) > 131072 else b"")' "$diff_file"
+
+      - name: Verify Windows installer version directives
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: python tool/test_windows_installer_metadata.py
 
       # Compiles the desktop runners and the native plugin code that only the
       # tagged release matrix built before; the bundle itself is discarded.
@@ -229,6 +282,10 @@ jobs:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
 
       - name: Install dependencies
         run: flutter pub get
@@ -311,6 +368,167 @@ jobs:
 
       - name: Run Windows service tests
         run: cargo test --manifest-path services/helper/Cargo.toml --features windows-service
+
+  candidate:
+    name: Candidate ${{ matrix.platform }} ${{ matrix.variant }}
+    if: github.repository == 'Artypoul/Flashco' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && startsWith(github.ref, 'refs/heads/')
+    needs: [dart, plugins, desktop, go, android, rust, windows-helper-test]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            variant: first-run-reality
+            os: ubuntu-24.04
+            subscription_url: ''
+            first_run: 'true'
+            reality: 'true'
+          - platform: android
+            variant: embedded-test
+            os: ubuntu-24.04
+            subscription_url: https://example.invalid/flashco-subscription.yaml
+            first_run: 'false'
+            reality: 'false'
+          - platform: windows
+            variant: embedded-test
+            os: windows-2022
+            subscription_url: https://example.invalid/flashco-subscription.yaml
+            first_run: 'false'
+            reality: 'false'
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Setup NDK
+        if: matrix.platform == 'android'
+        uses: nttld/setup-ndk@v1
+        id: candidate-ndk
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+      - name: Resolve dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Verify candidate inputs before packaging
+        shell: bash
+        run: dart run tool/verify_candidate_checkout.dart "$GITHUB_SHA"
+      - name: Build universal test APK
+        if: matrix.platform == 'android'
+        env:
+          ANDROID_NDK_HOME: ${{ steps.candidate-ndk.outputs.ndk-path }}
+          BOOTSTRAP_SUBSCRIPTION_URL: ${{ matrix.subscription_url }}
+          BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN: ${{ matrix.first_run }}
+          REALITY_SUPPORT_X25519MLKEM768: ${{ matrix.reality }}
+        run: dart setup.dart android --env pre --targets apk --universal-apk
+      - name: Verify Android test identity
+        if: matrix.platform == 'android'
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=(dist/*android*.apk)
+          test "${#apks[@]}" -eq 1
+          analyzer="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          "$analyzer" manifest application-id "${apks[0]}" | tee dist/android-package-id.txt
+          test "$(cat dist/android-package-id.txt)" = com.follow.flashco.dev
+          signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          "$signer" verify --print-certs "${apks[0]}" | tee dist/android-signing.txt
+          "$analyzer" manifest version-name "${apks[0]}" | tee dist/android-version-name.txt
+          "$analyzer" manifest version-code "${apks[0]}" | tee dist/android-version-code.txt
+          "$analyzer" files list "${apks[0]}" | grep -E '(^|/)lib/[^/]+/[^/]+\.so$' | tee dist/android-abis.txt
+          for abi in armeabi-v7a arm64-v8a x86_64; do
+            grep -q "lib/$abi/" dist/android-abis.txt
+          done
+      - name: Build test Windows EXE and ZIP
+        if: matrix.platform == 'windows'
+        env:
+          BOOTSTRAP_SUBSCRIPTION_URL: ${{ matrix.subscription_url }}
+          BOOTSTRAP_SUBSCRIPTION_ON_FIRST_RUN: ${{ matrix.first_run }}
+          REALITY_SUPPORT_X25519MLKEM768: ${{ matrix.reality }}
+        run: dart setup.dart windows --env pre --targets exe,zip
+      - name: Verify packaged Windows app version
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $zip = @(Get-Item 'dist/*-windows-amd64.zip')
+          if ($zip.Count -ne 1) { throw 'Expected exactly one Windows ZIP.' }
+          ./tool/verify_windows_app_version.ps1 -ZipPath ($zip[0].FullName) -OutputPath 'dist/windows-app-version.json'
+      - name: Verify Windows installer metadata
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $items = @(Get-Item 'dist/*-windows-amd64-setup.exe')
+          if ($items.Count -ne 1) { throw 'Expected exactly one Windows installer.' }
+          ./tool/verify_windows_installer_version.ps1 -InstallerPath ($items[0].FullName) -OutputPath 'dist/windows-installer-version.json'
+      - name: Verify candidate inputs after packaging
+        shell: bash
+        run: dart run tool/verify_candidate_checkout.dart "$GITHUB_SHA"
+      - name: Record candidate source and hashes
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          PLATFORM: ${{ matrix.platform }}
+          VARIANT: ${{ matrix.variant }}
+          SYNTHETIC_SUBSCRIPTION_URL: ${{ matrix.subscription_url }}
+          FIRST_RUN: ${{ matrix.first_run }}
+          REALITY: ${{ matrix.reality }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          printf '%s\n' "$SOURCE_SHA" > dist/SOURCE_SHA
+          cp env.json dist/build-defines.json
+          python - <<'PYCODE'
+          import json, os
+          metadata = {
+              'source_sha': os.environ['SOURCE_SHA'],
+              'platform': os.environ['PLATFORM'],
+              'variant': os.environ['VARIANT'],
+              'subscription_url': os.environ['SYNTHETIC_SUBSCRIPTION_URL'],
+              'subscription_url_is_synthetic': bool(os.environ['SYNTHETIC_SUBSCRIPTION_URL']),
+              'first_run': os.environ['FIRST_RUN'] == 'true',
+              'reality_x25519mlkem768': os.environ['REALITY'] == 'true',
+          }
+          with open('dist/candidate-metadata.json', 'w', encoding='utf-8') as output:
+              json.dump(metadata, output, indent=2)
+              output.write('\n')
+          PYCODE
+          if [[ "$PLATFORM" == android ]]; then
+            files=(dist/*android*.apk)
+            test "${#files[@]}" -eq 1 && test -f "${files[0]}"
+          else
+            shopt -s nullglob
+            exe=(dist/*.exe); zip=(dist/*.zip)
+            test "${#exe[@]}" -eq 1 && test "${#zip[@]}" -eq 1
+            files=("${exe[@]}" "${zip[@]}")
+          fi
+          bash .github/scripts/candidate-checksums.sh dist "${files[@]}"
+      - name: Upload candidate packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: flashco-candidate-${{ matrix.platform }}-${{ matrix.variant }}-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
 
   build:
     # Releases publish where the release links point: the public repository.
@@ -411,6 +629,10 @@ jobs:
           add-to-path: true
           link-to-sdk: true
 
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
+
       - name: Get Flutter Dependency
         run: |
           flutter --version
@@ -451,6 +673,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Download
         uses: actions/download-artifact@v4
@@ -465,6 +688,10 @@ jobs:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+
+      - name: Fetch verified CA bundle
+        shell: bash
+        run: bash .github/scripts/fetch-ca.sh
 
       - name: Install dependencies
         run: flutter pub get

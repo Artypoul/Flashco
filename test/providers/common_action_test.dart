@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:flashco/common/app_update.dart';
 import 'package:flashco/common/request.dart';
 import 'package:flashco/core/controller.dart';
 import 'package:flashco/core/interface.dart';
@@ -39,11 +40,11 @@ void main() {
 
   setUp(() {
     reset(core);
-    originalRequestAdapter = request.dio.httpClientAdapter;
+    originalRequestAdapter = request.releaseDio.httpClientAdapter;
   });
 
   tearDown(() {
-    request.dio.httpClientAdapter = originalRequestAdapter;
+    request.releaseDio.httpClientAdapter = originalRequestAdapter;
   });
 
   ProviderContainer buildContainer() {
@@ -168,10 +169,42 @@ void main() {
   });
 
   group('CommonAction.autoCheckUpdate', () {
+    late bool Function() originalEligibility;
+
+    setUp(() {
+      originalEligibility = resolveStableUpdateEligibility;
+      resolveStableUpdateEligibility = () => true;
+    });
+
+    tearDown(() {
+      resolveStableUpdateEligibility = originalEligibility;
+    });
+
+    test(
+      'does not contact the release service for an ineligible build',
+      () async {
+        final container = buildContainer();
+        final adapter = _UpdateAdapter(
+          (_) async => _releaseResponse(runningVersion),
+        );
+        request.releaseDio.httpClientAdapter = adapter;
+        container
+            .read(appSettingProvider.notifier)
+            .update((state) => state.copyWith(autoCheckUpdate: true));
+        resolveStableUpdateEligibility = () => false;
+
+        await expectLater(
+          container.read(commonActionProvider.notifier).autoCheckUpdate(),
+          completion(isFalse),
+        );
+        expect(adapter.calls, 0);
+      },
+    );
+
     test('returns without a network call when the setting is off', () async {
       final container = buildContainer();
       final adapter = _UpdateAdapter((_) async => _releaseResponse('v0.8.96'));
-      request.dio.httpClientAdapter = adapter;
+      request.releaseDio.httpClientAdapter = adapter;
       container
           .read(appSettingProvider.notifier)
           .update((state) => state.copyWith(autoCheckUpdate: false));
@@ -188,7 +221,7 @@ void main() {
       final adapter = _UpdateAdapter(
         (_) async => _releaseResponse(runningVersion),
       );
-      request.dio.httpClientAdapter = adapter;
+      request.releaseDio.httpClientAdapter = adapter;
 
       await expectLater(
         container.read(commonActionProvider.notifier).autoCheckUpdate(),
@@ -201,7 +234,7 @@ void main() {
       final container = buildContainer();
       final response = Completer<ResponseBody>();
       final adapter = _UpdateAdapter((_) => response.future);
-      request.dio.httpClientAdapter = adapter;
+      request.releaseDio.httpClientAdapter = adapter;
 
       final pending = container
           .read(commonActionProvider.notifier)

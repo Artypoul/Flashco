@@ -20,19 +20,22 @@ const _excludedPatterns = [
 const _groupFloors = <String, double>{
   'core': 76.0,
   'database': 81.0,
+  'ui': 97.0,
   'widgets': 82.0,
   'features': 81.0,
   'models': 67.0,
   'providers': 73.0,
   'common': 74.0,
+  'flashco': 95.0,
   'manager': 68.0,
   'views': 66.0,
   'enum': 86.0,
-  'icons': 90.0,
   'pages': 71.0,
   'plugins': 67.0,
   'lib': 20.0,
 };
+
+const _subgroupFloors = <String, double>{'ui/icons': 90.0};
 
 class _Coverage {
   int found = 0;
@@ -46,7 +49,7 @@ bool _isExcluded(String path) {
   return _excludedPatterns.any(normalized.contains);
 }
 
-String _group(String path) {
+String? _relativeSource(String path) {
   final normalized = path.replaceAll(r'\', '/');
   // Anchor on the project's own `lib/`, which is the last one on the path. The
   // first match is not it whenever the report carries absolute paths and
@@ -59,11 +62,16 @@ String _group(String path) {
   } else {
     final index = normalized.lastIndexOf('/lib/');
     if (index == -1) {
-      return 'other';
+      return null;
     }
     start = index + 5;
   }
-  final relative = normalized.substring(start);
+  return normalized.substring(start);
+}
+
+String _group(String path) {
+  final relative = _relativeSource(path);
+  if (relative == null) return 'other';
   final separator = relative.indexOf('/');
   return separator == -1 ? 'lib' : relative.substring(0, separator);
 }
@@ -93,6 +101,7 @@ void main(List<String> arguments) {
 
   final total = _Coverage();
   final byGroup = <String, _Coverage>{};
+  final bySubgroup = <String, _Coverage>{};
   var source = '';
   var excluded = false;
 
@@ -106,14 +115,26 @@ void main(List<String> arguments) {
       continue;
     }
     final group = byGroup.putIfAbsent(_group(source), _Coverage.new);
+    final relative = _relativeSource(source);
+    final subgroups = [
+      for (final name in _subgroupFloors.keys)
+        if (relative?.startsWith('$name/') == true)
+          bySubgroup.putIfAbsent(name, _Coverage.new),
+    ];
     if (line.startsWith('LF:')) {
       final found = int.parse(line.substring(3));
       total.found += found;
       group.found += found;
+      for (final subgroup in subgroups) {
+        subgroup.found += found;
+      }
     } else if (line.startsWith('LH:')) {
       final hit = int.parse(line.substring(3));
       total.hit += hit;
       group.hit += hit;
+      for (final subgroup in subgroups) {
+        subgroup.hit += hit;
+      }
     }
   }
 
@@ -141,6 +162,28 @@ void main(List<String> arguments) {
       '${coverage.percent.toStringAsFixed(1).padLeft(6)}%'
       '${floor == null ? ' (NO FLOOR)' : ' (floor ${floor.toStringAsFixed(0)}%)'}'
       '${below ? ' FAIL' : ''}',
+    );
+  }
+  for (final entry in _subgroupFloors.entries) {
+    final coverage = bySubgroup[entry.key];
+    if (coverage == null || coverage.found == 0) {
+      failures.add(
+        '${entry.key} has a floor but no measured lines in the report.',
+      );
+      continue;
+    }
+    final below = coverage.percent < entry.value;
+    if (below) {
+      failures.add(
+        '${entry.key} ${coverage.percent.toStringAsFixed(2)}% is below its '
+        '${entry.value.toStringAsFixed(2)}% floor.',
+      );
+    }
+    stdout.writeln(
+      '${entry.key.padRight(12)} '
+      '${coverage.hit.toString().padLeft(6)}/${coverage.found.toString().padLeft(6)} '
+      '${coverage.percent.toStringAsFixed(1).padLeft(6)}% '
+      '(floor ${entry.value.toStringAsFixed(0)}%)${below ? ' FAIL' : ''}',
     );
   }
   stdout.writeln(

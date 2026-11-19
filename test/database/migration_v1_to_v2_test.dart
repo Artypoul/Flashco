@@ -244,6 +244,68 @@ bool _hasTable(Database raw, String name) => raw.select(
 int _userVersion(Database raw) =>
     raw.select('PRAGMA user_version').single['user_version'] as int;
 
+void _createLegacyMitm(
+  Database raw, {
+  String extraConstraint = '',
+  String nameDefinition = 'name TEXT NOT NULL',
+}) {
+  raw.execute('DROP TABLE mitm_modules');
+  raw.execute(
+    'CREATE TABLE mitm_modules (id INTEGER NOT NULL PRIMARY KEY, '
+    "$nameDefinition, description TEXT NOT NULL DEFAULT '', url TEXT, "
+    'enabled INTEGER NOT NULL DEFAULT 1, "order" INTEGER, '
+    "arguments TEXT NOT NULL DEFAULT '{}', resources TEXT NOT NULL DEFAULT '{}', "
+    'system TEXT, scripts INTEGER NOT NULL DEFAULT 0, '
+    'last_update_time INTEGER NOT NULL, '
+    'update_interval_minutes INTEGER NOT NULL DEFAULT 1440$extraConstraint)',
+  );
+}
+
+void _seedCurrentData(Database raw) {
+  raw.execute(
+    'INSERT INTO profiles (id, type, label, url, extend_type, '
+    'auto_update_duration_millis, auto_update, selected_map, unfold_set, overrides) '
+    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [
+      7,
+      'url',
+      'saved',
+      'https://example.invalid/sub',
+      'standard',
+      60000,
+      1,
+      '{"PROXY":"Node A"}',
+      '["PROXY"]',
+      '{"tun":{"enable":false}}',
+    ],
+  );
+  raw.execute(
+    'INSERT INTO rules (id, rule_action, content, rule_target, "order") '
+    'VALUES (11, ?, ?, ?, ?), (12, ?, ?, ?, ?)',
+    [
+      'DOMAIN',
+      'first.example',
+      'DIRECT',
+      'a',
+      'DOMAIN',
+      'second.example',
+      'REJECT',
+      'b',
+    ],
+  );
+  raw.execute(
+    'INSERT INTO disabled_rules (profile_id, rule_id) VALUES (7, 12)',
+  );
+}
+
+Map<String, List<Map<String, Object?>>> _snapshot(Database raw) => {
+  for (final table in ['profiles', 'rules', 'disabled_rules'])
+    table: [
+      for (final row in raw.select('SELECT * FROM $table ORDER BY 1'))
+        Map.of(row),
+    ],
+};
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -260,12 +322,17 @@ void main() {
 
   tearDown(() => raw.close());
 
-  Future<fl.Database> openAndMigrate() async {
+  Future<fl.Database> openAndMigrate({bool autoClose = true}) async {
     final database = fl.Database(
       NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
     );
-    addTearDown(database.close);
-    await database.customSelect('SELECT 1').get();
+    try {
+      await database.customSelect('SELECT 1').get();
+    } catch (_) {
+      await database.close();
+      rethrow;
+    }
+    if (autoClose) addTearDown(database.close);
     return database;
   }
 
@@ -275,7 +342,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -285,7 +352,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
   });
 
   test('the v4 upgrade adds url to scripts', () async {
@@ -299,7 +366,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_columnsOf(raw, 'scripts'), contains('url'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     final scripts = await database.scriptsDao.query().get();
     expect(scripts.single.label, 'Local');
     expect(scripts.single.url, isNull);
@@ -316,7 +383,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_columnsOf(raw, 'scripts'), contains('order'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     final scripts = await database.scriptsDao.query().get();
     expect(scripts.map((item) => item.label), ['First', 'Second']);
     expect(scripts.map((item) => item.order), [null, null]);
@@ -331,7 +398,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 21);
+      expect(_userVersion(raw), 23);
     },
   );
 
@@ -342,7 +409,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_hasTable(raw, 'clash_providers'), isTrue);
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(await database.clashProvidersDao.query().get(), isEmpty);
   });
 
@@ -355,7 +422,7 @@ void main() {
       await openAndMigrate();
 
       expect(_hasTable(raw, 'clash_providers'), isTrue);
-      expect(_userVersion(raw), 21);
+      expect(_userVersion(raw), 23);
     },
   );
 
@@ -366,7 +433,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'proxy_groups'), contains('definition'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
   });
 
   test('a v6 user_version on the current proxy_groups still opens', () async {
@@ -376,7 +443,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'proxy_groups'), contains('definition'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
   });
 
   test(
@@ -400,7 +467,7 @@ void main() {
         _columnsOf(raw, 'clash_providers'),
         isNot(anyOf(contains('interval'), contains('filter'))),
       );
-      expect(_userVersion(raw), 21);
+      expect(_userVersion(raw), 23);
       expect(
         (await database.clashProvidersDao.query().get()).single.label,
         'Kept',
@@ -510,7 +577,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_hasTable(raw, 'custom_proxies'), isTrue);
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(await database.customProxiesDao.query().get(), isEmpty);
   });
 
@@ -521,7 +588,7 @@ void main() {
 
     expect(_columnsOf(raw, 'proxy_groups'), contains('definition'));
     expect(_columnsOf(raw, 'proxy_groups'), isNot(contains('url')));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
   });
 
   test('the v17 upgrade renames overwrite_type and adds overrides', () async {
@@ -591,7 +658,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(_hasTable(raw, 'profile_rule_mapping'), isFalse);
     expect(
       {
@@ -765,7 +832,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_hasTable(raw, 'proxy_dialers'), isTrue);
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(await database.proxyDialersDao.query(1).get(), isEmpty);
   });
 
@@ -777,7 +844,7 @@ void main() {
 
     expect(_hasTable(raw, 'icon_sets'), isTrue);
     expect(_columnsOf(raw, 'icon_sets'), contains('last_update_time'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(await database.iconSetsDao.query().get(), isEmpty);
   });
 
@@ -790,7 +857,7 @@ void main() {
       final database = await openAndMigrate();
 
       expect(_columnsOf(raw, 'icon_sets'), contains('last_update_time'));
-      expect(_userVersion(raw), 21);
+      expect(_userVersion(raw), 23);
       expect(await database.iconSetsDao.query().get(), isEmpty);
     },
   );
@@ -871,7 +938,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('age_secret_key'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(
       (await database.profilesDao.query().get()).single.ageSecretKey,
       isEmpty,
@@ -889,7 +956,7 @@ void main() {
     final database = await openAndMigrate();
 
     expect(_columnsOf(raw, 'custom_proxies'), contains('empty_options'));
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(
       (await database.customProxiesDao.query().get()).single.emptyOptions,
       isEmpty,
@@ -912,7 +979,7 @@ void main() {
 
       final database = await openAndMigrate();
 
-      expect(_userVersion(raw), 21);
+      expect(_userVersion(raw), 23);
       expect(
         (await database.proxyGroupsDao.query(3).get()).single.hidden,
         isTrue,
@@ -925,7 +992,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(
       await database.customSelect('SELECT * FROM rules').get(),
       hasLength(russianServiceDirectRules.length),
@@ -938,7 +1005,183 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 21);
+    expect(_userVersion(raw), 23);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
+  });
+  test(
+    'schema 21 creates absent donor tables without replacing rules',
+    () async {
+      final before = raw.select('SELECT * FROM rules');
+      raw.execute('DROP TABLE ip_qualities');
+      raw.execute('DROP TABLE mitm_modules');
+      raw.execute('PRAGMA user_version = 21');
+      await openAndMigrate();
+      expect(_userVersion(raw), 23);
+      expect(_hasTable(raw, 'ip_qualities'), isTrue);
+      expect(_hasTable(raw, 'mitm_modules'), isTrue);
+      expect(raw.select('SELECT * FROM rules').length, before.length);
+    },
+  );
+
+  test('schema 22 preserves legacy module rows and maps', () async {
+    _createLegacyMitm(raw);
+    raw.execute(
+      'INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time, update_interval_minutes) VALUES (?, ?, ?, ?, ?, ?)',
+      [42, 'module', '{"arg":"value"}', '{"file":"hash"}', 1234, 60],
+    );
+    raw.execute('PRAGMA user_version = 22');
+    await openAndMigrate();
+    final row = raw.select('SELECT * FROM mitm_modules').single;
+    expect(row['id'], 42);
+    expect(row['arguments'], '{"arg":"value"}');
+    expect(row['resources'], '{"file":"hash"}');
+    expect(
+      _columnsOf(raw, 'mitm_modules'),
+      isNot(contains('update_interval_minutes')),
+    );
+  });
+
+  test('incompatible module columns fail without advancing version', () async {
+    raw.execute('ALTER TABLE mitm_modules ADD COLUMN unknown_field TEXT');
+    raw.execute('PRAGMA user_version = 22');
+    await expectLater(openAndMigrate(), throwsStateError);
+    expect(_userVersion(raw), 22);
+    expect(_columnsOf(raw, 'mitm_modules'), contains('unknown_field'));
+  });
+  for (final constraint in [
+    ', UNIQUE (name)',
+    ', CHECK (length(name) > 0)',
+    ', FOREIGN KEY (url) REFERENCES profiles(id)',
+    ', hidden TEXT GENERATED ALWAYS AS (name) VIRTUAL',
+  ]) {
+    test('unknown legacy constraint rolls back: $constraint', () async {
+      _createLegacyMitm(raw, extraConstraint: constraint);
+      raw.execute(
+        "INSERT INTO mitm_modules (id, name, last_update_time) VALUES (42, 'kept', 1234)",
+      );
+      raw.execute('PRAGMA user_version = 22');
+      await expectLater(openAndMigrate(), throwsStateError);
+      expect(_userVersion(raw), 22);
+      expect(
+        raw.select('SELECT name FROM mitm_modules').single['name'],
+        'kept',
+      );
+      expect(
+        _columnsOf(raw, 'mitm_modules'),
+        contains('update_interval_minutes'),
+      );
+      await expectLater(openAndMigrate(), throwsStateError);
+      expect(_userVersion(raw), 22);
+    });
+  }
+
+  test('legacy collation is rejected without dropping rows', () async {
+    _createLegacyMitm(raw, nameDefinition: 'name TEXT NOT NULL COLLATE NOCASE');
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, last_update_time) VALUES (42, 'kept', 1234)",
+    );
+    raw.execute('PRAGMA user_version = 22');
+    await expectLater(openAndMigrate(), throwsStateError);
+    expect(_userVersion(raw), 22);
+    expect(raw.select('SELECT name FROM mitm_modules').single['name'], 'kept');
+  });
+
+  test('already current module table is not rebuilt', () async {
+    raw.execute('CREATE INDEX module_name_index ON mitm_modules(name)');
+    raw.execute('PRAGMA user_version = 22');
+    await openAndMigrate();
+    expect(_userVersion(raw), 23);
+    expect(
+      raw.select(
+        "SELECT name FROM sqlite_master WHERE name = 'module_name_index'",
+      ),
+      isNotEmpty,
+    );
+  });
+
+  test(
+    'schema 22 without modules creates them and survives reopening',
+    () async {
+      _seedCurrentData(raw);
+      final before = _snapshot(raw);
+      raw.execute('DROP TABLE mitm_modules');
+      raw.execute('PRAGMA user_version = 22');
+      var database = await openAndMigrate(autoClose: false);
+      expect(_userVersion(raw), 23);
+      expect(_hasTable(raw, 'mitm_modules'), isTrue);
+      expect(_snapshot(raw), before);
+      await database.close();
+      database = await openAndMigrate();
+      expect(_userVersion(raw), 23);
+      expect(_snapshot(raw), before);
+    },
+  );
+
+  test('stage 23 failure rolls back stage 22 and retry preserves data', () async {
+    _seedCurrentData(raw);
+    final before = _snapshot(raw);
+    raw.execute('DROP TABLE ip_qualities');
+    _createLegacyMitm(raw, extraConstraint: ', UNIQUE (name)');
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time) VALUES (42, 'kept', '{\"arg\":\"value\"}', '{\"file\":\"hash\"}', 1234)",
+    );
+    raw.execute('PRAGMA user_version = 21');
+    await expectLater(openAndMigrate(), throwsStateError);
+    expect(_userVersion(raw), 21);
+    expect(_hasTable(raw, 'ip_qualities'), isFalse);
+    expect(_snapshot(raw), before);
+    expect(
+      raw
+          .select('SELECT arguments, resources FROM mitm_modules')
+          .single['arguments'],
+      '{"arg":"value"}',
+    );
+    await expectLater(openAndMigrate(), throwsStateError);
+    expect(_hasTable(raw, 'ip_qualities'), isFalse);
+    _createLegacyMitm(raw);
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time) VALUES (42, 'kept', '{\"arg\":\"value\"}', '{\"file\":\"hash\"}', 1234)",
+    );
+    final database = await openAndMigrate(autoClose: false);
+    expect(_userVersion(raw), 23);
+    expect(_snapshot(raw), before);
+    expect(
+      raw
+          .select('SELECT arguments, resources FROM mitm_modules')
+          .single['resources'],
+      '{"file":"hash"}',
+    );
+    await database.close();
+    await openAndMigrate();
+    expect(_snapshot(raw), before);
+    expect(
+      raw.select('SELECT arguments FROM mitm_modules').single['arguments'],
+      '{"arg":"value"}',
+    );
+  });
+
+  test('retained newer tables and rows survive a repeated upgrade', () async {
+    _seedCurrentData(raw);
+    final before = _snapshot(raw);
+    raw.execute(
+      "INSERT INTO ip_qualities (ip, quality, checked_at) VALUES ('192.0.2.1', '{}', 1234)",
+    );
+    raw.execute(
+      "INSERT INTO mitm_modules (id, name, arguments, resources, last_update_time) VALUES (42, 'kept', '{\"arg\":\"value\"}', '{\"file\":\"hash\"}', 1234)",
+    );
+    final ip = Map.of(raw.select('SELECT * FROM ip_qualities').single);
+    final module = Map.of(raw.select('SELECT * FROM mitm_modules').single);
+    raw.execute('PRAGMA user_version = 21');
+    final database = await openAndMigrate(autoClose: false);
+    expect(_userVersion(raw), 23);
+    expect(_snapshot(raw), before);
+    expect(Map.of(raw.select('SELECT * FROM ip_qualities').single), ip);
+    expect(Map.of(raw.select('SELECT * FROM mitm_modules').single), module);
+    await database.close();
+    await openAndMigrate();
+    expect(_userVersion(raw), 23);
+    expect(_snapshot(raw), before);
+    expect(Map.of(raw.select('SELECT * FROM ip_qualities').single), ip);
+    expect(Map.of(raw.select('SELECT * FROM mitm_modules').single), module);
   });
 }

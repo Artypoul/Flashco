@@ -1,12 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flashco/common/constant.dart';
 import 'package:flashco/core/method.dart';
+import 'package:flashco/core/spill.dart';
 import 'package:flashco/enum/enum.dart';
 import 'package:flashco/models/models.dart';
 import 'package:flashco/plugins/service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart';
+
+import '../helpers/app_paths.dart';
 
 class _RecordingListener with ServiceListener {
   final events = <CoreEvent>[];
@@ -53,17 +58,24 @@ void main() {
 
   const channelName = '$packageName/service';
   const channel = MethodChannel(channelName);
+  const coreChannel = MethodChannel('$packageName/core');
   const codec = StandardMethodCodec();
 
   late List<MethodCall> calls;
 
-  void mockChannel(Future<Object?>? Function(MethodCall call) handler) {
+  void mockChannel(
+    Future<Object?>? Function(MethodCall call) handler, {
+    MethodChannel target = channel,
+  }) {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, (call) async {
+        .setMockMethodCallHandler(target, (call) async {
           calls.add(call);
           return handler(call);
         });
   }
+
+  void mockCoreChannel(Future<Object?>? Function(MethodCall call) handler) =>
+      mockChannel(handler, target: coreChannel);
 
   Future<void> emitFromPlatform(Object? arguments) async {
     final payload = json.encode(
@@ -72,7 +84,7 @@ void main() {
     await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .handlePlatformMessage(
           channelName,
-          codec.encodeMethodCall(MethodCall('event', payload)),
+          codec.encodeMethodCall(MethodCall('event', utf8.encode(payload))),
           null,
         );
   }
@@ -82,8 +94,10 @@ void main() {
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, null);
+    for (final target in [channel, coreChannel]) {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(target, null);
+    }
   });
 
   test('is a singleton so the platform handler is installed once', () {
@@ -153,6 +167,7 @@ void main() {
       final sent = json.decode(calls.single.arguments as String);
       expect(sent['currentProfileName'], 'profile');
       expect(sent['onlyStatisticsProxy'], isTrue);
+      expect(sent, isNot(contains('setupParams')));
     });
   });
 
@@ -257,7 +272,7 @@ void main() {
 
   group('invokeMethod', () {
     test('encodes the call and decodes the response envelope', () async {
-      mockChannel(
+      mockCoreChannel(
         (_) async => utf8.encode(
           json.encode(
             const CoreMethodResponse(id: '7', result: {'up': 1}).toJson(),
@@ -268,7 +283,7 @@ void main() {
       final response = await Service().invokeMethod(
         const CoreMethodCall(
           id: '7',
-          method: CoreMethod.getTraffic,
+          method: CoreMethod.trafficCurrent,
           arguments: true,
         ),
       );
@@ -277,45 +292,76 @@ void main() {
           json.decode(calls.single.arguments as String) as Map<String, Object?>;
       expect(calls.single.method, 'invokeMethod');
       expect(sent['id'], '7');
-      expect(sent['method'], CoreMethod.getTraffic.name);
+      expect(sent['method'], CoreMethod.trafficCurrent.wireName);
       expect(
         sent['arguments'],
         isTrue,
         reason: 'arguments stay structured JSON, never a pre-encoded string',
       );
-      expect(response!.id, '7');
+      expect(response.id, '7');
       expect(response.result, {'up': 1});
       expect(response.error, isNull);
     });
 
     test('decodes a large UTF-8 envelope off the calling isolate', () async {
       final names = List.generate(5000, (index) => '节点-$index');
-      mockChannel(
+      mockCoreChannel(
         (_) async => utf8.encode(
           json.encode(CoreMethodResponse(id: '3', result: names).toJson()),
         ),
       );
 
       final response = await Service().invokeMethod(
-        const CoreMethodCall(id: '3', method: CoreMethod.getProxies),
+        const CoreMethodCall(id: '3', method: CoreMethod.proxyList),
       );
 
-      expect(response!.result, names);
+      expect(response.result, names);
     });
 
-    test('returns null when the platform sends no envelope', () async {
-      mockChannel((_) async => null);
-
-      expect(
-        await Service().invokeMethod(
-          const CoreMethodCall(method: CoreMethod.getTraffic),
+    test('reads an envelope the Core spilled to a file', () async {
+      final home = Directory.systemTemp.createTempSync('service_spill');
+      addTearDown(() => home.deleteSync(recursive: true));
+      await useAppPaths(home);
+      final file = File(join(home.path, coreSpillDirectoryName, '1.json'))
+        ..createSync(recursive: true)
+        ..writeAsStringSync(
+          json.encode(
+            const CoreMethodResponse(id: '8', result: 'big').toJson(),
+          ),
+        );
+      mockCoreChannel(
+        (_) async => utf8.encode(
+          json.encode(CoreMethodResponse(id: '8', file: file.path).toJson()),
         ),
-        isNull,
+      );
+
+      final response = await Service().invokeMethod(
+        const CoreMethodCall(id: '8', method: CoreMethod.configRead),
+      );
+
+      expect(response.result, 'big');
+      expect(file.existsSync(), isFalse);
+    });
+
+    test('fails when the platform sends no envelope', () async {
+      mockCoreChannel((_) async => null);
+
+      await expectLater(
+        Service().invokeMethod(
+          const CoreMethodCall(method: CoreMethod.trafficCurrent),
+        ),
+        throwsA(
+          isA<CoreMethodException>().having(
+            (error) => error.code,
+            'code',
+            'no_response',
+          ),
+        ),
       );
     });
 
     test('surfaces a Core error inside the envelope', () async {
-      mockChannel(
+      mockCoreChannel(
         (_) async => utf8.encode(
           json.encode({
             'id': '1',
@@ -326,10 +372,10 @@ void main() {
       );
 
       final response = await Service().invokeMethod(
-        const CoreMethodCall(id: '1', method: CoreMethod.getTraffic),
+        const CoreMethodCall(id: '1', method: CoreMethod.trafficCurrent),
       );
 
-      expect(response!.error, isNotNull);
+      expect(response.error, isNotNull);
       expect(response.error!.code, 'unavailable');
       expect(response.error!.message, 'core down');
     });
@@ -450,7 +496,7 @@ void main() {
           .defaultBinaryMessenger
           .handlePlatformMessage(
             channelName,
-            codec.encodeMethodCall(const MethodCall('event', '')),
+            codec.encodeMethodCall(MethodCall('event', Uint8List(0))),
             null,
           );
 

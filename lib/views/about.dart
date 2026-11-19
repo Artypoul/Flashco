@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flashco/common/common.dart';
 import 'package:flashco/enum/enum.dart';
-import 'package:flashco/icons/icons.dart';
+import 'package:flashco/ui/icons/icons.dart';
+import 'package:flashco/ui/ui.dart';
 import 'package:flashco/providers/providers.dart';
 import 'package:flashco/state.dart';
-import 'package:flashco/widgets/scaffold.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AboutView extends ConsumerWidget {
@@ -30,7 +30,7 @@ class AboutView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     final isLoading = ref.watch(loadingProvider(LoadingTag.checkUpdate));
-    return CommonScaffold(
+    return Scaffold(
       isLoading: isLoading,
       title: appLocalizations.about,
       body: ListView(
@@ -47,9 +47,9 @@ class AboutView extends ConsumerWidget {
               ref
                   .read(appSettingProvider.notifier)
                   .update((state) => state.copyWith(developerMode: true));
-              context.showNotifier(
+              dialogs.showBanner(
                 appLocalizations.developerModeEnableTip,
-                level: MessageLevel.success,
+                level: BannerLevel.success,
               );
             },
           ),
@@ -77,7 +77,6 @@ class _AboutHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final textTheme = context.textTheme;
     final appLocalizations = context.appLocalizations;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -87,7 +86,7 @@ class _AboutHero extends StatelessWidget {
             onEnterDeveloperMode: onEnterDeveloperMode,
             child: DecoratedBox(
               decoration: ShapeDecoration(
-                color: colorScheme.surfaceContainerHigh,
+                color: context.raisedSurfaceLevel.colorOf(colorScheme),
                 shape: AppShape.all(AppCorner.fit(_logoSize)),
               ),
               child: Padding(
@@ -103,9 +102,7 @@ class _AboutHero extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             appName,
-            style: textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyle.title2.of(context, emphasized: true),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -120,7 +117,7 @@ class _AboutHero extends StatelessWidget {
               ),
               _Pill(
                 label: 'GPL-3.0',
-                color: colorScheme.surfaceContainerHighest,
+                color: context.raisedSurfaceLevel.colorOf(colorScheme),
                 foregroundColor: colorScheme.onSurfaceVariant,
               ),
             ],
@@ -131,17 +128,17 @@ class _AboutHero extends StatelessWidget {
             child: Text(
               appLocalizations.desc,
               textAlign: TextAlign.center,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                height: 1.5,
-              ),
+              style: AppTextStyle.subheadline
+                  .of(context)
+                  .copyWith(color: colorScheme.onSurfaceVariant, height: 1.5),
             ),
           ),
           const SizedBox(height: 20),
-          FilledButton.tonalIcon(
+          TonalButton(
+            size: TonalButtonSize.bar,
+            glyph: AppGlyphs.sync,
+            label: appLocalizations.checkUpdate,
             onPressed: isCheckingUpdate ? null : onCheckUpdate,
-            icon: const GlyphIcon(AppGlyphs.sync, fill: 1),
-            label: Text(appLocalizations.checkUpdate),
           ),
         ],
       ),
@@ -168,10 +165,9 @@ class _Pill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Text(
           label,
-          style: context.textTheme.labelMedium?.copyWith(
-            color: foregroundColor,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyle.caption1
+              .of(context, emphasized: true)
+              .copyWith(color: foregroundColor),
         ),
       ),
     );
