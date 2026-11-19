@@ -82,6 +82,7 @@ void main() {
     );
 
     expect(updated.appSettingProps.autoRun, isTrue);
+    expect(updated.appSettingProps.autoLaunch, isTrue);
     expect(updated.patchClashConfig.tun.strictRoute, isTrue);
     expect(await preferences.werePersonalDefaultsApplied(), isTrue);
     expect(await preferences.getConfig(), updated);
@@ -126,7 +127,13 @@ void main() {
     );
     expect(resumed.appSettingProps.locale, 'ru');
     expect(resumed.appSettingProps.autoRun, isTrue);
+    expect(resumed.appSettingProps.autoLaunch, isTrue);
     expect(resumed.patchClashConfig.tun.strictRoute, isTrue);
+    expect(resumed.patchClashConfig.tunOverride.strictRoute, isTrue);
+    expect(
+      resumed.patchClashConfig.tunOverrideKeys,
+      contains(TunOverrideKey.strictRoute),
+    );
     await store.reload();
     expect(await preferences.getConfig(), resumed);
     expect(await preferences.werePersonalDefaultsApplied(), isTrue);
@@ -171,6 +178,7 @@ void main() {
       expect(updated.themeProps.themeMode, ThemeMode.light);
       expect(updated.themeProps.fontFamily, isNull);
       expect(updated.appSettingProps.autoRun, isTrue);
+      expect(updated.appSettingProps.autoLaunch, isTrue);
       expect(updated.appSettingProps.locale, 'ru');
       expect(updated.networkProps.systemProxy, isFalse);
       expect(updated.networkProps.bypassPrivateRoute, isTrue);
@@ -209,6 +217,8 @@ void main() {
 
       expect(reloaded, _existing);
       expect(await preferences.getConfig(), _existing);
+      expect(reloaded.appSettingProps.autoLaunch, isFalse);
+      expect(reloaded.appSettingProps.autoRun, isFalse);
     },
   );
 
@@ -225,6 +235,7 @@ void main() {
       expect(updated.currentProfileId, isNull);
       expect(updated.themeProps.themeMode, ThemeMode.light);
       expect(updated.appSettingProps.autoRun, isTrue);
+      expect(updated.appSettingProps.autoLaunch, isTrue);
     },
   );
 
@@ -307,6 +318,8 @@ void main() {
       );
 
       expect(prompted, bundled);
+      expect(prompted.appSettingProps.autoLaunch, isTrue);
+      expect(prompted.appSettingProps.autoRun, isTrue);
       expect(await preferences.getConfig(), bundled);
       expect(await preferences.werePersonalDefaultsApplied(), isTrue);
     },

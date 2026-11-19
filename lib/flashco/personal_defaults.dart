@@ -20,6 +20,7 @@ bool shouldApplyPersonalDefaults({
 Config applyPersonalDefaults(Config config) {
   return config.copyWith(
     appSettingProps: config.appSettingProps.copyWith(
+      autoLaunch: true,
       autoRun: true,
       locale: 'ru',
     ),
@@ -40,6 +41,13 @@ Config applyPersonalDefaults(Config config) {
         stack: TunStack.mips,
         strictRoute: true,
       ),
+      tunOverride: config.patchClashConfig.tunOverride.copyWith(
+        strictRoute: true,
+      ),
+      tunOverrideKeys: {
+        ...config.patchClashConfig.tunOverrideKeys,
+        TunOverrideKey.strictRoute,
+      },
     ),
   );
 }
