@@ -1,6 +1,16 @@
+#define AppFullVersion "{{APP_VERSION}}"
+#define BuildSeparator Pos("+", AppFullVersion)
+#define WithoutBuild (BuildSeparator > 0 ? Copy(AppFullVersion, 1, BuildSeparator - 1) : AppFullVersion)
+#define PrereleaseSeparator Pos("-", WithoutBuild)
+#define AppNumericVersion (PrereleaseSeparator > 0 ? Copy(WithoutBuild, 1, PrereleaseSeparator - 1) : WithoutBuild) + ".0"
+
 [Setup]
 AppId={{APP_ID}}
 AppVersion={{APP_VERSION}}
+VersionInfoVersion={#AppNumericVersion}
+VersionInfoProductVersion={#AppNumericVersion}
+VersionInfoTextVersion={{APP_VERSION}}
+VersionInfoProductTextVersion={{APP_VERSION}}
 AppName={{DISPLAY_NAME}}
 AppPublisher={{PUBLISHER_NAME}}
 AppPublisherURL={{PUBLISHER_URL}}

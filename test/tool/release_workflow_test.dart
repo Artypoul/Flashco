@@ -73,6 +73,13 @@ void main() {
       expect(verify, greaterThan(build));
       expect(upload, greaterThan(verify));
       expect('${steps[verify]['run']}', contains('windows-amd64.zip'));
+      final installer = steps.indexWhere(
+        (step) =>
+            '${step['run']}'.contains('verify_windows_installer_version.ps1'),
+      );
+      expect(installer, greaterThan(build));
+      expect(upload, greaterThan(installer));
+      expect('${steps[installer]['run']}', contains('windows-amd64-setup.exe'));
     });
 
     test(

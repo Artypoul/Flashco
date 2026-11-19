@@ -208,6 +208,11 @@ jobs:
           git diff --no-ext-diff --no-color > "$diff_file"
           python -c 'import pathlib, sys; d = pathlib.Path(sys.argv[1]).read_bytes(); sys.stdout.buffer.write(d[:131072]); sys.stdout.buffer.write(b"\n[tracked diff truncated at 128 KiB]\n" if len(d) > 131072 else b"")' "$diff_file"
 
+      - name: Verify Windows installer version directives
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: python tool/test_windows_installer_metadata.py
+
       # Compiles the desktop runners and the native plugin code that only the
       # tagged release matrix built before; the bundle itself is discarded.
       - name: Build debug bundle
@@ -468,18 +473,13 @@ jobs:
           $zip = @(Get-Item 'dist/*-windows-amd64.zip')
           if ($zip.Count -ne 1) { throw 'Expected exactly one Windows ZIP.' }
           ./tool/verify_windows_app_version.ps1 -ZipPath ($zip[0].FullName) -OutputPath 'dist/windows-app-version.json'
-      - name: Record Windows installer metadata
+      - name: Verify Windows installer metadata
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
           $items = @(Get-Item 'dist/*-windows-amd64-setup.exe')
           if ($items.Count -ne 1) { throw 'Expected exactly one Windows installer.' }
-          $version = $items[0].VersionInfo
-          [ordered]@{
-            file = $items[0].Name
-            file_version = $version.FileVersion
-            product_version = $version.ProductVersion
-          } | ConvertTo-Json | Set-Content -Encoding utf8 'dist/windows-installer-version.json'
+          ./tool/verify_windows_installer_version.ps1 -InstallerPath ($items[0].FullName) -OutputPath 'dist/windows-installer-version.json'
       - name: Verify candidate inputs after packaging
         shell: bash
         run: dart run tool/verify_candidate_checkout.dart "$GITHUB_SHA"

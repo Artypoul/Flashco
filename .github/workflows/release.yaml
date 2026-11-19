@@ -208,6 +208,12 @@ jobs:
           $zip = @(Get-Item 'dist/*-windows-amd64.zip')
           if ($zip.Count -ne 1) { throw 'Expected exactly one Windows ZIP.' }
           ./tool/verify_windows_app_version.ps1 -ZipPath ($zip[0].FullName) -OutputPath 'dist/windows-app-version.json'
+      - name: Verify packaged Windows installer version
+        shell: pwsh
+        run: |
+          $items = @(Get-Item 'dist/*-windows-amd64-setup.exe')
+          if ($items.Count -ne 1) { throw 'Expected exactly one Windows installer.' }
+          ./tool/verify_windows_installer_version.ps1 -InstallerPath ($items[0].FullName) -OutputPath 'dist/windows-installer-version.json'
       - uses: actions/upload-artifact@v4
         with:
           name: release-windows-${{ github.run_id }}-${{ github.run_attempt }}

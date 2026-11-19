@@ -80,6 +80,26 @@ void main() {
       expect(commands, contains('build-defines.json'));
       expect(commands, contains('verify_windows_app_version.ps1'));
       expect(commands, contains('windows-app-version.json'));
+      final installerVersion = steps.indexWhere(
+        (step) =>
+            '${step['run']}'.contains('verify_windows_installer_version.ps1'),
+      );
+      expect(
+        installerVersion,
+        greaterThan(
+          steps.indexWhere(
+            (step) => step['name'] == 'Build test Windows EXE and ZIP',
+          ),
+        ),
+      );
+      expect(
+        installerVersion,
+        lessThan(
+          steps.indexWhere(
+            (step) => '${step['uses']}'.startsWith('actions/upload-artifact@'),
+          ),
+        ),
+      );
       expect(commands, contains('subscription_url_is_synthetic'));
       expect(commands, contains('flutter pub get --enforce-lockfile'));
       final checks = steps
